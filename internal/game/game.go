@@ -46,11 +46,14 @@ type Engine struct {
 }
 
 func NewEngine() *Engine {
+	audioMgr := audio.NewManager()
+	audioMgr.PlayIntroBGM()
+
 	return &Engine{
 		onca:              entities.NewOnca(),
 		obstacles:         entities.NewObstacleManager(ScreenWidth, GroundY),
 		scenery:           scenery.NewBackground(),
-		audio:             audio.NewManager(),
+		audio:             audioMgr,
 		score:             0,
 		ticks:             0,
 		lives:             3,
@@ -63,7 +66,7 @@ func NewEngine() *Engine {
 		stage:             1,
 		stageBannerTimer:  120,
 		isSaoBrasIntro:    true,
-		saoBrasTimer:      900, // ~15 segundos de visualização (ou avança com toque/clique/tecla)
+		saoBrasTimer:      0,
 		isTitleScreen:     false,
 		isShowingCredits:  false,
 		isPaused:          false,
@@ -100,6 +103,7 @@ func (e *Engine) Update() error {
 			e.isTitleScreen = false
 			e.stage = 1
 			e.stageBannerTimer = 120
+			e.audio.StopIntroBGM()
 			e.audio.RestartBGM()
 		}
 		return nil
