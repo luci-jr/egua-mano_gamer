@@ -59,29 +59,32 @@ func DrawHeart(screen *ebiten.Image, x, y float64, filled bool) {
 	}
 }
 
-func DrawHUD(screen *ebiten.Image, lives int, score int, stage int, isDoubleJump bool, stageBannerTimer int, isMuted bool) {
+func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, isDoubleJump bool, stageBannerTimer int, isMuted bool) {
 	for i := 0; i < 3; i++ {
-		hx := 14.0 + float64(i*14)
-		DrawHeart(screen, hx, 10, i < lives)
+		hx := 8.0 + float64(i*12)
+		DrawHeart(screen, hx, 9, i < hearts)
 	}
+
+	livesText := fmt.Sprintf("x%d VIDAS", lives)
+	ebitenutil.DebugPrintAt(screen, livesText, 46, 9)
 
 	stageName := "1. VER-O-PESO"
 	if stage == 2 {
 		stageName = "2. DOCAS"
 	} else if stage == 3 {
-		stageName = "3. THEATRO DA PAZ"
+		stageName = "3. THEATRO"
 	}
-	ebitenutil.DebugPrintAt(screen, stageName, 70, 10)
+	ebitenutil.DebugPrintAt(screen, stageName, 116, 9)
 
 	scoreText := fmt.Sprintf("SCORE: %05d", score)
-	ebitenutil.DebugPrintAt(screen, scoreText, 245, 10)
+	ebitenutil.DebugPrintAt(screen, scoreText, 226, 9)
 
 	if isMuted {
-		ebitenutil.DebugPrintAt(screen, "[MUDO]", 195, 10)
+		ebitenutil.DebugPrintAt(screen, "[MUDO]", 170, 24)
 	}
 
 	if isDoubleJump {
-		ebitenutil.DebugPrintAt(screen, "[RUGIDO DUPLO]", 120, 26)
+		ebitenutil.DebugPrintAt(screen, "[RUGIDO DUPLO]", 90, 24)
 	}
 
 	if stageBannerTimer > 0 {
@@ -94,10 +97,10 @@ func DrawHUD(screen *ebiten.Image, lives int, score int, stage int, isDoubleJump
 		default:
 			bannerTitle = "★ FASE 1: VER-O-PESO ★"
 		}
-		ebitenutil.DrawRect(screen, 40, 50, 260, 22, color.RGBA{R: 20, G: 20, B: 30, A: 210})
-		ebitenutil.DrawRect(screen, 40, 50, 260, 2, color.RGBA{R: 250, G: 200, B: 50, A: 255})
-		ebitenutil.DrawRect(screen, 40, 70, 260, 2, color.RGBA{R: 250, G: 200, B: 50, A: 255})
-		ebitenutil.DebugPrintAt(screen, bannerTitle, 55, 55)
+		ebitenutil.DrawRect(screen, 30, 50, 260, 22, color.RGBA{R: 20, G: 20, B: 30, A: 210})
+		ebitenutil.DrawRect(screen, 30, 50, 260, 2, color.RGBA{R: 250, G: 200, B: 50, A: 255})
+		ebitenutil.DrawRect(screen, 30, 70, 260, 2, color.RGBA{R: 250, G: 200, B: 50, A: 255})
+		ebitenutil.DebugPrintAt(screen, bannerTitle, 45, 55)
 	}
 }
 

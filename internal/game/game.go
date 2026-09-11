@@ -1,6 +1,8 @@
 package game
 
 import (
+	"fmt"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/luci-jr/paidegua-game/internal/audio"
@@ -18,13 +20,14 @@ const (
 
 type Engine struct {
 	onca            *entities.Onca
-	obstacle        *entities.Obstacle
+	obstacles       *entities.ObstacleManager
 	scenery         *scenery.Background
 	audio           *audio.Manager
 
 	score             int
 	ticks             int
 	lives             int
+	hearts            int
 	invincibleTicks   int
 	shakeTimer        int
 	hitDelayTimer     int
@@ -45,12 +48,13 @@ type Engine struct {
 func NewEngine() *Engine {
 	return &Engine{
 		onca:              entities.NewOnca(),
-		obstacle:          entities.NewObstacle(ScreenWidth, GroundY),
+		obstacles:         entities.NewObstacleManager(ScreenWidth, GroundY),
 		scenery:           scenery.NewBackground(),
 		audio:             audio.NewManager(),
 		score:             0,
 		ticks:             0,
 		lives:             3,
+		hearts:            3,
 		invincibleTicks:   0,
 		shakeTimer:        0,
 		hitDelayTimer:     0,
@@ -183,9 +187,10 @@ func (e *Engine) Update() error {
 				}
 			case 1:
 				e.onca.Reset()
-				e.obstacle.Reset()
+				e.obstacles.Reset()
 				e.score = 0
 				e.lives = 3
+				e.hearts = 3
 				e.stage = 1
 				e.stageBannerTimer = 120
 				e.speechBubbleTimer = 0
@@ -211,9 +216,10 @@ func (e *Engine) Update() error {
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 			e.onca.Reset()
-			e.obstacle.Reset()
+			e.obstacles.Reset()
 			e.score = 0
 			e.lives = 3
+			e.hearts = 3
 			e.stage = 1
 			e.stageBannerTimer = 120
 			e.isStageComplete = false
@@ -231,15 +237,17 @@ func (e *Engine) Update() error {
 				e.stage++
 				e.stageBannerTimer = 130
 				e.isStageComplete = false
-				e.obstacle.Reset()
+				e.hearts = 3
+				e.obstacles.Reset()
 				if !e.audio.IsMuted() {
 					e.audio.ResumeBGM()
 				}
 			} else {
 				e.onca.Reset()
-				e.obstacle.Reset()
+				e.obstacles.Reset()
 				e.score = 0
 				e.lives = 3
+				e.hearts = 3
 				e.stage = 1
 				e.stageBannerTimer = 120
 				e.isStageComplete = false
@@ -264,9 +272,10 @@ func (e *Engine) Update() error {
 
 		if restartPressed {
 			e.onca.Reset()
-			e.obstacle.Reset()
+			e.obstacles.Reset()
 			e.score = 0
 			e.lives = 3
+			e.hearts = 3
 			e.stage = 1
 			e.stageBannerTimer = 120
 			e.invincibleTicks = 0
@@ -323,11 +332,11 @@ func (e *Engine) Update() error {
 		e.stageBannerTimer--
 	}
 
-	stageTarget := 100
+	stageTarget := 1000
 	if e.stage == 2 {
-		stageTarget = 200
+		stageTarget = 2000
 	} else if e.stage == 3 {
-		stageTarget = 300
+		stageTarget = 3000
 	}
 
 	if e.score >= stageTarget && !e.isStageComplete {
@@ -418,24 +427,39 @@ func (e *Engine) Update() error {
 
 	e.onca.Update()
 
-	currentSpeed := BaseSpeed + float64(e.stage-1)*0.45 + float64(e.score)/1400.0
+	stageProgress := float64(e.score % 1000)
+	currentSpeed := BaseSpeed + float64(e.stage-1)*0.35 + (stageProgress / 2500.0)
 	e.scenery.Update(currentSpeed)
 
-	if passed := e.obstacle.Update(currentSpeed); passed {
-		e.score += 10
+	if passed := e.obstacles.Update(currentSpeed); passed > 0 {
+		e.score += passed * 25
+	}
+	if e.ticks%6 == 0 {
+		e.score += 1
 	}
 
 	oncaX, oncaY, oncaW, oncaH := e.onca.GetBounds(GroundY)
-	if e.obstacle.CheckCollision(oncaX, oncaY, oncaW, oncaH) && e.invincibleTicks <= 0 {
-		e.lives--
+	if e.obstacles.CheckCollision(oncaX, oncaY, oncaW, oncaH) && e.invincibleTicks <= 0 {
+		e.hearts--
 		e.shakeTimer = 14
-		if e.lives <= 0 {
-			e.lives = 0
-			e.isGameOver = true
-			e.speechBubbleText = "Levei o farelo mano, mancada!"
-			e.speechBubbleTimer = 999999
-			e.audio.PauseBGM()
-			e.audio.PlayGameOver()
+		if e.hearts <= 0 {
+			e.lives--
+			if e.lives <= 0 {
+				e.lives = 0
+				e.hearts = 0
+				e.isGameOver = true
+				e.speechBubbleText = "Levei o farelo mano, mancada!"
+				e.speechBubbleTimer = 999999
+				e.audio.PauseBGM()
+				e.audio.PlayGameOver()
+			} else {
+				e.hearts = 3 // Restaura os 3 corações para a próxima vida
+				e.speechBubbleText = fmt.Sprintf("PERDEU 1 VIDA! RESTAM %d", e.lives)
+				e.speechBubbleTimer = 85
+				e.hitDelayTimer = 25
+				e.invincibleTicks = 90
+				e.audio.PlayHit()
+			}
 		} else {
 			e.speechBubbleText = "EGUA MANO!..."
 			e.speechBubbleTimer = 65
@@ -477,10 +501,10 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 		ui.DrawSpeechBubble(screen, bubbleX, oncaY-24, e.speechBubbleText)
 	}
 
-	e.obstacle.Draw(screen, e.ticks, e.stage)
+	e.obstacles.Draw(screen, e.ticks, e.stage)
 
 	isDoubleJump := e.onca.JumpCount == 2
-	ui.DrawHUD(screen, e.lives, e.score, e.stage, isDoubleJump, e.stageBannerTimer, e.audio.IsMuted())
+	ui.DrawHUD(screen, e.lives, e.hearts, e.score, e.stage, isDoubleJump, e.stageBannerTimer, e.audio.IsMuted())
 
 	if e.isShowingCredits {
 		ui.DrawCreditsScreen(screen, ScreenWidth, ScreenHeight)
