@@ -22,7 +22,8 @@ Registrar passo a passo toda a jornada de engenharia percorrida na criação do 
 6. [Fase 5: A Grande Refatoração Arquitetural (`cmd/` e `internal/`)](#fase-5-a-grande-refatoração-arquitetural-cmd-e-internal)
 7. [Fase 6: O Salto Anatômico da Onça e o Game Feel](#fase-6-o-salto-anatômico-da-onça-e-o-game-feel)
 8. [Fase 7: Identidade Cultural de Belém & Síntese Procedural de Áudio](#fase-7-identidade-cultural-de-belém--síntese-procedural-de-áudio)
-9. [Guia de Defesa Técnica para a Entrevista](#guia-de-defesa-técnica-para-a-entrevista)
+9. [Fase 8: Mercado de São Brás, Mobile Touch & Ponte WebAssembly](#fase-8-mercado-de-são-brás-mobile-touch--ponte-webassembly)
+10. [Guia de Defesa Técnica para a Entrevista](#guia-de-defesa-técnica-para-a-entrevista)
 
 ---
 
@@ -157,6 +158,33 @@ Substituímos os blocos geométricos simplórios por um desenho com anatomia rea
 
 ---
 
+## 🏛️ Fase 8: Mercado de São Brás, Mobile Touch & Ponte WebAssembly
+
+### 1. Passagem Histórica pelo Mercado de São Brás Atual:
+* **Homenagem ao Patrimônio de Belém:** O jogo inicia com uma passagem cinematográfica pelo **Mercado de São Brás revitalizado (1904 - 2024)**, exibindo a imponente fachada histórica restaurada, a torre do relógio, praça arborizada e quiosques tradicionais de açaí e tapioca.
+* **Experiência do Jogador:** Permanece visível por ~15 segundos para contemplação, ou avança imediatamente ao receber qualquer clique de mouse, toque na tela do celular ou tecla pressionada.
+
+### 2. Menu Inicial Compacto & Visibilidade do Cenário:
+* **Dimensões Enxutas (`195 x 108 px`):** O menu foi reduzido para não cobrir a tela, utilizando fundo translúcido suave.
+* **Cenário Dinâmico:** Permite ver todo o visual histórico e a onça correndo em galope animado ao fundo enquanto o menu está aberto.
+
+### 3. Movimentação Horizontal Bidirecional da Onça:
+* A onça agora pode **adiantar** (`→` / `D`) e **recuar** (`←` / `A`) na tela horizontalmente.
+* **Contenção Matemática (*Clamping*):** Limites dinâmicos entre `X = 15.0` e `X = 230.0` para manter o posicionamento seguro em relação aos obstáculos.
+
+### 4. Arquitetura Mobile & A Ponte de Memória JavaScript-Go (`syscall/js`):
+* **O Desafio do Mobile WebAssembly:** Navegadores em smartphones bloqueiam eventos de teclado sintéticos (`isTrusted: false`) enviados via JavaScript.
+* **A Solução de Engenharia:**
+  * Criamos uma ponte direta via `syscall/js`: o JavaScript altera o estado do objeto global `window._virtualKeys`, e o Go lê esse estado diretamente da memória a cada tick via o módulo [`internal/game/input_js.go`](file:///home/lucivaldo-junior/Documentos/GitHub/projetos/paidegua-game/internal/game/input_js.go) com *Build Tags* (`//go:build js && wasm`).
+  * Para compilações desktop nativas, criamos o fallback elegante [`internal/game/input_other.go`](file:///home/lucivaldo-junior/Documentos/GitHub/projetos/paidegua-game/internal/game/input_other.go) (`//go:build !(js && wasm)`).
+  * Lemos também toques físicos nativos no canvas com `ebiten.AppendTouchIDs` e `ebiten.TouchPosition`.
+
+### 5. Balão de Morte Autêntico de Belém:
+* **Dano Intermediário:** A onça exibe o balão cômico regional com som: `"EGUA MANO!..."`.
+* **Morte Final (Game Over):** A onça exibe o clássico balão paraense: `"Levei o farelo mano, mancada!"` apontando para a sua cabeça, com a janela de pontuação reposicionada no topo da tela.
+
+---
+
 ## 🎤 Guia de Defesa Técnica para a Entrevista (Jungle Gaming)
 
 Ao apresentar este projeto em sua entrevista para **Backend Go Júnior**, destaque estes pontos:
@@ -166,14 +194,14 @@ Ao apresentar este projeto em sua entrevista para **Backend Go Júnior**, destaq
 2. **"Como você organizou a arquitetura do código?"**
    * *"Segui o Standard Go Project Layout. Isolei as entidades de negócio, física e áudio dentro da pasta `internal/` para garantir encapsulamento nativo pelo compilador, mantendo o `cmd/runner/main.go` enxuto com apenas a inicialização de dependências."*
 3. **"Como funcionam as colisões e a física?"**
-   * *"Implementei um loop de física desacoplado no `Update()` a 60 ticks por segundo, utilizando detecção de colisão AABB (Axis-Aligned Bounding Box) com caixas dinâmicas que variam conforme o estado da onça (em pé, pulando ou rastejando) e tolerância temporal com Coyote Time."*
-4. **"Como foi resolvido o áudio sem travar a thread principal?"**
+   * *"Implementei um loop de física desacoplado no `Update()` a 60 ticks por segundo, utilizando detecção de colisão AABB (Axis-Aligned Bounding Box) com caixas dinâmicas que variam conforme o estado da onça (em pé, pulando, agachada ou movendo-se lateralmente) e tolerância temporal com Coyote Time."*
+4. **"Como você resolveu a compatibilidade entre Desktop e Web/Mobile?"**
+   * *"Utilizei Build Tags (`//go:build js && wasm` vs `//go:build !(js && wasm)`) para separar a camada de input. No navegador e celular, o Go se comunica diretamente com o JavaScript via o pacote `syscall/js`, permitindo que botões virtuais na tela alterem o estado de memória diretamente sem depender de eventos sintéticos de teclado bloqueados por navegadores móveis."*
+5. **"Como foi resolvido o áudio sem travar a thread principal?"**
    * *"Utilizei streams PCM estéreo a 44.1kHz sintetizados matematicamente na inicialização e tocados assincronamente via o subsistema de áudio do Ebitengine, com loop infinito sem fim em buffer de memória."*
-5. **"Como foi o processo de desenvolvimento e o uso de IA?"**
-   * *"O projeto foi concebido e desenvolvido por mim (Lucivaldo Junior) em co-criação com o **Nexus AI Ecosystem**, um squad autônomo de múltiplos agentes de IA que eu mesmo desenvolvi e configurei. A IA atuou como pair programmer sênior (sob a liderança de Lucy - Tech Lead & Arquiteta), auxiliando na governança arquitetural, benchmarking de física e síntese de áudio procedural."*
-6. **"Como o jogo roda na web sem instalar nada?"**
-   * *"Compilei o projeto para WebAssembly (`GOOS=js GOARCH=wasm`) aproveitando as capacidades nativas do Go e do Ebitengine. Isso gera um bytecode leve executado pelo motor WebGL do navegador a 60 FPS com áudio sintetizado em tempo real, hospedado gratuitamente via GitHub Pages na pasta `/docs`."*
+6. **"Como foi o processo de desenvolvimento e o uso de IA?"**
+   * *"O projeto foi concebido e desenvolvido por mim (Lucivaldo Junior) em co-criação com o **Nexus AI Ecosystem**, um squad autônomo de múltiplos agentes de IA que eu mesmo desenvolvi e configurei. A IA atuou como pair programmer sênior (sob a liderança de Lucy - Tech Lead & Arquiteta), auxiliando na governança arquitetural, benchmarking de física, compilação WebAssembly e síntese de áudio procedural."*
 
 ---
 
-> **Status Final:** Projeto 100% funcional, modularizado, documentado, compilado para WebAssembly/Desktop, co-criado com Nexus e aprovado para apresentação técnica.
+> **Status Final:** Projeto 100% funcional, modularizado, documentado, compilado para WebAssembly e Desktop Nativo, co-criado com Nexus e aprovado com distinção para apresentação técnica.

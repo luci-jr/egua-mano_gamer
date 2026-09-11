@@ -31,7 +31,8 @@ O protagonista é uma **Onça-Pintada Brasileira** que percorre os cartões post
 | `Esc` | Botão virtual **`⏸ PAUSA`** | **Menu de Pausa Interativo** | Abre o menu com som, reinício e créditos. |
 | `C` | Opção do Menu | **Ver Créditos** | Informações sobre desenvolvedor, IA, Go e música. |
 | `R` ou Clique | Toque na tela | **Recomeçar Rápido** | Reinicia imediatamente na tela de conclusão ou Game Over. |
-| **Ao sofrer dano** | Automático | **Hitstop & "Égua mano!..."** | Congelamento (*hitstop*), som regional e balão de fala. |
+| **Ao sofrer dano (vidas restantes)** | Automático | **Hitstop & "Égua mano!..."** | Congelamento suave (*hitstop*), som regional e balão de fala da onça. |
+| **Ao morrer (perder todas as vidas)** | Automático | **"Levei o farelo mano, mancada!"** | A onça solta o clássico balão paraense de Game Over na pista. |
 
 ---
 
