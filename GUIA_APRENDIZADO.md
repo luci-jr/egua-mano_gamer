@@ -170,7 +170,9 @@ Ao apresentar este projeto em sua entrevista para **Backend Go Júnior**, destaq
    * *"Utilizei streams PCM estéreo a 44.1kHz sintetizados matematicamente na inicialização e tocados assincronamente via o subsistema de áudio do Ebitengine, com loop infinito sem fim em buffer de memória."*
 5. **"Como foi o processo de desenvolvimento e o uso de IA?"**
    * *"O projeto foi concebido e desenvolvido por mim (Lucivaldo Junior) em co-criação com o **Nexus AI Ecosystem**, um squad autônomo de múltiplos agentes de IA que eu mesmo desenvolvi e configurei. A IA atuou como pair programmer sênior (sob a liderança de Lucy - Tech Lead & Arquiteta), auxiliando na governança arquitetural, benchmarking de física e síntese de áudio procedural."*
+6. **"Como o jogo roda na web sem instalar nada?"**
+   * *"Compilei o projeto para WebAssembly (`GOOS=js GOARCH=wasm`) aproveitando as capacidades nativas do Go e do Ebitengine. Isso gera um bytecode leve executado pelo motor WebGL do navegador a 60 FPS com áudio sintetizado em tempo real, hospedado gratuitamente via GitHub Pages na pasta `/docs`."*
 
 ---
 
-> **Status Final:** Projeto 100% funcional, modularizado, documentado, co-criado com Nexus e aprovado para apresentação técnica.
+> **Status Final:** Projeto 100% funcional, modularizado, documentado, compilado para WebAssembly/Desktop, co-criado com Nexus e aprovado para apresentação técnica.
