@@ -21,11 +21,13 @@ O protagonista é uma **Onça-Pintada Brasileira** que percorre os cartões post
 
 | Comando | Ação | Descrição |
 | :--- | :--- | :--- |
-| `Espaço` ou `Seta para Cima` | **Pulo com Rugido** | A onça salta soltando um rugido felino gutural. Possui **altura variável** (segure para pular mais alto). |
-| `Espaço / Cima` (2x no ar) | **Pulo Duplo (*Double Jump*)** | Aciona um segundo impulso potente no ar com rugido duplo e efeito de partículas. |
-| `Seta para Baixo` (no chão) | **Abaixar / Rastejar** | Diminui o hitbox pela metade (de 22px para 12px), ideal para passar sob os pássaros. |
-| `Seta para Baixo` (no ar) | **Queda Rápida (*Fast Drop*)** | Acelera a descida em direção ao solo para antecipar o próximo movimento. |
-| `Enter` ou `Espaço` | **Iniciar / Confirmar Opção / Avançar** | Inicia o jogo na tela inicial, confirma seleções de menu, avança de fase ou reinicia após Game Over. |
+| `Seta para a Direita` ou `D` | **Adiantar (Andar para Frente)** | A onça avança na tela horizontalmente com limite seguro, permitindo melhor posicionamento e esquiva. |
+| `Seta para a Esquerda` ou `A` | **Recuar (Andar para Trás)** | A onça recua na tela horizontalmente para ganhar tempo e espaço contra obstáculos. |
+| `Espaço`, `Seta para Cima` ou `W` | **Pulo com Rugido** | A onça salta soltando um rugido felino gutural. Possui **altura variável** (segure para pular mais alto). |
+| `Espaço / Cima / W` (2x no ar) | **Pulo Duplo (*Double Jump*)** | Aciona um segundo impulso potente no ar com rugido duplo e efeito de partículas. |
+| `Seta para Baixo` ou `S` (no chão) | **Abaixar / Rastejar** | Diminui o hitbox pela metade (de 22px para 12px), ideal para passar sob os pássaros. |
+| `Seta para Baixo` ou `S` (no ar) | **Queda Rápida (*Fast Drop*)** | Acelera a descida em direção ao solo para antecipar o próximo movimento. |
+| `Enter` ou `Espaço` | **Iniciar / Confirmar Opção / Avançar** | Avança da tela de apresentação, inicia o jogo no menu compacto, confirma opções e avança de fase. |
 | `C` | **Ver Créditos** | Abre a tela de créditos com dados do Desenvolvedor, Linguagem (Go), Engine e Trilha Sonora. |
 | `Esc` | **Menu de Pausa Interativo** | Abre o menu com: **Continuar**, **Reiniciar Aventura**, alternar **Som (Mudo / Ligado)**, **Ver Créditos** e **Fechar o Jogo**. |
 | `Setas Cima / Baixo` | **Navegação do Menu** | Percorre os itens do Menu de Pausa. |
