@@ -17,11 +17,12 @@ const (
 	ScreenHeight = 210.0
 	GroundY      = 155.0
 	BaseSpeed    = 2.3
+	GameVersion  = "VER. 2.4.0"
 )
 
 var (
-	SpeedMultipliers = []float64{0.8, 1.0, 1.3, 1.6}
-	SpeedLabels      = []string{"0.8x CALMO", "1.0x NORMAL", "1.3x RAPIDO", "1.6x TURBO"}
+	SpeedMultipliers = []float64{0.6, 0.8, 1.0, 1.3}
+	SpeedLabels      = []string{"0.6x CALMO", "0.8x NORMAL", "1.0x RAPIDO", "1.3x TURBO"}
 )
 
 type Engine struct {
@@ -52,6 +53,7 @@ type Engine struct {
 	stage             int
 	stageDistance     float64
 	stageBannerTimer  int
+	isTitleCover      bool
 	isSaoBrasIntro    bool
 	saoBrasTimer      int
 	introMenuIndex    int
@@ -98,7 +100,8 @@ func NewEngine() *Engine {
 		heatSpeechTimer:   0,
 		stage:             1,
 		stageBannerTimer:  120,
-		isSaoBrasIntro:    true,
+		isTitleCover:      true,
+		isSaoBrasIntro:    false,
 		saoBrasTimer:      0,
 		introMenuIndex:    0,
 		speedIndex:        1,
@@ -152,6 +155,41 @@ func (e *Engine) Update() error {
 			if !e.isPaused && !e.isTitleScreen && !e.isSaoBrasIntro && !e.isCharSelect && !e.isGameOver && !e.isStageComplete && !e.audio.IsMuted() {
 				e.audio.ResumeBGM()
 			}
+		}
+		return nil
+	}
+
+	// 1.5. Tela de Abertura Limpa Arcade (Pitfall / Super Metroid / Contra) - Urubus e Garças Voando
+	if e.isTitleCover {
+		e.ticks++
+		if !e.audio.IsMuted() {
+			e.audio.PlayIntroBGM()
+		}
+
+		if inpututil.IsKeyJustPressed(ebiten.KeyC) {
+			e.isShowingCredits = true
+			return nil
+		}
+
+		startTriggered := isPointerJustPressed() ||
+			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
+			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
+			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
+			getVirtualKey("Enter") ||
+			getVirtualKey("Space")
+
+		if getVirtualKey("Enter") {
+			resetVirtualKey("Enter")
+		}
+		if getVirtualKey("Space") {
+			resetVirtualKey("Space")
+		}
+
+		if startTriggered {
+			e.isTitleCover = false
+			e.isSaoBrasIntro = true
+			e.audio.PlayShot()
+			return nil
 		}
 		return nil
 	}
@@ -285,6 +323,13 @@ func (e *Engine) Update() error {
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyC) {
 			e.isShowingCredits = true
+			return nil
+		}
+
+		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") {
+			resetVirtualKey("Escape")
+			e.isSaoBrasIntro = false
+			e.isTitleCover = true
 			return nil
 		}
 
@@ -928,13 +973,18 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 		return
 	}
 
+	if e.isTitleCover {
+		ui.DrawTitleCoverScreen(screen, ScreenWidth, ScreenHeight, e.ticks, GameVersion)
+		return
+	}
+
 	if e.isCharSelect {
 		ui.DrawCharacterSelectScreen(screen, ScreenWidth, ScreenHeight, e.ticks, e.selectedHero)
 		return
 	}
 
 	if e.isSaoBrasIntro {
-		ui.DrawTitleIntro(screen, ScreenWidth, ScreenHeight, e.ticks, e.audio.IsIntroPlaying(), e.introMenuIndex, e.audio.IsMuted(), SpeedLabels[e.speedIndex], heroFull)
+		ui.DrawTitleIntro(screen, ScreenWidth, ScreenHeight, e.ticks, e.audio.IsIntroPlaying(), e.introMenuIndex, e.audio.IsMuted(), SpeedLabels[e.speedIndex], heroFull, GameVersion)
 		return
 	}
 

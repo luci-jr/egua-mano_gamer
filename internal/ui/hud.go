@@ -177,13 +177,91 @@ func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, 
 	DrawCityFooter(screen, float64(screen.Bounds().Dx()), float64(screen.Bounds().Dy()), stage, ticks)
 }
 
-func DrawSaoBrasIntro(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int, isAudioPlaying bool, selectedIndex int, isMuted bool, speedLabel string, heroName string) {
-	DrawTitleIntro(screen, screenWidth, screenHeight, ticks, isAudioPlaying, selectedIndex, isMuted, speedLabel, heroName)
+// drawFlyingUrubu desenha um urubu em pixel art com asas animadas voando no céu
+func drawFlyingUrubu(screen *ebiten.Image, x, y float64, flapTick int) {
+	cBody := color.RGBA{R: 20, G: 20, B: 26, A: 245}
+	cBeak := color.RGBA{R: 75, G: 70, B: 65, A: 240}
+
+	phase := (flapTick / 8) % 4
+	switch phase {
+	case 0: // Asas para cima \_/
+		ebitenutil.DrawRect(screen, x+4, y+2, 4, 3, cBody)
+		ebitenutil.DrawRect(screen, x+3, y+3, 1, 1, cBeak)
+		ebitenutil.DrawRect(screen, x+2, y+1, 2, 2, cBody)
+		ebitenutil.DrawRect(screen, x, y-1, 2, 2, cBody)
+		ebitenutil.DrawRect(screen, x+8, y+1, 2, 2, cBody)
+		ebitenutil.DrawRect(screen, x+10, y-1, 2, 2, cBody)
+	case 1, 3: // Asas planas ---
+		ebitenutil.DrawRect(screen, x+4, y+2, 4, 3, cBody)
+		ebitenutil.DrawRect(screen, x+3, y+3, 1, 1, cBeak)
+		ebitenutil.DrawRect(screen, x-1, y+2, 5, 2, cBody)
+		ebitenutil.DrawRect(screen, x+8, y+2, 5, 2, cBody)
+	case 2: // Asas para baixo / \
+		ebitenutil.DrawRect(screen, x+4, y+2, 4, 3, cBody)
+		ebitenutil.DrawRect(screen, x+3, y+3, 1, 1, cBeak)
+		ebitenutil.DrawRect(screen, x+2, y+3, 2, 2, cBody)
+		ebitenutil.DrawRect(screen, x, y+5, 2, 2, cBody)
+		ebitenutil.DrawRect(screen, x+8, y+3, 2, 2, cBody)
+		ebitenutil.DrawRect(screen, x+10, y+5, 2, 2, cBody)
+	}
 }
 
-// DrawTitleIntro renderiza a tela inicial oficial com o nome do jogo, arte 16-bit da selva amazônica e ruínas
-func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int, isAudioPlaying bool, selectedIndex int, isMuted bool, speedLabel string, heroName string) {
-	// 1. Imagem de fundo 16-bit (Selva Amazônica com Sumaúma, Ruínas de Marajó e Tochas)
+// drawFlyingGarca desenha uma garça branca esguia em pixel art cruzando a baía
+func drawFlyingGarca(screen *ebiten.Image, x, y float64, flapTick int) {
+	cWhite := color.RGBA{R: 250, G: 250, B: 255, A: 255}
+	cBeak := color.RGBA{R: 255, G: 210, B: 40, A: 255}
+	cLegs := color.RGBA{R: 50, G: 50, B: 55, A: 220}
+
+	phase := (flapTick / 10) % 4
+	switch phase {
+	case 0: // Asas subindo
+		ebitenutil.DrawRect(screen, x+5, y+2, 5, 2, cWhite)
+		ebitenutil.DrawRect(screen, x+3, y+1, 2, 2, cWhite)
+		ebitenutil.DrawRect(screen, x+1, y+2, 2, 1, cBeak)
+		ebitenutil.DrawRect(screen, x+10, y+3, 3, 1, cLegs)
+		ebitenutil.DrawRect(screen, x+4, y, 3, 2, cWhite)
+		ebitenutil.DrawRect(screen, x+2, y-2, 2, 2, cWhite)
+	case 1, 3: // Asas planas
+		ebitenutil.DrawRect(screen, x+5, y+2, 5, 2, cWhite)
+		ebitenutil.DrawRect(screen, x+3, y+2, 2, 2, cWhite)
+		ebitenutil.DrawRect(screen, x+1, y+2, 2, 1, cBeak)
+		ebitenutil.DrawRect(screen, x+10, y+3, 3, 1, cLegs)
+		ebitenutil.DrawRect(screen, x+1, y+1, 6, 2, cWhite)
+		ebitenutil.DrawRect(screen, x+8, y+1, 4, 2, cWhite)
+	case 2: // Asas descendo
+		ebitenutil.DrawRect(screen, x+5, y+2, 5, 2, cWhite)
+		ebitenutil.DrawRect(screen, x+3, y+2, 2, 2, cWhite)
+		ebitenutil.DrawRect(screen, x+1, y+2, 2, 1, cBeak)
+		ebitenutil.DrawRect(screen, x+10, y+3, 3, 1, cLegs)
+		ebitenutil.DrawRect(screen, x+4, y+3, 3, 2, cWhite)
+		ebitenutil.DrawRect(screen, x+2, y+5, 2, 2, cWhite)
+	}
+}
+
+// drawBelemSkyBirds desenha a revoada de urubus e garças sobre Belém
+func drawBelemSkyBirds(screen *ebiten.Image, screenWidth float64, ticks int) {
+	// 4 Urubus voando em círculos e planando no céu alto do Ver-o-Peso
+	for i := 0; i < 4; i++ {
+		baseSpeed := 0.7 + float64(i)*0.18
+		rawX := float64(ticks)*baseSpeed + float64(i*85)
+		ux := screenWidth + 20.0 - math.Mod(rawX, screenWidth+80.0)
+		uy := 28.0 + float64(i*12) + math.Sin(float64(ticks+i*35)*0.03)*5.0
+		drawFlyingUrubu(screen, ux, uy, ticks+i*17)
+	}
+
+	// 3 Garças Brancas voando sobre as águas da Baía do Guajará
+	for i := 0; i < 3; i++ {
+		baseSpeed := 1.1 + float64(i)*0.15
+		rawX := float64(ticks)*baseSpeed + float64(i*115)
+		gx := math.Mod(rawX, screenWidth+90.0) - 30.0
+		gy := 105.0 + float64(i*11) + math.Sin(float64(ticks+i*40)*0.04)*4.0
+		drawFlyingGarca(screen, gx, gy, ticks+i*23)
+	}
+}
+
+// DrawTitleCoverScreen renderiza a tela de abertura oficial limpa (sem menu) estilo Pitfall / Super Metroid / Contra
+func DrawTitleCoverScreen(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int, version string) {
+	// 1. Imagem de fundo de Belém (Mercado do Ver-o-Peso ao pôr do sol)
 	tImg := getTitleScreenImage()
 	if tImg != nil {
 		op := &ebiten.DrawImageOptions{}
@@ -196,7 +274,7 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 		ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 10, G: 16, B: 24, A: 255})
 	}
 
-	// 2. Reflexos cintilantes do pôr do sol na Baía do Guajará
+	// 2. Reflexos cintilantes do pôr do sol na água da Baía do Guajará
 	for i := 0; i < 8; i++ {
 		glX := 160.0 + float64(i*18) + math.Sin(float64(ticks+i*15)*0.08)*12.0
 		glY := 140.0 + math.Sin(float64(ticks+i*22)*0.06)*16.0
@@ -204,13 +282,89 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 		ebitenutil.DrawRect(screen, glX, glY, 3, 1, color.RGBA{R: 255, G: 220, B: 130, A: alpha})
 	}
 
-	// 3. Logo Principal do Jogo em destaque superior épico
-	logoW := 276.0
+	// 3. Urubus e Garças voando pelo céu de Belém do Pará
+	drawBelemSkyBirds(screen, screenWidth, ticks)
+
+	// 4. Logo Principal do Jogo em destaque superior épico
+	logoW := 304.0
+	logoH := 30.0
+	logoX := (screenWidth - logoW) / 2.0
+	logoY := 10.0
+
+	ebitenutil.DrawRect(screen, logoX+2, logoY+2, logoW, logoH, color.RGBA{R: 0, G: 0, B: 0, A: 170})
+	ebitenutil.DrawRect(screen, logoX, logoY, logoW, logoH, color.RGBA{R: 12, G: 18, B: 30, A: 245})
+	ebitenutil.DrawRect(screen, logoX, logoY, logoW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, logoX, logoY+logoH, logoW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, logoX, logoY, 2, logoH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, logoX+logoW, logoY, 2, logoH+2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+
+	ebitenutil.DebugPrintAt(screen, "★ P A I D E G U A   G A M E ★", int(logoX)+56, int(logoY)+5)
+	ebitenutil.DebugPrintAt(screen, "UMA AVENTURA PELA CIDADE DE BELEM DO PARA", int(logoX)+22, int(logoY)+17)
+
+	// Badge com a versão no canto superior direito
+	verW := float64(len(version)*6 + 12)
+	verX := screenWidth - verW - 6.0
+	ebitenutil.DrawRect(screen, verX, 10.0, verW, 14, color.RGBA{R: 16, G: 26, B: 44, A: 235})
+	ebitenutil.DrawRect(screen, verX, 10.0, verW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 200})
+	ebitenutil.DebugPrintAt(screen, version, int(verX)+6, 11)
+
+	// 5. Chamada de ação estilo PRESS START BUTTON (em português paraense pulsante)
+	startW := 250.0
+	startX := (screenWidth - startW) / 2.0
+	startY := 115.0
+
+	if (ticks/24)%2 == 0 {
+		ebitenutil.DrawRect(screen, startX, startY-2, startW, 18, color.RGBA{R: 8, G: 14, B: 24, A: 210})
+		ebitenutil.DrawRect(screen, startX, startY-2, startW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+		ebitenutil.DrawRect(screen, startX, startY+16, startW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+		ebitenutil.DebugPrintAt(screen, ">> APERTE ENTER OU TOQUE NA TELA <<", int(startX)+18, int(startY)+2)
+	} else {
+		ebitenutil.DrawRect(screen, startX, startY-2, startW, 18, color.RGBA{R: 8, G: 14, B: 24, A: 140})
+		ebitenutil.DebugPrintAt(screen, "   APERTE ENTER OU TOQUE NA TELA   ", int(startX)+18, int(startY)+2)
+	}
+
+	// 6. Rodapé clássico de abertura estilo Pitfall / Contra / Super Metroid
+	botH := 26.0
+	botY := screenHeight - botH
+	ebitenutil.DrawRect(screen, 0, botY, screenWidth, botH, color.RGBA{R: 8, G: 12, B: 22, A: 245})
+	ebitenutil.DrawRect(screen, 0, botY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+
+	ebitenutil.DebugPrintAt(screen, "(C) 2026 LUCIVALDO JUNIOR & NEXUS AI  |  [C] CREDITOS", 14, int(botY)+4)
+	ebitenutil.DebugPrintAt(screen, "BELEM DO PARA - BRASIL  |  DESENVOLVIDO EM GO + EBITENGINE", 12, int(botY)+14)
+}
+
+// DrawTitleIntro renderiza o menu de opções interativo que surge APÓS o jogador apertar Enter/clicar na tela de título
+func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int, isAudioPlaying bool, selectedIndex int, isMuted bool, speedLabel string, heroName string, version string) {
+	// 1. Imagem de fundo de Belém (Ver-o-Peso ao pôr do sol)
+	tImg := getTitleScreenImage()
+	if tImg != nil {
+		op := &ebiten.DrawImageOptions{}
+		bounds := tImg.Bounds()
+		scaleX := screenWidth / float64(bounds.Dx())
+		scaleY := screenHeight / float64(bounds.Dy())
+		op.GeoM.Scale(scaleX, scaleY)
+		screen.DrawImage(tImg, op)
+	} else {
+		ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 10, G: 16, B: 24, A: 255})
+	}
+
+	// 2. Reflexos cintilantes na água
+	for i := 0; i < 8; i++ {
+		glX := 160.0 + float64(i*18) + math.Sin(float64(ticks+i*15)*0.08)*12.0
+		glY := 140.0 + math.Sin(float64(ticks+i*22)*0.06)*16.0
+		alpha := uint8(120 + math.Sin(float64(ticks+i*20)*0.1)*100)
+		ebitenutil.DrawRect(screen, glX, glY, 3, 1, color.RGBA{R: 255, G: 220, B: 130, A: alpha})
+	}
+
+	// 3. Urubus e Garças voando pelo céu de Belém
+	drawBelemSkyBirds(screen, screenWidth, ticks)
+
+	// 4. Logo Principal do Jogo
+	logoW := 294.0
 	logoH := 26.0
 	logoX := (screenWidth - logoW) / 2.0
 	logoY := 5.0
 
-	// Fundo da placa de título com relevo moderno e borda dourada
 	ebitenutil.DrawRect(screen, logoX+2, logoY+2, logoW, logoH, color.RGBA{R: 0, G: 0, B: 0, A: 160})
 	ebitenutil.DrawRect(screen, logoX, logoY, logoW, logoH, color.RGBA{R: 10, G: 18, B: 28, A: 245})
 	ebitenutil.DrawRect(screen, logoX, logoY, logoW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
@@ -218,12 +372,11 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 	ebitenutil.DrawRect(screen, logoX, logoY, 2, logoH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 	ebitenutil.DrawRect(screen, logoX+logoW, logoY, 2, logoH+2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 
-	// Tipografia do Título com sombra para profundidade
-	ebitenutil.DebugPrintAt(screen, "★ P A I D E G U A   G A M E ★", int(logoX)+45, int(logoY)+3)
-	ebitenutil.DebugPrintAt(screen, "AVENTURA EM BELEM DO PARA", int(logoX)+55, int(logoY)+14)
+	ebitenutil.DebugPrintAt(screen, "★ P A I D E G U A   G A M E ★", int(logoX)+52, int(logoY)+3)
+	ebitenutil.DebugPrintAt(screen, "UMA AVENTURA PELA CIDADE DE BELEM DO PARA", int(logoX)+18, int(logoY)+14)
 
-	// 4. Menu Principal Interativo centralizado
-	boxW := 226.0
+	// 5. Menu Principal Interativo centralizado
+	boxW := 236.0
 	boxH := 94.0
 	boxX := (screenWidth - boxW) / 2.0
 	boxY := 35.0
@@ -238,7 +391,7 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 	bx := int(boxX)
 	by := int(boxY)
 
-	ebitenutil.DebugPrintAt(screen, "★ MENU DE AVENTURA ★", bx+50, by+5)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("★ MENU DE AVENTURA (%s) ★", version), bx+28, by+5)
 	ebitenutil.DrawRect(screen, boxX+10, boxY+17, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
 
 	soundStatus := "SOM: [ LIGADO ]"
@@ -266,7 +419,7 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 		}
 	}
 
-	// 5. Faixa inferior ampla com narrativa cultural de Belém do Pará
+	// 6. Faixa inferior ampla com narrativa cultural de Belém do Pará
 	bannerH := 45.0
 	bannerY := screenHeight - bannerH
 	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, bannerH, color.RGBA{R: 6, G: 12, B: 22, A: 245})
@@ -278,7 +431,7 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 		ebitenutil.DebugPrintAt(screen, "★ PAIDEGUA GAME: AVENTURA EM BELEM DO PARA ★", 24, int(bannerY)+3)
 	}
 
-	// Linha 2: Letreiro de ação e cultura paraense
+	// Letreiro de ação e cultura paraense
 	loreTicker := "★ MISSAO: Explore o Mercado do Ver-o-Peso, o cais da Estacao das Docas e o Theatro da Paz!  " +
 		"★ DOIS HEROIS: O destemido Garoto Curumim ou a guardiao Onca-Pintada!  " +
 		"★ CULTURA: Saboreie acai, curta o carimbo de Belem e conquiste as reliquias sagradas!  "
@@ -293,8 +446,8 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 	ebitenutil.DrawRect(screen, 48, bannerY+15, 1, 14, color.RGBA{R: 45, G: 215, B: 175, A: 255})
 	ebitenutil.DebugPrintAt(screen, "★BELEM", 4, int(bannerY)+16)
 
-	// Linha 3: Dica clara de navegação
-	ebitenutil.DebugPrintAt(screen, "[CIMA/BAIXO] Navegar | [ENTER/ESPACO] Escolher | [ESQ/DIR] Ajustar", 6, int(bannerY)+30)
+	// Dica clara de navegação
+	ebitenutil.DebugPrintAt(screen, "[CIMA/BAIXO] Navegar | [ENTER/ESPACO] Escolher | [ESC] Voltar", 8, int(bannerY)+30)
 }
 
 // DrawCharacterSelectScreen renderiza a tela dedicada de escolha de personagem (Garoto vs Onça)
