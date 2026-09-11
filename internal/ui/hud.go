@@ -100,7 +100,7 @@ func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, 
 	}
 }
 
-func DrawSaoBrasIntro(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int) {
+func DrawSaoBrasIntro(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int, isAudioPlaying bool) {
 	sImg := getSaoBrasImage()
 	if sImg != nil {
 		op := &ebiten.DrawImageOptions{}
@@ -114,16 +114,25 @@ func DrawSaoBrasIntro(screen *ebiten.Image, screenWidth, screenHeight float64, t
 	}
 
 	// Faixa inferior elegante destacando o Mercado de São Brás atual
-	bannerH := 34.0
+	bannerH := 36.0
 	bannerY := screenHeight - bannerH
-	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, bannerH, color.RGBA{R: 6, G: 10, B: 20, A: 225})
+	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, bannerH, color.RGBA{R: 6, G: 10, B: 20, A: 230})
 	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DebugPrintAt(screen, "★ MERCADO DE SAO BRAS ATUAL - BELEM DO PARA ★", 35, int(bannerY)+5)
 
-	if (ticks/25)%2 == 0 {
-		ebitenutil.DebugPrintAt(screen, ">> CLIQUE NA JANELA DO JOGO PARA INICIAR <<", 38, int(bannerY)+18)
+	if isAudioPlaying {
+		ebitenutil.DebugPrintAt(screen, "★ MERCADO DE SAO BRAS (TRILHA DE APRESENTACAO) ★", 24, int(bannerY)+4)
+		if (ticks/25)%2 == 0 {
+			ebitenutil.DebugPrintAt(screen, ">> CLIQUE NA JANELA PARA COMEÇAR A CORRIDA <<", 30, int(bannerY)+19)
+		} else {
+			ebitenutil.DebugPrintAt(screen, "   CLIQUE NA JANELA PARA COMEÇAR A CORRIDA   ", 30, int(bannerY)+19)
+		}
 	} else {
-		ebitenutil.DebugPrintAt(screen, "   CLIQUE NA JANELA DO JOGO PARA INICIAR   ", 38, int(bannerY)+18)
+		ebitenutil.DebugPrintAt(screen, "★ MERCADO DE SAO BRAS ATUAL (BELEM - PA) ★", 34, int(bannerY)+4)
+		if (ticks/25)%2 == 0 {
+			ebitenutil.DebugPrintAt(screen, ">> CLIQUE NA JANELA DO JOGO PARA INICIAR <<", 33, int(bannerY)+19)
+		} else {
+			ebitenutil.DebugPrintAt(screen, "   CLIQUE NA JANELA DO JOGO PARA INICIAR   ", 33, int(bannerY)+19)
+		}
 	}
 }
 

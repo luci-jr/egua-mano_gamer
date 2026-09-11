@@ -148,11 +148,13 @@ paidegua-game/
 
 Ao invés de carregar arquivos `.wav` ou `.mp3` pesados, todos os efeitos e músicas são **sintetizados matematicamente em tempo real** diretamente na memória:
 
-1. **Trilha Suave de São Brás (Intro BGM):**
-   * Melodia nostálgica, serena e aveludada inspirada na brisa das tardes de Belém, tocando na tela de abertura do Mercado de São Brás.
+1. **Trilha de Apresentação de São Brás (Intro BGM):**
+   * Melodia aconchegante e nostálgica de 64 passos inspirada na Guitarrada Paraense e na brisa de Belém.
+   * Síntese com harmônicos de primeira e segunda oitava, vibrato sutil, contrabaixo encorpado e maracas procedurais de carimbó.
+   * Toca em segundo plano na tela de abertura do Mercado de São Brás antes de iniciar a corrida.
 2. **Trilha de Carimbó da Corrida (Gameplay BGM):**
    * Curimbó grave (82Hz), repiques sincopados e marimba procedural em loop contínuo via `audio.NewInfiniteLoop`.
-   * Mixagem alegre e festiva ao estilo dos ritmos paraenses durante toda a corrida.
+   * Mixagem alegre, enérgica e festiva ao estilo dos ritmos paraenses durante toda a corrida.
 3. **Rugido Felino da Onça (*Feline Roar*):**
    * Sintetizado com frequência base grave (85Hz a 110Hz) modulada por tremolo de garganta (38Hz) e respiração felina.
 4. **Impacto e Danos:**

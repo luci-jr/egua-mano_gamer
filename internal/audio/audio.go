@@ -250,30 +250,49 @@ func createCarimboBGM() []byte {
 }
 
 func createSaoBrasIntroBGM() []byte {
-	// Melodia suave, nostálgica e aconchegante inspirada na brisa de Belém (Mercado de São Brás)
+	// Melodia de apresentação inspirada no Mercado de São Brás e Carimbó/Guitarrada Paraense
+	// Frases harmônicas com balanço característico de Belém do Pará
 	melodyNotes := []float64{
-		261.63, 329.63, 392.00, 523.25, // C - E - G - C
-		329.63, 392.00, 493.88, 659.25, // E - G - B - E
-		349.23, 440.00, 523.25, 698.46, // F - A - C - F
-		392.00, 493.88, 587.33, 783.99, // G - B - D - G
-		440.00, 523.25, 659.25, 523.25, // A - C - E - C
-		349.23, 440.00, 523.25, 440.00, // F - A - C - A
-		392.00, 329.63, 293.66, 246.94, // G - E - D - B
-		261.63, 329.63, 392.00, 261.63, // C - E - G - C
+		// Frase 1: Entrada majestosa de boas-vindas ao Mercado de São Brás (C - G - C - E)
+		261.63, 329.63, 392.00, 523.25, 659.25, 587.33, 523.25, 392.00,
+		// Frase 2: Guitarrada Paraense nostálgica em Am (Lá Menor)
+		440.00, 523.25, 659.25, 880.00, 783.99, 659.25, 523.25, 440.00,
+		// Frase 3: Brisa do Ver-o-Rio e Baía do Guajará em F (Fá Maior)
+		349.23, 440.00, 523.25, 698.46, 659.25, 587.33, 523.25, 440.00,
+		// Frase 4: Cadência rítmica e chamada de Carimbó em G7
+		392.00, 493.88, 587.33, 698.46, 783.99, 698.46, 587.33, 493.88,
+
+		// Frase 5: Tema alegre e vibrante da Onça-Pintada
+		659.25, 783.99, 659.25, 587.33, 523.25, 392.00, 440.00, 523.25,
+		// Frase 6: Balanço sincopado de carimbó tradicional
+		587.33, 523.25, 440.00, 523.25, 587.33, 698.46, 659.25, 587.33,
+		// Frase 7: Arpejo ascendente de guitarrada paraense
+		783.99, 587.33, 493.88, 392.00, 493.88, 587.33, 659.25, 587.33,
+		// Frase 8: Resolução harmônica convidativa para o loop contínuo
+		523.25, 659.25, 783.99, 1046.50, 783.99, 659.25, 587.33, 523.25,
 	}
 
 	bassNotes := []float64{
-		130.81, 130.81, 130.81, 130.81, // C3
-		164.81, 164.81, 164.81, 164.81, // E3
-		174.61, 174.61, 174.61, 174.61, // F3
-		196.00, 196.00, 196.00, 196.00, // G3
-		220.00, 220.00, 220.00, 220.00, // A3
-		174.61, 174.61, 174.61, 174.61, // F3
-		196.00, 196.00, 196.00, 196.00, // G3
-		130.81, 130.81, 130.81, 130.81, // C3
+		// C Maior
+		130.81, 130.81, 98.00, 130.81, 130.81, 130.81, 98.00, 130.81,
+		// Am
+		110.00, 110.00, 82.41, 110.00, 110.00, 110.00, 82.41, 110.00,
+		// F Maior
+		87.31, 87.31, 130.81, 87.31, 87.31, 87.31, 130.81, 87.31,
+		// G Maior
+		98.00, 98.00, 146.83, 98.00, 98.00, 98.00, 146.83, 98.00,
+
+		// C Maior
+		130.81, 130.81, 98.00, 130.81, 130.81, 130.81, 98.00, 130.81,
+		// F Maior
+		87.31, 87.31, 130.81, 87.31, 87.31, 87.31, 130.81, 87.31,
+		// G Maior
+		98.00, 98.00, 146.83, 98.00, 98.00, 98.00, 146.83, 98.00,
+		// C Maior cadência
+		130.81, 98.00, 130.81, 98.00, 130.81, 130.81, 98.00, 130.81,
 	}
 
-	noteMs := 240 // Andamento sereno e aveludado (~240ms por nota)
+	noteMs := 160 // Andamento musical (~160ms por nota, ~10s ciclo completo)
 	totalSamples := (sampleRate * noteMs / 1000) * len(melodyNotes)
 	buf := make([]byte, totalSamples*4)
 
@@ -289,22 +308,27 @@ func createSaoBrasIntroBGM() []byte {
 		for s := 0; s < stepSamples; s++ {
 			t := float64(s) / float64(stepSamples)
 
-			melPhase += 2.0 * math.Pi * melFreq / float64(sampleRate)
+			// Leve vibrato acústico de guitarrada
+			vibrato := 1.0 + 0.006*math.Sin(2.0*math.Pi*5.0*t)
+			melPhase += 2.0 * math.Pi * (melFreq * vibrato) / float64(sampleRate)
 			bassPhase += 2.0 * math.Pi * bassFreq / float64(sampleRate)
 
-			// Onda suave com harmônico aveludado estilo marimba / xilofone
-			melVal := math.Sin(melPhase) + 0.22*math.Sin(melPhase*2.0)
-			melAttack := math.Min(1.0, float64(s)/float64(sampleRate*0.035))
-			melDecay := math.Exp(-2.4 * t)
+			// Timbre rico: fundamental + harmônico 2x (oitava) + harmônico 3x com ataque rápido
+			melVal := math.Sin(melPhase) + 0.28*math.Sin(melPhase*2.0) + 0.08*math.Sin(melPhase*3.0)
+			melAttack := math.Min(1.0, float64(s)/float64(sampleRate*0.012))
+			melDecay := math.Exp(-2.5 * t)
 			melEnvelope := melAttack * melDecay
 
-			// Baixo harmônico quente
-			bassVal := math.Sin(bassPhase)
-			bassAttack := math.Min(1.0, float64(s)/float64(sampleRate*0.04))
-			bassDecay := math.Exp(-1.9 * t)
+			// Baixo acústico encorpado com harmônico de 2ª oitava para alto-falantes de celular
+			bassVal := math.Sin(bassPhase) + 0.32*math.Sin(bassPhase*2.0)
+			bassAttack := math.Min(1.0, float64(s)/float64(sampleRate*0.018))
+			bassDecay := math.Exp(-2.0 * t)
 			bassEnvelope := bassAttack * bassDecay
 
-			mix := (melVal*melEnvelope*0.14 + bassVal*bassEnvelope*0.16)
+			// Toque sutil de maraca/percussão de carimbó sintetizado
+			maraca := math.Sin(float64(s)*0.75) * math.Exp(-35.0*t) * 0.035
+
+			mix := (melVal*melEnvelope*0.13 + bassVal*bassEnvelope*0.16 + maraca)
 			sample := int16(mix * 32767.0)
 
 			idx := sampleIdx * 4
@@ -347,7 +371,7 @@ func NewManager() *Manager {
 	introLoop := ebitenaudio.NewInfiniteLoop(bytes.NewReader(introBytes), int64(len(introBytes)))
 	introPlayer, err := ctx.NewPlayer(introLoop)
 	if err == nil {
-		introPlayer.SetVolume(0.28)
+		introPlayer.SetVolume(0.50) // Volume presente e audível em smartphones e notebooks
 		m.introPlayer = introPlayer
 	}
 
@@ -369,6 +393,10 @@ func (m *Manager) StopIntroBGM() {
 	if m.introPlayer != nil && m.introPlayer.IsPlaying() {
 		m.introPlayer.Pause()
 	}
+}
+
+func (m *Manager) IsIntroPlaying() bool {
+	return m.introPlayer != nil && m.introPlayer.IsPlaying()
 }
 
 func (m *Manager) ToggleMute() bool {

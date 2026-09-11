@@ -92,6 +92,10 @@ func isPointerJustPressed() bool {
 func (e *Engine) Update() error {
 	if e.isSaoBrasIntro {
 		e.ticks++
+		if !e.audio.IsMuted() {
+			e.audio.PlayIntroBGM()
+		}
+
 		if inpututil.IsKeyJustPressed(ebiten.KeyC) {
 			e.isShowingCredits = true
 			return nil
@@ -99,6 +103,12 @@ func (e *Engine) Update() error {
 
 		// O jogo só inicia quando houver um clique explícito na janela do jogo ou toque
 		if isPointerJustPressed() {
+			// Se o áudio ainda não iniciou (ex: autoplay suspenso pelo navegador web até o 1º gesto)
+			if !e.audio.IsIntroPlaying() && !e.audio.IsMuted() {
+				e.audio.PlayIntroBGM()
+				return nil
+			}
+
 			e.isSaoBrasIntro = false
 			e.isTitleScreen = false
 			e.stage = 1
@@ -480,7 +490,7 @@ func (e *Engine) Update() error {
 
 func (e *Engine) Draw(screen *ebiten.Image) {
 	if e.isSaoBrasIntro {
-		ui.DrawSaoBrasIntro(screen, ScreenWidth, ScreenHeight, e.ticks)
+		ui.DrawSaoBrasIntro(screen, ScreenWidth, ScreenHeight, e.ticks, e.audio.IsIntroPlaying())
 		return
 	}
 
