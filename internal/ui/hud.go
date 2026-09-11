@@ -83,10 +83,6 @@ func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, 
 		ebitenutil.DebugPrintAt(screen, "[MUDO]", 170, 24)
 	}
 
-	if isDoubleJump {
-		ebitenutil.DebugPrintAt(screen, "[RUGIDO DUPLO]", 90, 24)
-	}
-
 	if stageBannerTimer > 0 {
 		var bannerTitle string
 		switch stage {

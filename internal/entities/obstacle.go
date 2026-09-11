@@ -11,12 +11,10 @@ import (
 type ObstacleType int
 
 const (
-	TypeGround ObstacleType = 0 // Paneiro de açaí / Cesto artesanal
+	TypeGround ObstacleType = 0 // Paneiro de açaí tradicional / Cesto artesanal
 	TypeAir    ObstacleType = 1 // Urubu / Gaivota / Arara (aéreo - desvia agachando)
-	TypeTall   ObstacleType = 2 // Paneiros empilhados (alto - incentiva pulo duplo)
-	TypePuddle ObstacleType = 3 // Poça da chuva das 4h (rasteiro e rápido)
-	TypeJacare ObstacleType = 4 // Jacaré-Açu Amazônico com bocarra, dentes e escamas (substitui barris)
-	TypeSnake  ObstacleType = 5 // Cobra-Coral / Sucuri ondulando com língua bífida (rasteira)
+	TypeJacare ObstacleType = 2 // Jacaré-Açu Amazônico com bocarra, dentes e escamas
+	TypeSnake  ObstacleType = 3 // Cobra-Coral Amazônica ondulando com língua bífida
 )
 
 type Obstacle struct {
@@ -49,16 +47,6 @@ func (obs *Obstacle) GetBounds() (x, y, w, h float64) {
 		h = 16.0
 		x = obs.X
 		y = obs.groundY - 34.0
-	case TypeTall:
-		w = 22.0
-		h = 36.0
-		x = obs.X
-		y = obs.groundY - h
-	case TypePuddle:
-		w = 26.0
-		h = 8.0
-		x = obs.X
-		y = obs.groundY - h
 	case TypeJacare:
 		w = 32.0
 		h = 17.0
@@ -91,10 +79,6 @@ func (obs *Obstacle) Draw(screen *ebiten.Image, ticks int, stage int) {
 		obs.drawGround(screen, ticks, stage)
 	case TypeAir:
 		obs.drawAir(screen, ticks, stage)
-	case TypeTall:
-		obs.drawTall(screen, ticks, stage)
-	case TypePuddle:
-		obs.drawPuddle(screen, ticks, stage)
 	case TypeJacare:
 		obs.drawJacare(screen, ticks, stage)
 	case TypeSnake:
@@ -107,7 +91,7 @@ func (obs *Obstacle) drawGround(screen *ebiten.Image, ticks int, stage int) {
 
 	switch stage {
 	case 2:
-		// Na Estação das Docas, ao invés de barris genéricos, um Jacaré descansando no cais!
+		// Na Estação das Docas, ao invés de barris genéricos, um Jacaré na beirada do cais!
 		obs.drawJacare(screen, ticks, stage)
 
 	case 3:
@@ -118,7 +102,7 @@ func (obs *Obstacle) drawGround(screen *ebiten.Image, ticks int, stage int) {
 		ebitenutil.DrawRect(screen, obs.X+11, obsRealY+6, 7, 7, color.RGBA{R: 240, G: 175, B: 35, A: 255})
 
 	default:
-		// Paneiro tradicional de açaí (Ver-o-Peso)
+		// Paneiro tradicional de açaí único (Ver-o-Peso)
 		basketStraw := color.RGBA{R: 185, G: 135, B: 75, A: 255}
 		basketDark := color.RGBA{R: 135, G: 90, B: 45, A: 255}
 		acaiPurple := color.RGBA{R: 45, G: 15, B: 48, A: 255}
@@ -199,102 +183,6 @@ func (obs *Obstacle) drawAir(screen *ebiten.Image, ticks int, stage int) {
 	}
 }
 
-func (obs *Obstacle) drawTall(screen *ebiten.Image, ticks int, stage int) {
-	obsRealY := obs.groundY - 36.0
-
-	switch stage {
-	case 2:
-		// Jacaré grande com bocarra aberta empinada na beira do cais
-		obs.drawJacare(screen, ticks, stage)
-
-	case 3:
-		// Cestos nobres empilhados (Theatro da Paz)
-		gold := color.RGBA{R: 215, G: 160, B: 40, A: 255}
-		brown := color.RGBA{R: 120, G: 75, B: 40, A: 255}
-		redNut := color.RGBA{R: 190, G: 50, B: 30, A: 255}
-
-		ebitenutil.DrawRect(screen, obs.X+2, obsRealY+17, 18, 19, brown)
-		ebitenutil.DrawRect(screen, obs.X+4, obsRealY+19, 14, 15, gold)
-		ebitenutil.DrawRect(screen, obs.X+3, obsRealY+2, 16, 15, brown)
-		ebitenutil.DrawRect(screen, obs.X+5, obsRealY+4, 12, 11, gold)
-		ebitenutil.DrawRect(screen, obs.X+6, obsRealY, 8, 4, redNut)
-
-	default:
-		// Pilha dupla de paneiros de açaí (Ver-o-Peso)
-		basketStraw := color.RGBA{R: 185, G: 135, B: 75, A: 255}
-		basketDark := color.RGBA{R: 135, G: 90, B: 45, A: 255}
-		acaiPurple := color.RGBA{R: 45, G: 15, B: 48, A: 255}
-		acaiLight := color.RGBA{R: 85, G: 30, B: 85, A: 255}
-		palmGreen := color.RGBA{R: 40, G: 145, B: 50, A: 255}
-
-		// Paneiro inferior
-		ebitenutil.DrawRect(screen, obs.X+2, obsRealY+18, 18, 18, basketStraw)
-		ebitenutil.DrawRect(screen, obs.X+4, obsRealY+20, 14, 14, basketDark)
-		ebitenutil.DrawRect(screen, obs.X+1, obsRealY+26, 20, 2, basketDark)
-
-		// Paneiro superior
-		ebitenutil.DrawRect(screen, obs.X+3, obsRealY+3, 16, 15, basketStraw)
-		ebitenutil.DrawRect(screen, obs.X+5, obsRealY+5, 12, 11, basketDark)
-		ebitenutil.DrawRect(screen, obs.X+2, obsRealY+10, 18, 2, basketDark)
-
-		// Açaí derramando no topo
-		ebitenutil.DrawRect(screen, obs.X+4, obsRealY+1, 14, 5, acaiPurple)
-		ebitenutil.DrawRect(screen, obs.X+6, obsRealY, 10, 3, acaiLight)
-
-		// Folha de palmeira saindo do topo
-		ebitenutil.DrawRect(screen, obs.X+16, obsRealY-4, 3, 7, palmGreen)
-		ebitenutil.DrawRect(screen, obs.X+18, obsRealY-6, 4, 3, palmGreen)
-	}
-}
-
-func (obs *Obstacle) drawPuddle(screen *ebiten.Image, ticks int, stage int) {
-	obsRealY := obs.groundY - 8.0
-
-	switch stage {
-	case 2:
-		// Poça salina do cais das Docas
-		waterDeep := color.RGBA{R: 20, G: 70, B: 90, A: 230}
-		waterMid := color.RGBA{R: 45, G: 125, B: 145, A: 230}
-		waterFoam := color.RGBA{R: 210, G: 240, B: 245, A: 255}
-
-		ebitenutil.DrawRect(screen, obs.X+2, obsRealY+2, 22, 5, waterDeep)
-		ebitenutil.DrawRect(screen, obs.X+5, obsRealY+3, 16, 3, waterMid)
-		if (ticks/12)%2 == 0 {
-			ebitenutil.DrawRect(screen, obs.X+8, obsRealY+3, 5, 1, waterFoam)
-		} else {
-			ebitenutil.DrawRect(screen, obs.X+14, obsRealY+4, 5, 1, waterFoam)
-		}
-
-	case 3:
-		// Poça cristalina sobre pedras portuguesas (Theatro da Paz)
-		waterDeep := color.RGBA{R: 40, G: 80, B: 130, A: 230}
-		waterLight := color.RGBA{R: 90, G: 155, B: 220, A: 230}
-		waterGlint := color.RGBA{R: 240, G: 245, B: 255, A: 255}
-
-		ebitenutil.DrawRect(screen, obs.X+3, obsRealY+2, 20, 5, waterDeep)
-		ebitenutil.DrawRect(screen, obs.X+6, obsRealY+3, 14, 3, waterLight)
-		ebitenutil.DrawRect(screen, obs.X+9, obsRealY+3, 4, 1, waterGlint)
-
-	default:
-		// Poça da chuva das 4h da tarde de Belém (Ver-o-Peso)
-		rainDeep := color.RGBA{R: 35, G: 75, B: 145, A: 240}
-		rainMid := color.RGBA{R: 70, G: 140, B: 215, A: 240}
-		rainReflect := color.RGBA{R: 200, G: 230, B: 255, A: 255}
-
-		ebitenutil.DrawRect(screen, obs.X+2, obsRealY+2, 22, 5, rainDeep)
-		ebitenutil.DrawRect(screen, obs.X+5, obsRealY+3, 16, 3, rainMid)
-		ebitenutil.DrawRect(screen, obs.X+1, obsRealY+4, 24, 2, rainDeep)
-
-		if (ticks/10)%2 == 0 {
-			ebitenutil.DrawRect(screen, obs.X+7, obsRealY+3, 6, 1, rainReflect)
-			ebitenutil.DrawRect(screen, obs.X+16, obsRealY+4, 3, 1, rainReflect)
-		} else {
-			ebitenutil.DrawRect(screen, obs.X+10, obsRealY+4, 7, 1, rainReflect)
-			ebitenutil.DrawRect(screen, obs.X+4, obsRealY+3, 3, 1, rainReflect)
-		}
-	}
-}
-
 // drawJacare desenha um autêntico Jacaré-Açu da Amazônia com escamas, cristas, dentes afiados e bocarra
 func (obs *Obstacle) drawJacare(screen *ebiten.Image, ticks int, stage int) {
 	obsRealY := obs.groundY - 17.0
@@ -341,7 +229,7 @@ func (obs *Obstacle) drawJacare(screen *ebiten.Image, ticks int, stage int) {
 	ebitenutil.DrawRect(screen, obs.X+1, obsRealY+4, 7, 1, midGreen)
 	ebitenutil.DrawRect(screen, obs.X, obsRealY+5, 1, 1, black) // Narina
 
-	// Abertura dinâmica da bocarra (abre e fecha ligeiramente)
+	// Abertura dinâmica da bocarra
 	mouthGap := 2.0
 	if (ticks/16)%2 == 0 {
 		mouthGap = 3.0
@@ -438,9 +326,9 @@ func NewObstacleManager(screenWidth, groundY float64) *ObstacleManager {
 		screenWidth: screenWidth,
 		groundY:     groundY,
 		Obstacles: []*Obstacle{
-			{X: screenWidth + 30, Type: TypeJacare, screenWidth: screenWidth, groundY: groundY},
+			{X: screenWidth + 30, Type: TypeGround, screenWidth: screenWidth, groundY: groundY},
 			{X: screenWidth + 185, Type: TypeAir, screenWidth: screenWidth, groundY: groundY},
-			{X: screenWidth + 340, Type: TypeSnake, screenWidth: screenWidth, groundY: groundY},
+			{X: screenWidth + 340, Type: TypeJacare, screenWidth: screenWidth, groundY: groundY},
 		},
 	}
 	return m
@@ -457,9 +345,9 @@ func (m *ObstacleManager) Update(speed float64) int {
 					furthestX = other.X
 				}
 			}
-			obs.X = furthestX + 135.0 + float64(rand.Intn(55))
-			// Sorteia entre os 6 tipos proceduralmente
-			obs.Type = ObstacleType(rand.Intn(6))
+			obs.X = furthestX + 140.0 + float64(rand.Intn(50))
+			// Sorteia entre os 4 obstáculos oficiais coesos
+			obs.Type = ObstacleType(rand.Intn(4))
 			obs.collided = false
 			passedCount++
 		}
@@ -486,8 +374,8 @@ func (m *ObstacleManager) Draw(screen *ebiten.Image, ticks int, stage int) {
 }
 
 func (m *ObstacleManager) Reset() {
-	spacing := 160.0
-	types := []ObstacleType{TypeJacare, TypeAir, TypeSnake}
+	spacing := 165.0
+	types := []ObstacleType{TypeGround, TypeAir, TypeJacare, TypeSnake}
 	for i, obs := range m.Obstacles {
 		obs.X = m.screenWidth + 25.0 + float64(i)*spacing
 		obs.Type = types[i%len(types)]
