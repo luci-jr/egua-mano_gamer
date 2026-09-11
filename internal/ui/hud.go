@@ -204,19 +204,11 @@ func DrawSaoBrasIntro(screen *ebiten.Image, screenWidth, screenHeight float64, t
 	ebitenutil.DrawRect(screen, 48, bannerY+15, 1, 14, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 	ebitenutil.DebugPrintAt(screen, "★FATO", 6, int(bannerY)+16)
 
-	// Linha 3: Botão de largada piscante
-	if isAudioPlaying {
-		if (ticks/25)%2 == 0 {
-			ebitenutil.DebugPrintAt(screen, ">> CLIQUE NA JANELA PARA COMEÇAR A CORRIDA <<", 30, int(bannerY)+30)
-		} else {
-			ebitenutil.DebugPrintAt(screen, "   CLIQUE NA JANELA PARA COMEÇAR A CORRIDA   ", 30, int(bannerY)+30)
-		}
+	// Linha 3: Botão de largada piscante com suporte a clique, Enter, Espaço e Esc
+	if (ticks/25)%2 == 0 {
+		ebitenutil.DebugPrintAt(screen, ">> [CLIQUE / ENTER / ESPACO / ESC] INICIAR <<", 26, int(bannerY)+30)
 	} else {
-		if (ticks/25)%2 == 0 {
-			ebitenutil.DebugPrintAt(screen, ">> CLIQUE NA JANELA DO JOGO PARA INICIAR <<", 33, int(bannerY)+30)
-		} else {
-			ebitenutil.DebugPrintAt(screen, "   CLIQUE NA JANELA DO JOGO PARA INICIAR   ", 33, int(bannerY)+30)
-		}
+		ebitenutil.DebugPrintAt(screen, "   [CLIQUE / ENTER / ESPACO / ESC] INICIAR   ", 26, int(bannerY)+30)
 	}
 }
 

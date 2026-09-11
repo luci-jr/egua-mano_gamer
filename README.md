@@ -27,7 +27,7 @@ O protagonista é uma **Onça-Pintada Brasileira** que percorre os cartões post
 | `Espaço / Cima` (2x) | Tocar **`▲ PULO`** (2x) | **Pulo Duplo (*Double Jump*)** | Impulso no ar com rugido duplo e faíscas. |
 | `Seta Baixo` ou `S` | Botão virtual **`▼ BAIXO`** | **Abaixar / Rastejar** | Reduz o hitbox pela metade (passa sob pássaros). |
 | `Seta Baixo` (no ar) | Botão **`▼ BAIXO`** (no ar) | **Queda Rápida (*Fast Drop*)** | Acelera a descida ao solo. |
-| Clique na Janela / Toque | **Toque na Tela / Clique** | **Iniciar o Jogo** | O jogo aguarda na tela de São Brás e só inicia após um clique explícito na janela. |
+| Clique / `Enter` / `Espaço` / `Esc` | **Toque na Tela / Botões Virtuais** | **Iniciar o Jogo** | O jogo aguarda na tela de São Brás e inicia com Clique do mouse, `Enter`, `Espaço` ou `Esc`. |
 | `Esc` | Botão virtual **`⏸ PAUSA`** | **Menu de Pausa Interativo** | Abre o menu com som, reinício e créditos. |
 | `C` | Opção do Menu | **Ver Créditos** | Informações sobre desenvolvedor, IA, Go e música. |
 | `R` ou Clique | Toque na tela | **Recomeçar Rápido** | Reinicia imediatamente na tela de conclusão ou Game Over. |
