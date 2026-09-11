@@ -378,36 +378,16 @@
       btn.addEventListener('mouseleave', onEnd);
     }
 
-    // Vincula os botões virtuais às teclas
+    // Vincula os botões virtuais às teclas corretas
     bindTouchButton('btn-touch-left', 'ArrowLeft', 'ArrowLeft', 37, 'ArrowLeft');
     bindTouchButton('btn-touch-right', 'ArrowRight', 'ArrowRight', 39, 'ArrowRight');
-    bindTouchButton('btn-touch-jump', 'Space', ' ', 32, 'Jump');
+    bindTouchButton('btn-touch-jump', 'ArrowUp', 'ArrowUp', 38, 'ArrowUp');
     bindTouchButton('btn-touch-duck', 'ArrowDown', 'ArrowDown', 40, 'ArrowDown');
-    bindTouchButton('btn-touch-attack', 'KeyX', 'x', 88, 'Attack');
+    bindTouchButton('btn-touch-attack', 'Space', ' ', 32, 'Attack');
     bindTouchButton('btn-touch-pause', 'Escape', 'Escape', 27, 'Escape');
 
-    // Toque em qualquer área vazia inicia ou confirma o jogo
-    window.addEventListener('touchstart', (e) => {
-      if (!e.target.closest('#touch-controls')) {
-        setVirtual('Enter', true);
-        triggerKey('Enter', 'Enter', 13, 'keydown');
-        setTimeout(() => {
-          setVirtual('Enter', false);
-          triggerKey('Enter', 'Enter', 13, 'keyup');
-        }, 80);
-      }
-    }, { passive: true });
-
-    window.addEventListener('click', (e) => {
+    window.addEventListener('click', () => {
       window.focus();
-      if (!e.target.closest('#touch-controls')) {
-        setVirtual('Enter', true);
-        triggerKey('Enter', 'Enter', 13, 'keydown');
-        setTimeout(() => {
-          setVirtual('Enter', false);
-          triggerKey('Enter', 'Enter', 13, 'keyup');
-        }, 80);
-      }
     });
 
     // Curiosidades Históricas e Culturais de Belém do Pará

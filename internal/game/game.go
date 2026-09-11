@@ -123,116 +123,38 @@ func isPointerJustPressed() bool {
 }
 
 func (e *Engine) Update() error {
-	if e.isSaoBrasIntro {
-		e.ticks++
-		if !e.audio.IsMuted() {
-			e.audio.PlayIntroBGM()
-		}
-
-		if inpututil.IsKeyJustPressed(ebiten.KeyC) {
-			e.isShowingCredits = true
-			return nil
-		}
-
-		// Navegação no Menu Principal (5 opções)
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) || getVirtualKey("ArrowUp") {
-			resetVirtualKey("ArrowUp")
-			e.introMenuIndex = (e.introMenuIndex - 1 + 5) % 5
-		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) || getVirtualKey("ArrowDown") {
-			resetVirtualKey("ArrowDown")
-			e.introMenuIndex = (e.introMenuIndex + 1) % 5
-		}
-
-		// Ajuste com Esquerda / Direita
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
-			if e.introMenuIndex == 1 {
-				if e.selectedHero == entities.HeroGaroto {
-					e.selectedHero = entities.HeroOnca
-					e.player = e.onca
-					e.audio.PlayRoar(false)
-				} else {
-					e.selectedHero = entities.HeroGaroto
-					e.player = e.garoto
-					e.audio.PlayShot()
-				}
-			} else if e.introMenuIndex == 2 {
-				e.audio.ToggleMute()
-			} else if e.introMenuIndex == 3 {
-				e.speedIndex = (e.speedIndex - 1 + len(SpeedMultipliers)) % len(SpeedMultipliers)
-			}
-		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
-			if e.introMenuIndex == 1 {
-				if e.selectedHero == entities.HeroGaroto {
-					e.selectedHero = entities.HeroOnca
-					e.player = e.onca
-					e.audio.PlayRoar(false)
-				} else {
-					e.selectedHero = entities.HeroGaroto
-					e.player = e.garoto
-					e.audio.PlayShot()
-				}
-			} else if e.introMenuIndex == 2 {
-				e.audio.ToggleMute()
-			} else if e.introMenuIndex == 3 {
-				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
-			}
-		}
-
-		// Detecção de clique / toque
-		mouseTriggered := false
-		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-			mx, my := ebiten.CursorPosition()
-			boxX := (ScreenWidth - 220.0) / 2.0
-			boxY := 36.0
-			if float64(mx) >= boxX && float64(mx) <= boxX+220.0 && float64(my) >= boxY+21 && float64(my) <= boxY+21+5*14 {
-				clickedIdx := int((float64(my) - (boxY + 21)) / 14.0)
-				if clickedIdx >= 0 && clickedIdx < 5 {
-					e.introMenuIndex = clickedIdx
-					mouseTriggered = true
-				}
-			} else if float64(my) < boxY || float64(my) > boxY+96 {
-				mouseTriggered = true
-			}
-		}
-
-		selectTriggered := mouseTriggered ||
+	// 1. Tela de Créditos (visível sobre qualquer tela)
+	if e.isShowingCredits {
+		exitCredits := isPointerJustPressed() ||
+			inpututil.IsKeyJustPressed(ebiten.KeyEscape) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
-			getVirtualKey("Enter")
+			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
+			inpututil.IsKeyJustPressed(ebiten.KeyC) ||
+			getVirtualKey("Escape") ||
+			getVirtualKey("Enter") ||
+			getVirtualKey("Space")
 
+		if getVirtualKey("Escape") {
+			resetVirtualKey("Escape")
+		}
 		if getVirtualKey("Enter") {
 			resetVirtualKey("Enter")
 		}
+		if getVirtualKey("Space") {
+			resetVirtualKey("Space")
+		}
 
-		if selectTriggered {
-			switch e.introMenuIndex {
-			case 0:
-				e.isCharSelect = true
-			case 1:
-				if e.selectedHero == entities.HeroGaroto {
-					e.selectedHero = entities.HeroOnca
-					e.player = e.onca
-					e.audio.PlayRoar(false)
-				} else {
-					e.selectedHero = entities.HeroGaroto
-					e.player = e.garoto
-					e.audio.PlayShot()
-				}
-				e.isCharSelect = true
-			case 2:
-				e.audio.ToggleMute()
-			case 3:
-				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
-			case 4:
-				e.isShowingCredits = true
+		if exitCredits {
+			e.isShowingCredits = false
+			if !e.isPaused && !e.isTitleScreen && !e.isSaoBrasIntro && !e.isCharSelect && !e.isGameOver && !e.isStageComplete && !e.audio.IsMuted() {
+				e.audio.ResumeBGM()
 			}
-			return nil
 		}
 		return nil
 	}
 
+	// 2. Tela de Seleção de Personagem (Garoto Curumim vs Onça-Pintada)
 	if e.isCharSelect {
 		e.ticks++
 		if !e.audio.IsMuted() {
@@ -314,10 +236,15 @@ func (e *Engine) Update() error {
 		confirmPressed := cardClicked ||
 			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
-			getVirtualKey("Enter")
+			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
+			getVirtualKey("Enter") ||
+			getVirtualKey("Space")
 
 		if getVirtualKey("Enter") {
 			resetVirtualKey("Enter")
+		}
+		if getVirtualKey("Space") {
+			resetVirtualKey("Space")
 		}
 
 		if confirmPressed {
@@ -339,24 +266,147 @@ func (e *Engine) Update() error {
 		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") {
 			resetVirtualKey("Escape")
 			e.isCharSelect = false
+			e.isSaoBrasIntro = true
 			return nil
 		}
 
 		return nil
 	}
 
-	if e.isShowingCredits {
-		exitCredits := isPointerJustPressed() ||
-			inpututil.IsKeyJustPressed(ebiten.KeyEscape) ||
+	// 3. Menu Principal (Abertura oficial)
+	if e.isSaoBrasIntro {
+		e.ticks++
+		if !e.audio.IsMuted() {
+			e.audio.PlayIntroBGM()
+		}
+
+		if inpututil.IsKeyJustPressed(ebiten.KeyC) {
+			e.isShowingCredits = true
+			return nil
+		}
+
+		// Navegação no Menu Principal (5 opções)
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) || getVirtualKey("ArrowUp") {
+			resetVirtualKey("ArrowUp")
+			e.introMenuIndex = (e.introMenuIndex - 1 + 5) % 5
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) || getVirtualKey("ArrowDown") {
+			resetVirtualKey("ArrowDown")
+			e.introMenuIndex = (e.introMenuIndex + 1) % 5
+		}
+
+		// Ajuste com Esquerda / Direita
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
+			if e.introMenuIndex == 1 {
+				if e.selectedHero == entities.HeroGaroto {
+					e.selectedHero = entities.HeroOnca
+					e.player = e.onca
+					e.audio.PlayRoar(false)
+				} else {
+					e.selectedHero = entities.HeroGaroto
+					e.player = e.garoto
+					e.audio.PlayShot()
+				}
+			} else if e.introMenuIndex == 2 {
+				e.audio.ToggleMute()
+			} else if e.introMenuIndex == 3 {
+				e.speedIndex = (e.speedIndex - 1 + len(SpeedMultipliers)) % len(SpeedMultipliers)
+			}
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
+			if e.introMenuIndex == 1 {
+				if e.selectedHero == entities.HeroGaroto {
+					e.selectedHero = entities.HeroOnca
+					e.player = e.onca
+					e.audio.PlayRoar(false)
+				} else {
+					e.selectedHero = entities.HeroGaroto
+					e.player = e.garoto
+					e.audio.PlayShot()
+				}
+			} else if e.introMenuIndex == 2 {
+				e.audio.ToggleMute()
+			} else if e.introMenuIndex == 3 {
+				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
+			}
+		}
+
+		// Detecção de clique / toque no Menu
+		mouseTriggered := false
+		boxX := (ScreenWidth - 226.0) / 2.0
+		boxY := 35.0
+		startY := boxY + 21.0
+
+		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+			mx, my := ebiten.CursorPosition()
+			fmx, fmy := float64(mx), float64(my)
+			if fmx >= boxX && fmx <= boxX+226.0 && fmy >= startY && fmy <= startY+5*14.0 {
+				clickedIdx := int((fmy - startY) / 14.0)
+				if clickedIdx >= 0 && clickedIdx < 5 {
+					e.introMenuIndex = clickedIdx
+					mouseTriggered = true
+				}
+			} else if fmy >= boxY && fmy <= boxY+94.0 {
+				mouseTriggered = true
+			}
+		}
+
+		menuTouches := inpututil.AppendJustPressedTouchIDs(nil)
+		for _, id := range menuTouches {
+			tx, ty := ebiten.TouchPosition(id)
+			ftx, fty := float64(tx), float64(ty)
+			if ftx >= boxX && ftx <= boxX+226.0 && fty >= startY && fty <= startY+5*14.0 {
+				clickedIdx := int((fty - startY) / 14.0)
+				if clickedIdx >= 0 && clickedIdx < 5 {
+					e.introMenuIndex = clickedIdx
+					mouseTriggered = true
+				}
+			} else {
+				mouseTriggered = true
+			}
+		}
+
+		selectTriggered := mouseTriggered ||
 			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
-			inpututil.IsKeyJustPressed(ebiten.KeyC)
-		if exitCredits {
-			e.isShowingCredits = false
-			if !e.isPaused && !e.isTitleScreen && !e.isSaoBrasIntro && !e.isGameOver && !e.isStageComplete && !e.audio.IsMuted() {
-				e.audio.ResumeBGM()
+			getVirtualKey("Enter") ||
+			getVirtualKey("Space")
+
+		if getVirtualKey("Enter") {
+			resetVirtualKey("Enter")
+		}
+		if getVirtualKey("Space") {
+			resetVirtualKey("Space")
+		}
+
+		if selectTriggered {
+			switch e.introMenuIndex {
+			case 0:
+				e.isCharSelect = true
+				e.isSaoBrasIntro = false
+				return nil
+			case 1:
+				if e.selectedHero == entities.HeroGaroto {
+					e.selectedHero = entities.HeroOnca
+					e.player = e.onca
+					e.audio.PlayRoar(false)
+				} else {
+					e.selectedHero = entities.HeroGaroto
+					e.player = e.garoto
+					e.audio.PlayShot()
+				}
+				e.isCharSelect = true
+				e.isSaoBrasIntro = false
+				return nil
+			case 2:
+				e.audio.ToggleMute()
+			case 3:
+				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
+			case 4:
+				e.isShowingCredits = true
 			}
+			return nil
 		}
 		return nil
 	}
@@ -898,13 +948,18 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 		heroFull = "ONCA PINTADA"
 	}
 
-	if e.isSaoBrasIntro {
-		ui.DrawTitleIntro(screen, ScreenWidth, ScreenHeight, e.ticks, e.audio.IsIntroPlaying(), e.introMenuIndex, e.audio.IsMuted(), SpeedLabels[e.speedIndex], heroFull)
+	if e.isShowingCredits {
+		ui.DrawCreditsScreen(screen, ScreenWidth, ScreenHeight)
 		return
 	}
 
 	if e.isCharSelect {
 		ui.DrawCharacterSelectScreen(screen, ScreenWidth, ScreenHeight, e.ticks, e.selectedHero)
+		return
+	}
+
+	if e.isSaoBrasIntro {
+		ui.DrawTitleIntro(screen, ScreenWidth, ScreenHeight, e.ticks, e.audio.IsIntroPlaying(), e.introMenuIndex, e.audio.IsMuted(), SpeedLabels[e.speedIndex], heroFull)
 		return
 	}
 

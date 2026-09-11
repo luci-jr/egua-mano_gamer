@@ -1,8 +1,8 @@
-# 🏹 Paidégua Game: Aventura Amazônica (Estilo Pitfall)
+# 🏹 Paidégua Game: Aventura em Belém do Pará
 
-![Paidégua Game: Aventura Amazônica](assets/capa_paidegua.jpg)
+![Paidégua Game: Aventura em Belém do Pará](assets/capa_paidegua.jpg)
 
-> Um jogo de ação e aventura arcade retrô 16-bit construído 100% em **Go** com **Ebitengine (v2)**, inspirado no clássico ***Pitfall: The Mayan Adventure*** e ambientado nas paisagens e na cultura mística de **Belém do Pará**.
+> Um jogo de ação e aventura arcade retrô construído 100% em **Go** com **Ebitengine (v2)**, ambientado nas paisagens, cartões-postais e na cultura vibrante de **Belém do Pará**.
 >
 > 🕹️ **Jogue agora online no navegador (WebAssembly):**  
 > 👉 **[https://luci-jr.github.io/paidegua-game/](https://luci-jr.github.io/paidegua-game/)** *(Zero instalação, compatível com PC e Celular / Smartphone Android & iOS!)*
@@ -30,7 +30,7 @@ Na nova versão inspirada em clássicos arcade dos anos 90, o jogador pode **esc
 
 ## 🕹️ Menu Interativo & Configurações de Jogo
 
-Tanto na **Tela de Abertura (Ruínas de Marajó & Selva 16-bit)** quanto no **Menu de Pausa (`Esc`)**, o jogador conta com um painel completo de controle:
+Tanto na **Tela de Abertura (Belém do Pará & Baía do Guajará)** quanto no **Menu de Pausa (`Esc`)**, o jogador conta com um painel completo de controle:
 
 * **▶ INICIAR AVENTURA:** Abre a **Tela de Seleção de Personagem** para escolher entre Garoto Curumim ou Onça-Pintada.
 * **🐾 HERÓI: [ GAROTO CURUMIM / ONÇA-PINTADA ]:** Alterna o herói ativo diretamente com `Esquerda/Direita` ou clicando no menu.
@@ -125,13 +125,13 @@ Durante o jogo e na tela de abertura, o rodapé exibe um letreiro digital contí
 * **Fase 1 (Ver-o-Peso):** Fatos sobre a fundação da feira livre em 1627, a tradição do açaí puro com peixe frito e o tacacá com jambu adormecedor.
 * **Fase 2 (Estação das Docas):** Fatos sobre a restauração dos armazéns de ferro ingleses de 1897, os guindastes históricos e o ecoturismo no Rio Guamá.
 * **Fase 3 (Theatro da Paz):** Fatos sobre a Belle Époque amazônica, o Theatro da Paz (1878), o Círio de Nazaré e a gíria "Paidégua".
-* **Tela de Abertura (Ruínas de Marajó):** Tradições marajoaras, cerâmica milenar da Ilha de Marajó, lendas da selva e a misteriosa ruína perdida.
+* **Tela de Abertura (Belém do Pará):** Visão panorâmica do Mercado do Ver-o-Peso, Baía do Guajará, barcos amazônicos e o crepúsculo dourado paraense.
 
 ---
 
 ## 📸 Galeria Visual do Jogo
 
-| Capa Oficial (Estilo Pitfall 16-bit) | Mercado do Ver-o-Peso (Fase 1) |
+| Capa Oficial (Belém do Pará) | Mercado do Ver-o-Peso (Fase 1) |
 | :---: | :---: |
 | ![Capa Oficial](assets/capa_paidegua.jpg) | ![Fase 1](assets/fase1_ver_o_peso.jpg) |
 

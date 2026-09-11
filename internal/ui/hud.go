@@ -187,16 +187,13 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 		ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 10, G: 16, B: 24, A: 255})
 	}
 
-	// 2. Partículas atmosféricas: Faíscas das tochas e vaga-lumes místicos da floresta
-	for i := 0; i < 6; i++ {
-		emX := 220.0 + float64(i*12) + math.Sin(float64(ticks+i*18)*0.1)*5.0
-		emY := 138.0 - math.Mod(float64(ticks*2+i*16), 55.0)
-		ebitenutil.DrawRect(screen, emX, emY, 2, 2, color.RGBA{R: 255, G: 190, B: 45, A: 220})
+	// 2. Reflexos cintilantes do pôr do sol na Baía do Guajará
+	for i := 0; i < 8; i++ {
+		glX := 160.0 + float64(i*18) + math.Sin(float64(ticks+i*15)*0.08)*12.0
+		glY := 140.0 + math.Sin(float64(ticks+i*22)*0.06)*16.0
+		alpha := uint8(120 + math.Sin(float64(ticks+i*20)*0.1)*100)
+		ebitenutil.DrawRect(screen, glX, glY, 3, 1, color.RGBA{R: 255, G: 220, B: 130, A: alpha})
 	}
-	// Brilho pulsante das runas arqueológicas de pedra à esquerda
-	runeGlow := uint8(140 + math.Sin(float64(ticks)*0.08)*70)
-	ebitenutil.DrawRect(screen, 16, 138, 5, 2, color.RGBA{R: 40, G: 240, B: 190, A: runeGlow})
-	ebitenutil.DrawRect(screen, 17, 142, 3, 4, color.RGBA{R: 40, G: 240, B: 190, A: runeGlow})
 
 	// 3. Logo Principal do Jogo em destaque superior épico
 	logoW := 276.0
@@ -204,7 +201,7 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 	logoX := (screenWidth - logoW) / 2.0
 	logoY := 5.0
 
-	// Fundo da placa de título com relevo de pedra e borda dourada
+	// Fundo da placa de título com relevo moderno e borda dourada
 	ebitenutil.DrawRect(screen, logoX+2, logoY+2, logoW, logoH, color.RGBA{R: 0, G: 0, B: 0, A: 160})
 	ebitenutil.DrawRect(screen, logoX, logoY, logoW, logoH, color.RGBA{R: 10, G: 18, B: 28, A: 245})
 	ebitenutil.DrawRect(screen, logoX, logoY, logoW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
@@ -214,7 +211,7 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 
 	// Tipografia do Título com sombra para profundidade
 	ebitenutil.DebugPrintAt(screen, "★ P A I D E G U A   G A M E ★", int(logoX)+45, int(logoY)+3)
-	ebitenutil.DebugPrintAt(screen, "AVENTURA AMAZONICA: RUINAS DE MARAJO", int(logoX)+30, int(logoY)+14)
+	ebitenutil.DebugPrintAt(screen, "AVENTURA EM BELEM DO PARA", int(logoX)+55, int(logoY)+14)
 
 	// 4. Menu Principal Interativo centralizado
 	boxW := 226.0
@@ -260,7 +257,7 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 		}
 	}
 
-	// 5. Faixa inferior ampla com narrativa de ação e lore amazônico estimulante
+	// 5. Faixa inferior ampla com narrativa cultural de Belém do Pará
 	bannerH := 45.0
 	bannerY := screenHeight - bannerH
 	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, bannerH, color.RGBA{R: 6, G: 12, B: 22, A: 245})
@@ -269,14 +266,13 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 	if isAudioPlaying {
 		ebitenutil.DebugPrintAt(screen, "★ TRILHA SONORA: GUITARRADA & CARIMBO PROCEDURAL ★", 18, int(bannerY)+3)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "★ PAIDEGUA GAME: O MISTERIO DAS RUINAS AMAZONICAS ★", 16, int(bannerY)+3)
+		ebitenutil.DebugPrintAt(screen, "★ PAIDEGUA GAME: AVENTURA EM BELEM DO PARA ★", 24, int(bannerY)+3)
 	}
 
-	// Linha 2: Letreiro de ação e aventura épica para todas as idades
-	loreTicker := "★ MISSAO: Salte em cipos pendulares, escape de pocos de lama movedica e desvende templos perdidos!  " +
-		"★ DOIS HEROIS: Garoto com Baladeira de Acai ou Onca-Pintada com Rugido Sonico Trovejante!  " +
-		"★ RELIQUIAS: Colete Muiraquitas sagrados de jade, Urnas funerarias e Ouro de Tapajos!  " +
-		"★ BELEM DO PARA: Uma expedicao das matas sagradas aos cartoes postais historicos!  "
+	// Linha 2: Letreiro de ação e cultura paraense
+	loreTicker := "★ MISSAO: Explore o Mercado do Ver-o-Peso, o cais da Estacao das Docas e o Theatro da Paz!  " +
+		"★ DOIS HEROIS: O destemido Garoto Curumim ou a guardiao Onca-Pintada!  " +
+		"★ CULTURA: Saboreie acai, curta o carimbo de Belem e conquiste as reliquias sagradas!  "
 	loreTextWidth := len(loreTicker) * 6
 	loreOffset := ticks % loreTextWidth
 	loreBaseX := 52 - loreOffset
@@ -286,10 +282,10 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 	}
 	ebitenutil.DrawRect(screen, 0, bannerY+15, 48, 14, color.RGBA{R: 16, G: 32, B: 52, A: 255})
 	ebitenutil.DrawRect(screen, 48, bannerY+15, 1, 14, color.RGBA{R: 45, G: 215, B: 175, A: 255})
-	ebitenutil.DebugPrintAt(screen, "★LORE", 4, int(bannerY)+16)
+	ebitenutil.DebugPrintAt(screen, "★BELEM", 4, int(bannerY)+16)
 
 	// Linha 3: Dica clara de navegação
-	ebitenutil.DebugPrintAt(screen, "[CIMA/BAIXO] Navegar | [ESQ/DIR] Ajustar | [ENTER] Selecionar", 10, int(bannerY)+30)
+	ebitenutil.DebugPrintAt(screen, "[CIMA/BAIXO] Navegar | [ENTER/ESPACO] Escolher | [ESQ/DIR] Ajustar", 6, int(bannerY)+30)
 }
 
 // DrawCharacterSelectScreen renderiza a tela dedicada de escolha de personagem (Garoto vs Onça)
