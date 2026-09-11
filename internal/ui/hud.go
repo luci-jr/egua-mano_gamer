@@ -1030,14 +1030,6 @@ func DrawSpeechBubble(screen *ebiten.Image, x, y float64, text string) {
 	ebitenutil.DrawRect(screen, tailX+1, tailY+2, 3, 2, color.RGBA{R: 250, G: 210, B: 50, A: 255})
 	ebitenutil.DrawRect(screen, tailX+2, tailY+4, 1, 2, color.RGBA{R: 250, G: 210, B: 50, A: 255})
 
-	// Se a fala for sobre o calor, desenha gotinhas de suor caindo para simbolizar a alta temperatura
-	if strings.Contains(text, "sol pra cada um") {
-		sweatY := tailY + 2.0
-		ebitenutil.DrawRect(screen, tailX+9, sweatY, 2, 3, color.RGBA{R: 90, G: 190, B: 255, A: 240})
-		ebitenutil.DrawRect(screen, tailX+10, sweatY+3, 1, 2, color.RGBA{R: 90, G: 190, B: 255, A: 240})
-		ebitenutil.DrawRect(screen, tailX+15, sweatY-2, 2, 2, color.RGBA{R: 90, G: 190, B: 255, A: 240})
-	}
-
 	// Texto da giria
 	ebitenutil.DebugPrintAt(screen, text, int(x)+7, int(y)+3)
 }
