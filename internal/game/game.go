@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -18,19 +19,33 @@ const (
 	BaseSpeed    = 2.3
 )
 
+var (
+	SpeedMultipliers = []float64{0.8, 1.0, 1.3, 1.6}
+	SpeedLabels      = []string{"0.8x CALMO", "1.0x NORMAL", "1.3x RAPIDO", "1.6x TURBO"}
+)
+
 type Engine struct {
-	onca            *entities.Onca
-	obstacles       *entities.ObstacleManager
-	scenery         *scenery.Background
-	audio           *audio.Manager
+	player            entities.PlayerCharacter
+	garoto            *entities.Garoto
+	onca              *entities.Onca
+	selectedHero      int
+	isCharSelect      bool
+	projectiles       *entities.ProjectileManager
+	obstacles         *entities.ObstacleManager
+	vines             *entities.VineManager
+	relics            *entities.RelicManager
+	scenery           *scenery.Background
+	audio             *audio.Manager
 
 	score             int
+	relicsCount       int
 	ticks             int
 	lives             int
 	hearts            int
 	invincibleTicks   int
 	shakeTimer        int
 	hitDelayTimer     int
+	mudSinkTimer      int
 	speechBubbleTimer int
 	speechBubbleText  string
 	heatSpeechTimer   int
@@ -38,6 +53,8 @@ type Engine struct {
 	stageBannerTimer  int
 	isSaoBrasIntro    bool
 	saoBrasTimer      int
+	introMenuIndex    int
+	speedIndex        int
 	isTitleScreen     bool
 	isShowingCredits  bool
 	isPaused          bool
@@ -50,18 +67,30 @@ func NewEngine() *Engine {
 	audioMgr := audio.NewManager()
 	audioMgr.PlayIntroBGM()
 
+	g := entities.NewGaroto()
+	o := entities.NewOnca()
+
 	return &Engine{
-		onca:              entities.NewOnca(),
+		player:            g,
+		garoto:            g,
+		onca:              o,
+		selectedHero:      entities.HeroGaroto,
+		isCharSelect:      false,
+		projectiles:       entities.NewProjectileManager(ScreenWidth),
 		obstacles:         entities.NewObstacleManager(ScreenWidth, GroundY),
+		vines:             entities.NewVineManager(ScreenWidth),
+		relics:            entities.NewRelicManager(ScreenWidth, GroundY),
 		scenery:           scenery.NewBackground(),
 		audio:             audioMgr,
 		score:             0,
+		relicsCount:       0,
 		ticks:             0,
 		lives:             3,
 		hearts:            3,
 		invincibleTicks:   0,
 		shakeTimer:        0,
 		hitDelayTimer:     0,
+		mudSinkTimer:      0,
 		speechBubbleTimer: 0,
 		speechBubbleText:  "",
 		heatSpeechTimer:   0,
@@ -69,6 +98,8 @@ func NewEngine() *Engine {
 		stageBannerTimer:  120,
 		isSaoBrasIntro:    true,
 		saoBrasTimer:      0,
+		introMenuIndex:    0,
+		speedIndex:        1,
 		isTitleScreen:     false,
 		isShowingCredits:  false,
 		isPaused:          false,
@@ -103,19 +134,199 @@ func (e *Engine) Update() error {
 			return nil
 		}
 
-		// O jogo inicia quando clicar com o mouse/toque, ou apertar ENTER, ESPAÇO ou ESC
-		startTriggered := isPointerJustPressed() ||
-			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
-			inpututil.IsKeyJustPressed(ebiten.KeyEscape) ||
-			getVirtualKey("Escape")
-
-		if getVirtualKey("Escape") {
-			resetVirtualKey("Escape")
+		// Navegação no Menu Principal (5 opções)
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) || getVirtualKey("ArrowUp") {
+			resetVirtualKey("ArrowUp")
+			e.introMenuIndex = (e.introMenuIndex - 1 + 5) % 5
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) || getVirtualKey("ArrowDown") {
+			resetVirtualKey("ArrowDown")
+			e.introMenuIndex = (e.introMenuIndex + 1) % 5
 		}
 
-		if startTriggered {
+		// Ajuste com Esquerda / Direita
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
+			if e.introMenuIndex == 1 {
+				if e.selectedHero == entities.HeroGaroto {
+					e.selectedHero = entities.HeroOnca
+					e.player = e.onca
+					e.audio.PlayRoar(false)
+				} else {
+					e.selectedHero = entities.HeroGaroto
+					e.player = e.garoto
+					e.audio.PlayShot()
+				}
+			} else if e.introMenuIndex == 2 {
+				e.audio.ToggleMute()
+			} else if e.introMenuIndex == 3 {
+				e.speedIndex = (e.speedIndex - 1 + len(SpeedMultipliers)) % len(SpeedMultipliers)
+			}
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
+			if e.introMenuIndex == 1 {
+				if e.selectedHero == entities.HeroGaroto {
+					e.selectedHero = entities.HeroOnca
+					e.player = e.onca
+					e.audio.PlayRoar(false)
+				} else {
+					e.selectedHero = entities.HeroGaroto
+					e.player = e.garoto
+					e.audio.PlayShot()
+				}
+			} else if e.introMenuIndex == 2 {
+				e.audio.ToggleMute()
+			} else if e.introMenuIndex == 3 {
+				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
+			}
+		}
+
+		// Detecção de clique / toque
+		mouseTriggered := false
+		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+			mx, my := ebiten.CursorPosition()
+			boxX := (ScreenWidth - 220.0) / 2.0
+			boxY := 36.0
+			if float64(mx) >= boxX && float64(mx) <= boxX+220.0 && float64(my) >= boxY+21 && float64(my) <= boxY+21+5*14 {
+				clickedIdx := int((float64(my) - (boxY + 21)) / 14.0)
+				if clickedIdx >= 0 && clickedIdx < 5 {
+					e.introMenuIndex = clickedIdx
+					mouseTriggered = true
+				}
+			} else if float64(my) < boxY || float64(my) > boxY+96 {
+				mouseTriggered = true
+			}
+		}
+
+		selectTriggered := mouseTriggered ||
+			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
+			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
+			getVirtualKey("Enter")
+
+		if getVirtualKey("Enter") {
+			resetVirtualKey("Enter")
+		}
+
+		if selectTriggered {
+			switch e.introMenuIndex {
+			case 0:
+				e.isCharSelect = true
+			case 1:
+				if e.selectedHero == entities.HeroGaroto {
+					e.selectedHero = entities.HeroOnca
+					e.player = e.onca
+					e.audio.PlayRoar(false)
+				} else {
+					e.selectedHero = entities.HeroGaroto
+					e.player = e.garoto
+					e.audio.PlayShot()
+				}
+				e.isCharSelect = true
+			case 2:
+				e.audio.ToggleMute()
+			case 3:
+				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
+			case 4:
+				e.isShowingCredits = true
+			}
+			return nil
+		}
+		return nil
+	}
+
+	if e.isCharSelect {
+		e.ticks++
+		if !e.audio.IsMuted() {
+			e.audio.PlayIntroBGM()
+		}
+
+		leftPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft")
+		if getVirtualKey("ArrowLeft") {
+			resetVirtualKey("ArrowLeft")
+		}
+		rightPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) || getVirtualKey("ArrowRight")
+		if getVirtualKey("ArrowRight") {
+			resetVirtualKey("ArrowRight")
+		}
+
+		if leftPressed && e.selectedHero != entities.HeroGaroto {
+			e.selectedHero = entities.HeroGaroto
+			e.player = e.garoto
+			e.audio.PlayShot()
+		}
+		if rightPressed && e.selectedHero != entities.HeroOnca {
+			e.selectedHero = entities.HeroOnca
+			e.player = e.onca
+			e.audio.PlayRoar(false)
+		}
+
+		cardClicked := false
+		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+			mx, my := ebiten.CursorPosition()
+			if float64(my) >= 32.0 && float64(my) <= 174.0 {
+				if float64(mx) < ScreenWidth/2.0 {
+					if e.selectedHero != entities.HeroGaroto {
+						e.selectedHero = entities.HeroGaroto
+						e.player = e.garoto
+						e.audio.PlayShot()
+					} else {
+						cardClicked = true
+					}
+				} else {
+					if e.selectedHero != entities.HeroOnca {
+						e.selectedHero = entities.HeroOnca
+						e.player = e.onca
+						e.audio.PlayRoar(false)
+					} else {
+						cardClicked = true
+					}
+				}
+			} else if float64(my) > 174.0 {
+				cardClicked = true
+			}
+		}
+
+		touches := inpututil.AppendJustPressedTouchIDs(nil)
+		for _, id := range touches {
+			tx, ty := ebiten.TouchPosition(id)
+			if ty >= 32 && ty <= 174 {
+				if float64(tx) < ScreenWidth/2.0 {
+					if e.selectedHero != entities.HeroGaroto {
+						e.selectedHero = entities.HeroGaroto
+						e.player = e.garoto
+						e.audio.PlayShot()
+					} else {
+						cardClicked = true
+					}
+				} else {
+					if e.selectedHero != entities.HeroOnca {
+						e.selectedHero = entities.HeroOnca
+						e.player = e.onca
+						e.audio.PlayRoar(false)
+					} else {
+						cardClicked = true
+					}
+				}
+			} else if ty > 174 {
+				cardClicked = true
+			}
+		}
+
+		confirmPressed := cardClicked ||
+			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
+			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
+			getVirtualKey("Enter")
+
+		if getVirtualKey("Enter") {
+			resetVirtualKey("Enter")
+		}
+
+		if confirmPressed {
+			if e.selectedHero == entities.HeroGaroto {
+				e.player = e.garoto
+			} else {
+				e.player = e.onca
+			}
+			e.isCharSelect = false
 			e.isSaoBrasIntro = false
 			e.isTitleScreen = false
 			e.stage = 1
@@ -124,6 +335,13 @@ func (e *Engine) Update() error {
 			e.audio.RestartBGM()
 			return nil
 		}
+
+		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") {
+			resetVirtualKey("Escape")
+			e.isCharSelect = false
+			return nil
+		}
+
 		return nil
 	}
 
@@ -167,18 +385,33 @@ func (e *Engine) Update() error {
 
 		e.ticks++
 		e.scenery.Update(0.6)
-		e.onca.Update()
+		e.player.Update()
 		return nil
 	}
 
 	if e.isPaused {
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || getVirtualKey("ArrowUp") {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) || getVirtualKey("ArrowUp") {
 			resetVirtualKey("ArrowUp")
-			e.pauseMenuIndex = (e.pauseMenuIndex - 1 + 5) % 5
+			e.pauseMenuIndex = (e.pauseMenuIndex - 1 + 6) % 6
 		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || getVirtualKey("ArrowDown") {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) || getVirtualKey("ArrowDown") {
 			resetVirtualKey("ArrowDown")
-			e.pauseMenuIndex = (e.pauseMenuIndex + 1) % 5
+			e.pauseMenuIndex = (e.pauseMenuIndex + 1) % 6
+		}
+
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
+			if e.pauseMenuIndex == 1 {
+				e.audio.ToggleMute()
+			} else if e.pauseMenuIndex == 2 {
+				e.speedIndex = (e.speedIndex - 1 + len(SpeedMultipliers)) % len(SpeedMultipliers)
+			}
+		}
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
+			if e.pauseMenuIndex == 1 {
+				e.audio.ToggleMute()
+			} else if e.pauseMenuIndex == 2 {
+				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
+			}
 		}
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") {
@@ -203,9 +436,18 @@ func (e *Engine) Update() error {
 					e.audio.ResumeBGM()
 				}
 			case 1:
-				e.onca.Reset()
+				e.audio.ToggleMute()
+			case 2:
+				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
+			case 3:
+				e.player.Reset()
+				e.projectiles.Reset()
 				e.obstacles.Reset()
+				e.vines.Reset()
+				e.relics.Reset()
 				e.score = 0
+				e.relicsCount = 0
+				e.mudSinkTimer = 0
 				e.lives = 3
 				e.hearts = 3
 				e.stage = 1
@@ -214,11 +456,9 @@ func (e *Engine) Update() error {
 				e.speechBubbleText = ""
 				e.isPaused = false
 				e.audio.RestartBGM()
-			case 2:
-				e.audio.ToggleMute()
-			case 3:
-				e.isShowingCredits = true
 			case 4:
+				e.isShowingCredits = true
+			case 5:
 				return ebiten.Termination
 			}
 		}
@@ -232,9 +472,14 @@ func (e *Engine) Update() error {
 		}
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyR) {
-			e.onca.Reset()
+			e.player.Reset()
+			e.projectiles.Reset()
 			e.obstacles.Reset()
+			e.vines.Reset()
+			e.relics.Reset()
 			e.score = 0
+			e.relicsCount = 0
+			e.mudSinkTimer = 0
 			e.lives = 3
 			e.hearts = 3
 			e.stage = 1
@@ -255,14 +500,22 @@ func (e *Engine) Update() error {
 				e.stageBannerTimer = 130
 				e.isStageComplete = false
 				e.hearts = 3
+				e.projectiles.Reset()
 				e.obstacles.Reset()
+				e.vines.Reset()
+				e.relics.Reset()
 				if !e.audio.IsMuted() {
 					e.audio.ResumeBGM()
 				}
 			} else {
-				e.onca.Reset()
+				e.player.Reset()
+				e.projectiles.Reset()
 				e.obstacles.Reset()
+				e.vines.Reset()
+				e.relics.Reset()
 				e.score = 0
+				e.relicsCount = 0
+				e.mudSinkTimer = 0
 				e.lives = 3
 				e.hearts = 3
 				e.stage = 1
@@ -288,9 +541,14 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeySpace)
 
 		if restartPressed {
-			e.onca.Reset()
+			e.player.Reset()
+			e.projectiles.Reset()
 			e.obstacles.Reset()
+			e.vines.Reset()
+			e.relics.Reset()
 			e.score = 0
+			e.relicsCount = 0
+			e.mudSinkTimer = 0
 			e.lives = 3
 			e.hearts = 3
 			e.stage = 1
@@ -373,8 +631,11 @@ func (e *Engine) Update() error {
 		return nil
 	}
 
-	// Movimentação horizontal da Onça (Adiantar e Recuar com Teclado, Botões Virtuais ou Toque no Canvas)
+	// Movimentação horizontal do herói (Adiantar e Recuar com Teclado, Botões Virtuais ou Toque no Canvas)
 	moveSpeed := 2.2
+	if e.selectedHero == entities.HeroOnca {
+		moveSpeed = 2.4 // Onça tem reflexos e velocidade felina ligeiramente superiores
+	}
 	moveForward := ebiten.IsKeyPressed(ebiten.KeyArrowRight) || ebiten.IsKeyPressed(ebiten.KeyD) || getVirtualKey("ArrowRight")
 	moveBackward := ebiten.IsKeyPressed(ebiten.KeyArrowLeft) || ebiten.IsKeyPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft")
 
@@ -382,7 +643,6 @@ func (e *Engine) Update() error {
 	duckJustPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS)
 
 	jumpJustPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) ||
-		inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
 		inpututil.IsKeyJustPressed(ebiten.KeyW) ||
 		getVirtualKey("JustJump")
 	if getVirtualKey("JustJump") {
@@ -390,7 +650,6 @@ func (e *Engine) Update() error {
 	}
 
 	jumpHolding := ebiten.IsKeyPressed(ebiten.KeyArrowUp) ||
-		ebiten.IsKeyPressed(ebiten.KeySpace) ||
 		ebiten.IsKeyPressed(ebiten.KeyW) ||
 		getVirtualKey("Jump")
 
@@ -420,43 +679,132 @@ func (e *Engine) Update() error {
 		}
 	}
 
-	if moveForward {
-		e.onca.MoveForward(moveSpeed)
+	aimUp := (ebiten.IsKeyPressed(ebiten.KeyArrowUp) || ebiten.IsKeyPressed(ebiten.KeyW) || getVirtualKey("ArrowUp")) && !e.player.IsPlayerJumping()
+	e.player.SetAimUp(aimUp)
+
+	attackJustPressed := inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyX) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyJ) ||
+		getVirtualKey("Attack")
+	if getVirtualKey("Attack") {
+		resetVirtualKey("Attack")
 	}
-	if moveBackward {
-		e.onca.MoveBackward(moveSpeed)
+	if attackJustPressed {
+		e.player.TriggerAttack()
+		origX, origY, vx, vy := e.player.GetShootOrigin(GroundY)
+		if e.selectedHero == entities.HeroOnca {
+			e.projectiles.ShootRoar(origX, origY, vx, vy)
+			e.audio.PlayRoar(false)
+		} else {
+			e.projectiles.ShootAcai(origX, origY, vx, vy)
+			e.audio.PlayShot()
+		}
 	}
 
-	if duckJustPressed && !e.onca.IsJumping {
+	if moveForward {
+		e.player.MoveForward(moveSpeed)
+	}
+	if moveBackward {
+		e.player.MoveBackward(moveSpeed)
+	}
+	if !moveForward && !moveBackward {
+		e.player.StopRunning()
+	}
+
+	if duckJustPressed && !e.player.IsPlayerJumping() {
 		e.audio.PlayDuck()
 	}
 
 	if duckKey {
-		if e.onca.IsJumping {
-			e.onca.FastDrop()
+		if e.player.IsPlayerJumping() {
+			e.player.FastDrop()
 		} else {
-			e.onca.SetCrouch(true)
+			e.player.SetCrouch(true)
 		}
 	} else {
-		e.onca.SetCrouch(false)
+		e.player.SetCrouch(false)
 	}
 
 	if jumpJustPressed {
-		jumped, isDouble := e.onca.Jump()
+		wasSwinging := e.player.IsPlayerSwinging()
+		jumped, isDouble := e.player.Jump()
 		if jumped {
-			e.audio.PlayRoar(isDouble)
+			if wasSwinging {
+				if e.selectedHero == entities.HeroOnca {
+					e.audio.PlayRoar(true)
+				} else {
+					e.audio.PlayJungleYell()
+				}
+			} else {
+				e.audio.PlayRoar(isDouble)
+			}
 		}
 	}
 
-	if !jumpHolding && e.onca.JumpHolding {
-		e.onca.ReleaseJump()
+	if !jumpHolding && e.player.GetJumpHolding() {
+		e.player.ReleaseJump()
 	}
 
-	e.onca.Update()
+	e.player.Update()
+	e.projectiles.Update(ScreenWidth)
+
+	playerX, playerY, playerW, playerH := e.player.GetBounds(GroundY)
+
+	// Agarrar o cipó pendular se estiver no ar e cruzar com o nó inferior (Estilo Pitfall)
+	if !e.player.IsPlayerSwinging() && e.player.IsPlayerJumping() {
+		if v := e.vines.CheckGrab(playerX, playerY, playerW, playerH); v != nil {
+			e.player.GrabVine(v)
+		}
+	}
+
+	// Colisão de Projéteis (Sementes da Baladeira) contra Inimigos e Obstáculos
+	for _, proj := range e.projectiles.Projectiles {
+		if !proj.Active {
+			continue
+		}
+		px, py, pw, ph := proj.GetBounds()
+		hit, hitX, hitY, obsType := e.obstacles.CheckProjectileHit(px, py, pw, ph)
+		if hit {
+			proj.Active = false
+			e.audio.PlayDefeat()
+
+			scoreBonus := 50
+			burstColor := color.RGBA{R: 215, G: 50, B: 55, A: 255}
+			switch obsType {
+			case entities.TypeAir:
+				scoreBonus = 100
+				burstColor = color.RGBA{R: 240, G: 240, B: 250, A: 255} // Penas
+			case entities.TypeJacare:
+				scoreBonus = 120
+				burstColor = color.RGBA{R: 45, G: 160, B: 55, A: 255} // Escamas
+			case entities.TypeSnake:
+				scoreBonus = 90
+				burstColor = color.RGBA{R: 245, G: 180, B: 35, A: 255} // Coral
+			default:
+				scoreBonus = 50
+				burstColor = color.RGBA{R: 120, G: 45, B: 140, A: 255} // Açaí
+			}
+
+			e.score += scoreBonus
+			e.projectiles.SpawnHitBurst(hitX, hitY, burstColor, 10)
+			e.projectiles.AddScorePopup(hitX-8, hitY-10, scoreBonus)
+		}
+	}
 
 	stageProgress := float64(e.score % 1000)
-	currentSpeed := BaseSpeed + float64(e.stage-1)*0.35 + (stageProgress / 2500.0)
+	currentSpeed := (BaseSpeed + float64(e.stage-1)*0.35 + (stageProgress / 2500.0)) * SpeedMultipliers[e.speedIndex]
 	e.scenery.Update(currentSpeed)
+	e.vines.Update(currentSpeed)
+	e.relics.Update(currentSpeed)
+
+	// Coleta de Relíquias e Tesouros Amazônicos (Muiraquitã, Urna Marajoara, Ouro)
+	if collected, r := e.relics.CheckCollection(playerX, playerY, playerW, playerH); collected {
+		e.relicsCount++
+		e.score += r.Value
+		e.audio.PlayTreasure()
+		e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 255, G: 220, B: 50, A: 255}, 12)
+		e.projectiles.AddScorePopup(r.X, r.Y-8, r.Value)
+	}
 
 	if passed := e.obstacles.Update(currentSpeed); passed > 0 {
 		e.score += passed * 25
@@ -465,57 +813,107 @@ func (e *Engine) Update() error {
 		e.score += 1
 	}
 
-	oncaX, oncaY, oncaW, oncaH := e.onca.GetBounds(GroundY)
-	hit, hitType := e.obstacles.CheckCollision(oncaX, oncaY, oncaW, oncaH)
+	hit, hitType := e.obstacles.CheckCollision(playerX, playerY, playerW, playerH)
 	if hit && e.invincibleTicks <= 0 {
-		e.hearts--
-		e.shakeTimer = 14
-		if e.hearts <= 0 {
-			e.lives--
-			if e.lives <= 0 {
-				e.lives = 0
-				e.hearts = 0
-				e.isGameOver = true
-				e.speechBubbleText = "Levei o farelo mano, mancada!"
-				e.speechBubbleTimer = 999999
-				e.audio.PauseBGM()
-				e.audio.PlayGameOver()
-			} else {
-				e.hearts = 3 // Restaura os 3 corações para a próxima vida
-				e.speechBubbleText = fmt.Sprintf("PERDEU 1 VIDA! RESTAM %d", e.lives)
-				e.speechBubbleTimer = 85
-				e.hitDelayTimer = 25
-				e.invincibleTicks = 90
-				e.audio.PlayHit()
+		if hitType == entities.TypeMudPit {
+			// Se o jogador estiver no cipó, sobrevoa a lama movediça em segurança!
+			if !e.player.IsPlayerSwinging() && !e.player.IsPlayerJumping() {
+				e.mudSinkTimer++
+				if e.selectedHero == entities.HeroOnca {
+					e.speechBubbleText = "LAMA SUJA! PULE RAPIDO!"
+				} else {
+					e.speechBubbleText = "LAMA MOVEDICA! PULE!"
+				}
+				e.speechBubbleTimer = 35
+				if e.mudSinkTimer%14 == 0 {
+					e.audio.PlayDuck()
+				}
+				if e.mudSinkTimer >= 42 {
+					e.hearts--
+					e.shakeTimer = 12
+					e.mudSinkTimer = 0
+					e.audio.PlayHit()
+				}
 			}
 		} else {
-			if hitType == entities.TypeJacare {
-				e.speechBubbleText = "EGUA DO JACARE!..."
-			} else if hitType == entities.TypeSnake {
-				e.speechBubbleText = "VALHA-ME! UMA COBRA!"
+			e.mudSinkTimer = 0
+			e.hearts--
+			e.shakeTimer = 14
+			if e.hearts <= 0 {
+				e.lives--
+				if e.lives <= 0 {
+					e.lives = 0
+					e.hearts = 0
+					e.isGameOver = true
+					if e.selectedHero == entities.HeroOnca {
+						e.speechBubbleText = "Arrgh! A floresta me chama..."
+					} else {
+						e.speechBubbleText = "Levei o farelo mano, mancada!"
+					}
+					e.speechBubbleTimer = 999999
+					e.audio.PauseBGM()
+					e.audio.PlayGameOver()
+				} else {
+					e.hearts = 3 // Restaura os 3 corações para a próxima vida
+					e.speechBubbleText = fmt.Sprintf("PERDEU 1 VIDA! RESTAM %d", e.lives)
+					e.speechBubbleTimer = 85
+					e.hitDelayTimer = 25
+					e.invincibleTicks = 90
+					e.audio.PlayHit()
+				}
 			} else {
-				e.speechBubbleText = "EGUA MANO!..."
+				if hitType == entities.TypeJacare {
+					if e.selectedHero == entities.HeroOnca {
+						e.speechBubbleText = "EGUA DO JACARE FOFOQUEIRO!"
+					} else {
+						e.speechBubbleText = "EGUA DO JACARE!..."
+					}
+				} else if hitType == entities.TypeSnake {
+					if e.selectedHero == entities.HeroOnca {
+						e.speechBubbleText = "SAI PRA LA, COBRA TRAIDORA!"
+					} else {
+						e.speechBubbleText = "VALHA-ME! UMA COBRA!"
+					}
+				} else {
+					e.speechBubbleText = "EGUA MANO!..."
+				}
+				e.speechBubbleTimer = 65
+				e.hitDelayTimer = 22
+				e.invincibleTicks = 75
+				e.audio.PlayHit()
 			}
-			e.speechBubbleTimer = 65
-			e.hitDelayTimer = 22
-			e.invincibleTicks = 75
-			e.audio.PlayHit()
 		}
+	} else if !hit {
+		e.mudSinkTimer = 0
 	}
 
 	return nil
 }
 
 func (e *Engine) Draw(screen *ebiten.Image) {
+	heroName := "GAROTO"
+	heroFull := "GAROTO CURUMIM"
+	if e.selectedHero == entities.HeroOnca {
+		heroName = "ONCA"
+		heroFull = "ONCA PINTADA"
+	}
+
 	if e.isSaoBrasIntro {
-		ui.DrawSaoBrasIntro(screen, ScreenWidth, ScreenHeight, e.ticks, e.audio.IsIntroPlaying())
+		ui.DrawTitleIntro(screen, ScreenWidth, ScreenHeight, e.ticks, e.audio.IsIntroPlaying(), e.introMenuIndex, e.audio.IsMuted(), SpeedLabels[e.speedIndex], heroFull)
+		return
+	}
+
+	if e.isCharSelect {
+		ui.DrawCharacterSelectScreen(screen, ScreenWidth, ScreenHeight, e.ticks, e.selectedHero)
 		return
 	}
 
 	e.scenery.Draw(screen, ScreenWidth, GroundY, e.ticks, e.stage)
+	e.vines.Draw(screen)
+	e.relics.Draw(screen, e.ticks)
 
 	if e.isTitleScreen {
-		e.onca.Draw(screen, GroundY, e.ticks, 0)
+		e.player.Draw(screen, GroundY, e.ticks, 0)
 		ui.DrawCityFooter(screen, ScreenWidth, ScreenHeight, 1, e.ticks)
 		if e.isShowingCredits {
 			ui.DrawCreditsScreen(screen, ScreenWidth, ScreenHeight)
@@ -525,24 +923,25 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 		return
 	}
 
-	e.onca.Draw(screen, GroundY, e.ticks, e.invincibleTicks)
+	e.player.Draw(screen, GroundY, e.ticks, e.invincibleTicks)
 
 	if e.speechBubbleTimer > 0 && e.speechBubbleText != "" {
-		oncaX, oncaY, _, _ := e.onca.GetBounds(GroundY)
-		bubbleX := oncaX - 10
+		pX, pY, _, _ := e.player.GetBounds(GroundY)
+		bubbleX := pX - 10
 		if bubbleX < 10 {
 			bubbleX = 10
 		}
 		if bubbleX+float64(len(e.speechBubbleText)*6) > ScreenWidth-10 {
-			bubbleX = oncaX - 25
+			bubbleX = pX - 25
 		}
-		ui.DrawSpeechBubble(screen, bubbleX, oncaY-24, e.speechBubbleText)
+		ui.DrawSpeechBubble(screen, bubbleX, pY-24, e.speechBubbleText)
 	}
 
 	e.obstacles.Draw(screen, e.ticks, e.stage)
+	e.projectiles.Draw(screen, e.ticks)
 
-	isDoubleJump := e.onca.JumpCount == 2
-	ui.DrawHUD(screen, e.lives, e.hearts, e.score, e.stage, isDoubleJump, e.stageBannerTimer, e.audio.IsMuted(), e.ticks)
+	isDoubleJump := e.player.GetJumpCount() == 2
+	ui.DrawHUD(screen, e.lives, e.hearts, e.score, e.stage, isDoubleJump, e.stageBannerTimer, e.audio.IsMuted(), e.ticks, e.relicsCount, heroName)
 
 	if e.isShowingCredits {
 		ui.DrawCreditsScreen(screen, ScreenWidth, ScreenHeight)
@@ -550,7 +949,7 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 	}
 
 	if e.isPaused {
-		ui.DrawPauseMenu(screen, ScreenWidth, ScreenHeight, e.pauseMenuIndex, e.audio.IsMuted())
+		ui.DrawPauseMenu(screen, ScreenWidth, ScreenHeight, e.pauseMenuIndex, e.audio.IsMuted(), SpeedLabels[e.speedIndex])
 	}
 
 	if e.isStageComplete {
@@ -568,7 +967,7 @@ func (e *Engine) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 func Start() error {
 	ebiten.SetWindowSize(680, 420)
-	ebiten.SetWindowTitle("Pai D'Égua Game: A Aventura da Onça em Belém do Pará")
+	ebiten.SetWindowTitle("Pai D'Égua Game: Aventura Amazônica")
 
 	engine := NewEngine()
 	return ebiten.RunGame(engine)

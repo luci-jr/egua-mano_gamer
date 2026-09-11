@@ -15,6 +15,10 @@ type Manager struct {
 	sndDoubleRoar []byte
 	sndDuck       []byte
 	sndHit        []byte
+	sndShot       []byte
+	sndDefeat     []byte
+	sndJungleYell []byte
+	sndTreasure   []byte
 	sndEguaMano   []byte
 	sndGameOver   []byte
 	sndStageUp    []byte
@@ -177,6 +181,134 @@ func createStageUpJingle() []byte {
 			buf[idx+3] = byte(sample >> 8)
 			sampleIdx++
 		}
+	}
+	return buf
+}
+
+func createSlingshotShot() []byte {
+	durationMs := 95
+	numSamples := sampleRate * durationMs / 1000
+	buf := make([]byte, numSamples*4)
+	phase := 0.0
+
+	for i := 0; i < numSamples; i++ {
+		t := float64(i) / float64(numSamples)
+		freq := 780.0*math.Exp(-12.0*t) + 180.0
+		phase += 2.0 * math.Pi * freq / float64(sampleRate)
+
+		tone := math.Sin(phase) + 0.3*math.Sin(phase*2.0)
+		attack := math.Min(1.0, float64(i)/float64(sampleRate*0.005))
+		decay := math.Exp(-8.0 * t)
+		sample := int16(tone * attack * decay * 0.32 * 32767.0)
+
+		idx := i * 4
+		buf[idx] = byte(sample)
+		buf[idx+1] = byte(sample >> 8)
+		buf[idx+2] = byte(sample)
+		buf[idx+3] = byte(sample >> 8)
+	}
+	return buf
+}
+
+func createEnemyDefeat() []byte {
+	durationMs := 130
+	numSamples := sampleRate * durationMs / 1000
+	buf := make([]byte, numSamples*4)
+	phase := 0.0
+
+	for i := 0; i < numSamples; i++ {
+		t := float64(i) / float64(numSamples)
+		freq := 280.0*math.Sin(t*math.Pi*2.0) + 160.0*math.Exp(-5.0*t) + 80.0
+		phase += 2.0 * math.Pi * freq / float64(sampleRate)
+
+		noise := (float64((i*1103515245+12345)%32768)/16384.0 - 1.0) * 0.25
+		tone := math.Sin(phase)*0.75 + noise
+
+		attack := math.Min(1.0, float64(i)/float64(sampleRate*0.008))
+		decay := math.Exp(-6.5 * t)
+		sample := int16(tone * attack * decay * 0.35 * 32767.0)
+
+		idx := i * 4
+		buf[idx] = byte(sample)
+		buf[idx+1] = byte(sample >> 8)
+		buf[idx+2] = byte(sample)
+		buf[idx+3] = byte(sample >> 8)
+	}
+	return buf
+}
+
+func createJungleYell() []byte {
+	durationMs := 480
+	numSamples := sampleRate * durationMs / 1000
+	buf := make([]byte, numSamples*4)
+	phase := 0.0
+
+	for i := 0; i < numSamples; i++ {
+		t := float64(i) / float64(numSamples)
+
+		var freq float64
+		if t < 0.18 {
+			freq = 360.0 + (t/0.18)*200.0
+		} else if t < 0.55 {
+			yodelPhase := (t - 0.18) / 0.37
+			yodel := math.Sin(yodelPhase * math.Pi * 12.0)
+			freq = 520.0 + yodel*65.0
+		} else if t < 0.82 {
+			yodelPhase := (t - 0.55) / 0.27
+			yodel := math.Sin(yodelPhase * math.Pi * 8.0)
+			freq = 430.0 + yodel*50.0
+		} else {
+			dropPhase := (t - 0.82) / 0.18
+			freq = 380.0 - dropPhase*90.0
+		}
+
+		phase += 2.0 * math.Pi * freq / float64(sampleRate)
+		tone := math.Sin(phase) + 0.45*math.Sin(phase*2.0) + 0.22*math.Sin(phase*3.0)
+
+		attack := math.Min(1.0, float64(i)/float64(sampleRate*0.015))
+		decay := 1.0
+		if t > 0.75 {
+			decay = math.Exp(-7.0 * (t - 0.75) / 0.25)
+		}
+
+		sample := int16(tone * attack * decay * 0.38 * 32767.0)
+		idx := i * 4
+		buf[idx] = byte(sample)
+		buf[idx+1] = byte(sample >> 8)
+		buf[idx+2] = byte(sample)
+		buf[idx+3] = byte(sample >> 8)
+	}
+	return buf
+}
+
+func createTreasureJingle() []byte {
+	durationMs := 340
+	numSamples := sampleRate * durationMs / 1000
+	buf := make([]byte, numSamples*4)
+	phase := 0.0
+
+	notes := []float64{1318.5, 1661.2, 1975.5, 2637.0}
+	samplesPerNote := numSamples / len(notes)
+
+	for i := 0; i < numSamples; i++ {
+		noteIdx := i / samplesPerNote
+		if noteIdx >= len(notes) {
+			noteIdx = len(notes) - 1
+		}
+		freq := notes[noteIdx]
+		phase += 2.0 * math.Pi * freq / float64(sampleRate)
+
+		noteT := float64(i%samplesPerNote) / float64(samplesPerNote)
+		envelope := math.Exp(-5.5 * noteT)
+
+		tone := math.Sin(phase) + 0.35*math.Sin(phase*2.75)
+		sample := int16(tone * envelope * 0.32 * 32767.0)
+
+		idx := i * 4
+		buf[idx] = byte(sample)
+		buf[idx+1] = byte(sample >> 8)
+		buf[idx+2] = byte(sample)
+		buf[idx+3] = byte(sample >> 8)
 	}
 	return buf
 }
@@ -352,6 +484,10 @@ func NewManager() *Manager {
 		sndDoubleRoar: createRoar(true),
 		sndDuck:       createSmoothTone(260, 160, 70, 0.1),
 		sndHit:        createHitPunch(),
+		sndShot:       createSlingshotShot(),
+		sndDefeat:     createEnemyDefeat(),
+		sndJungleYell: createJungleYell(),
+		sndTreasure:   createTreasureJingle(),
 		sndEguaMano:   createEguaManoSfx(),
 		sndGameOver:   createSmoothTone(320, 95, 450, 0.3),
 		sndStageUp:    createStageUpJingle(),
@@ -455,6 +591,34 @@ func (m *Manager) PlayStageUp() {
 		return
 	}
 	m.ctx.NewPlayerFromBytes(m.sndStageUp).Play()
+}
+
+func (m *Manager) PlayShot() {
+	if m.isMuted || m.ctx == nil || len(m.sndShot) == 0 {
+		return
+	}
+	m.ctx.NewPlayerFromBytes(m.sndShot).Play()
+}
+
+func (m *Manager) PlayDefeat() {
+	if m.isMuted || m.ctx == nil || len(m.sndDefeat) == 0 {
+		return
+	}
+	m.ctx.NewPlayerFromBytes(m.sndDefeat).Play()
+}
+
+func (m *Manager) PlayJungleYell() {
+	if m.isMuted || m.ctx == nil || len(m.sndJungleYell) == 0 {
+		return
+	}
+	m.ctx.NewPlayerFromBytes(m.sndJungleYell).Play()
+}
+
+func (m *Manager) PlayTreasure() {
+	if m.isMuted || m.ctx == nil || len(m.sndTreasure) == 0 {
+		return
+	}
+	m.ctx.NewPlayerFromBytes(m.sndTreasure).Play()
 }
 
 func (m *Manager) PauseBGM() {

@@ -15,6 +15,7 @@ const (
 	TypeAir    ObstacleType = 1 // Urubu / Gaivota / Arara (aéreo - desvia agachando)
 	TypeJacare ObstacleType = 2 // Jacaré-Açu Amazônico com bocarra, dentes e escamas
 	TypeSnake  ObstacleType = 3 // Cobra-Coral Amazônica ondulando com língua bífida
+	TypeMudPit ObstacleType = 4 // Poço de Lama Movediça / Areia Movediça (Estilo Pitfall)
 )
 
 type Obstacle struct {
@@ -23,6 +24,8 @@ type Obstacle struct {
 	screenWidth float64
 	groundY     float64
 	collided    bool
+	Defeated    bool
+	DefeatTicks int
 }
 
 func NewObstacle(screenWidth, groundY float64) *Obstacle {
@@ -32,10 +35,15 @@ func NewObstacle(screenWidth, groundY float64) *Obstacle {
 		screenWidth: screenWidth,
 		groundY:     groundY,
 		collided:    false,
+		Defeated:    false,
+		DefeatTicks: 0,
 	}
 }
 
 func (obs *Obstacle) GetBounds() (x, y, w, h float64) {
+	if obs.Defeated {
+		return 0, 0, 0, 0
+	}
 	switch obs.Type {
 	case TypeGround:
 		w = 22.0
@@ -57,6 +65,11 @@ func (obs *Obstacle) GetBounds() (x, y, w, h float64) {
 		h = 12.0
 		x = obs.X
 		y = obs.groundY - h
+	case TypeMudPit:
+		w = 40.0
+		h = 10.0
+		x = obs.X
+		y = obs.groundY - 2.0
 	default:
 		w = 22.0
 		h = 24.0
@@ -66,14 +79,19 @@ func (obs *Obstacle) GetBounds() (x, y, w, h float64) {
 	return x, y, w, h
 }
 
-func (obs *Obstacle) CheckCollision(oncaX, oncaY, oncaW, oncaH float64) bool {
+func (obs *Obstacle) CheckCollision(playerX, playerY, playerW, playerH float64) bool {
 	obsX, obsY, obsW, obsH := obs.GetBounds()
-	overlapX := obsX < oncaX+oncaW && obsX+obsW > oncaX
-	overlapY := obsY < oncaY+oncaH && obsY+obsH > oncaY
+	overlapX := obsX < playerX+playerW && obsX+obsW > playerX
+	overlapY := obsY < playerY+playerH && obsY+obsH > playerY
 	return overlapX && overlapY
 }
 
 func (obs *Obstacle) Draw(screen *ebiten.Image, ticks int, stage int) {
+	if obs.Defeated {
+		if (obs.DefeatTicks/3)%2 != 0 {
+			return
+		}
+	}
 	switch obs.Type {
 	case TypeGround:
 		obs.drawGround(screen, ticks, stage)
@@ -83,6 +101,8 @@ func (obs *Obstacle) Draw(screen *ebiten.Image, ticks int, stage int) {
 		obs.drawJacare(screen, ticks, stage)
 	case TypeSnake:
 		obs.drawSnake(screen, ticks, stage)
+	case TypeMudPit:
+		obs.drawMudPit(screen, ticks)
 	}
 }
 
@@ -334,9 +354,61 @@ func NewObstacleManager(screenWidth, groundY float64) *ObstacleManager {
 	return m
 }
 
+func (obs *Obstacle) drawMudPit(screen *ebiten.Image, ticks int) {
+	cMudDark := color.RGBA{R: 35, G: 22, B: 14, A: 255}
+	cMudMid := color.RGBA{R: 62, G: 42, B: 26, A: 255}
+	cMudLight := color.RGBA{R: 105, G: 72, B: 42, A: 255}
+	cMoss := color.RGBA{R: 42, G: 125, B: 45, A: 255}
+
+	pitW := 40.0
+	pitH := 10.0
+	py := obs.groundY - 2.0
+
+	// Poço escavado no solo (lamaçal movediço estilo Pitfall)
+	ebitenutil.DrawRect(screen, obs.X, py, pitW, pitH, cMudDark)
+	ebitenutil.DrawRect(screen, obs.X+2, py+2, pitW-4, pitH-2, cMudMid)
+
+	// Bordas com vegetação pantanosa
+	ebitenutil.DrawRect(screen, obs.X-2, py-2, 4, 4, cMoss)
+	ebitenutil.DrawRect(screen, obs.X+pitW-2, py-2, 4, 4, cMoss)
+
+	// Bolhas de lodo borbulhando no pântano
+	bubblePhase := (ticks / 9) % 3
+	switch bubblePhase {
+	case 0:
+		ebitenutil.DrawRect(screen, obs.X+8, py+2, 4, 3, cMudLight)
+		ebitenutil.DrawRect(screen, obs.X+9, py+1, 2, 1, cMudLight)
+	case 1:
+		ebitenutil.DrawRect(screen, obs.X+20, py+3, 5, 4, cMudLight)
+		ebitenutil.DrawRect(screen, obs.X+21, py+2, 3, 1, cMudLight)
+	case 2:
+		ebitenutil.DrawRect(screen, obs.X+30, py+2, 4, 3, cMudLight)
+	}
+}
+
 func (m *ObstacleManager) Update(speed float64) int {
 	passedCount := 0
 	for _, obs := range m.Obstacles {
+		if obs.Defeated {
+			obs.DefeatTicks--
+			obs.X -= speed * 0.4
+			if obs.DefeatTicks <= 0 || obs.X < -40 {
+				furthestX := m.screenWidth
+				for _, other := range m.Obstacles {
+					if other != obs && other.X > furthestX {
+						furthestX = other.X
+					}
+				}
+				obs.X = furthestX + 140.0 + float64(rand.Intn(50))
+				obs.Type = ObstacleType(rand.Intn(5))
+				obs.collided = false
+				obs.Defeated = false
+				obs.DefeatTicks = 0
+				passedCount++
+			}
+			continue
+		}
+
 		obs.X -= speed
 		if obs.X < -40 {
 			furthestX := m.screenWidth
@@ -346,23 +418,40 @@ func (m *ObstacleManager) Update(speed float64) int {
 				}
 			}
 			obs.X = furthestX + 140.0 + float64(rand.Intn(50))
-			// Sorteia entre os 4 obstáculos oficiais coesos
-			obs.Type = ObstacleType(rand.Intn(4))
+			obs.Type = ObstacleType(rand.Intn(5))
 			obs.collided = false
+			obs.Defeated = false
+			obs.DefeatTicks = 0
 			passedCount++
 		}
 	}
 	return passedCount
 }
 
-func (m *ObstacleManager) CheckCollision(oncaX, oncaY, oncaW, oncaH float64) (bool, ObstacleType) {
+func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH float64) (bool, ObstacleType) {
 	for _, obs := range m.Obstacles {
-		if !obs.collided && obs.CheckCollision(oncaX, oncaY, oncaW, oncaH) {
+		if !obs.collided && !obs.Defeated && obs.CheckCollision(playerX, playerY, playerW, playerH) {
 			obs.collided = true
 			return true, obs.Type
 		}
 	}
 	return false, TypeGround
+}
+
+func (m *ObstacleManager) CheckProjectileHit(projX, projY, projW, projH float64) (bool, float64, float64, ObstacleType) {
+	for _, obs := range m.Obstacles {
+		if !obs.Defeated && obs.Type != TypeMudPit && obs.X > -20 && obs.X < m.screenWidth+20 {
+			ox, oy, ow, oh := obs.GetBounds()
+			overlapX := projX < ox+ow && projX+projW > ox
+			overlapY := projY < oy+oh && projY+projH > oy
+			if overlapX && overlapY {
+				obs.Defeated = true
+				obs.DefeatTicks = 26
+				return true, ox + ow/2.0, oy + oh/2.0, obs.Type
+			}
+		}
+	}
+	return false, 0, 0, TypeGround
 }
 
 func (m *ObstacleManager) Draw(screen *ebiten.Image, ticks int, stage int) {
@@ -375,10 +464,12 @@ func (m *ObstacleManager) Draw(screen *ebiten.Image, ticks int, stage int) {
 
 func (m *ObstacleManager) Reset() {
 	spacing := 165.0
-	types := []ObstacleType{TypeGround, TypeAir, TypeJacare, TypeSnake}
+	types := []ObstacleType{TypeGround, TypeAir, TypeJacare, TypeSnake, TypeMudPit}
 	for i, obs := range m.Obstacles {
 		obs.X = m.screenWidth + 25.0 + float64(i)*spacing
 		obs.Type = types[i%len(types)]
 		obs.collided = false
+		obs.Defeated = false
+		obs.DefeatTicks = 0
 	}
 }

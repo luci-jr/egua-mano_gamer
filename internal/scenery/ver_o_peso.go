@@ -7,6 +7,7 @@ import (
 	"image/color"
 	_ "image/jpeg"
 	_ "image/png"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -54,11 +55,7 @@ func (b *Background) Draw(screen *ebiten.Image, screenWidth, groundY float64, ti
 	case 3:
 		b.drawTheatroDaPaz(screen, screenWidth, groundY, ticks)
 	default:
-		if b.bgImage != nil {
-			b.drawVerOPesoImage(screen, screenWidth, groundY)
-		} else {
-			b.drawVeroPesoProcedural(screen, screenWidth, groundY, ticks)
-		}
+		b.drawAmazonRuins(screen, screenWidth, groundY, ticks)
 	}
 }
 
@@ -204,5 +201,125 @@ func (b *Background) drawTheatroDaPaz(screen *ebiten.Image, screenWidth, groundY
 		ebitenutil.DrawRect(screen, x+8, groundY+3, 7, 7, color.RGBA{R: 40, G: 40, B: 45, A: 255})
 		ebitenutil.DrawRect(screen, x, groundY+12, 7, 7, color.RGBA{R: 40, G: 40, B: 45, A: 255})
 		ebitenutil.DrawRect(screen, x+8, groundY+12, 7, 7, color.RGBA{R: 220, G: 220, B: 220, A: 255})
+	}
+}
+
+func (b *Background) drawAmazonRuins(screen *ebiten.Image, screenWidth, groundY float64, ticks int) {
+	// Céu denso da selva amazônica (Estilo Pitfall 16-bit)
+	screen.Fill(color.RGBA{R: 16, G: 34, B: 26, A: 255})
+
+	// Raios solares translúcidos (God Rays) filtrando pelas copas
+	godRayColor := color.RGBA{R: 245, G: 235, B: 160, A: 16}
+	for ray := 0; ray < 3; ray++ {
+		rx := float64(ray*115) + 25.0
+		ebitenutil.DrawRect(screen, rx, 0, 36, groundY, godRayColor)
+		ebitenutil.DrawRect(screen, rx+8, 0, 16, groundY, godRayColor)
+	}
+
+	// Copas densas de árvores no topo da tela (Dossel da Selva)
+	canopyDark := color.RGBA{R: 14, G: 42, B: 20, A: 255}
+	canopyMid := color.RGBA{R: 24, G: 68, B: 32, A: 255}
+	canopyLight := color.RGBA{R: 42, G: 105, B: 50, A: 255}
+	ebitenutil.DrawRect(screen, 0, 0, screenWidth, 22, canopyDark)
+	for leafX := 0.0; leafX < screenWidth; leafX += 16.0 {
+		ebitenutil.DrawRect(screen, leafX, 20, 15, 8, canopyMid)
+		ebitenutil.DrawRect(screen, leafX+3, 26, 8, 4, canopyLight)
+	}
+
+	// Cipós pendurados balançando suavemente no fundo (decorativos)
+	cVineBg := color.RGBA{R: 32, G: 60, B: 24, A: 210}
+	for v := 0; v < 4; v++ {
+		vx := float64(v*90) + 30.0 - math.Mod(b.scrollOffset*0.3, 90.0)
+		swing := math.Sin(float64(ticks+v*30)*0.04) * 4.0
+		ebitenutil.DrawLine(screen, vx, 14, vx+swing, groundY-40, cVineBg)
+		ebitenutil.DrawLine(screen, vx+1, 14, vx+swing+1, groundY-40, cVineBg)
+	}
+
+	// Sumaúmas gigantes no horizonte (Parallax distante)
+	treeDark := color.RGBA{R: 38, G: 30, B: 24, A: 255}
+	treeLight := color.RGBA{R: 55, G: 44, B: 32, A: 255}
+	treeMoss := color.RGBA{R: 48, G: 90, B: 38, A: 255}
+
+	for t := 0; t < 3; t++ {
+		tx := float64(t*130) + 15.0 - math.Mod(b.scrollOffset*0.4, 130.0)
+		// Tronco massivo
+		ebitenutil.DrawRect(screen, tx, groundY-85, 24, 85, treeDark)
+		ebitenutil.DrawRect(screen, tx+4, groundY-82, 16, 82, treeLight)
+		// Sapopembas (raízes tubulares na base)
+		ebitenutil.DrawRect(screen, tx-10, groundY-25, 12, 25, treeDark)
+		ebitenutil.DrawRect(screen, tx+22, groundY-25, 12, 25, treeDark)
+		// Musgo no tronco
+		ebitenutil.DrawRect(screen, tx+6, groundY-50, 6, 12, treeMoss)
+		ebitenutil.DrawRect(screen, tx+8, groundY-30, 8, 8, treeMoss)
+	}
+
+	// Ruínas Arqueológicas de Pedra Marajoara com Tochas Crepitantes
+	stoneBase := color.RGBA{R: 68, G: 76, B: 72, A: 255}
+	stoneLight := color.RGBA{R: 92, G: 102, B: 96, A: 255}
+	stoneGlyph := color.RGBA{R: 42, G: 48, B: 45, A: 255}
+	mossGreen := color.RGBA{R: 42, G: 110, B: 48, A: 255}
+
+	for r := 0; r < 2; r++ {
+		rx := float64(r*175) + 60.0 - math.Mod(b.scrollOffset*0.7, 175.0)
+
+		// Pilar / Altar de pedra escalonada
+		ebitenutil.DrawRect(screen, rx, groundY-55, 45, 55, stoneBase)
+		ebitenutil.DrawRect(screen, rx+3, groundY-52, 39, 52, stoneLight)
+		ebitenutil.DrawRect(screen, rx-4, groundY-58, 53, 5, stoneBase)
+		ebitenutil.DrawRect(screen, rx-2, groundY-56, 49, 3, stoneLight)
+
+		// Glifos geométricos esculpidos na pedra
+		ebitenutil.DrawRect(screen, rx+8, groundY-44, 10, 10, stoneGlyph)
+		ebitenutil.DrawRect(screen, rx+10, groundY-42, 6, 6, stoneLight)
+		ebitenutil.DrawRect(screen, rx+26, groundY-44, 10, 10, stoneGlyph)
+		ebitenutil.DrawRect(screen, rx+28, groundY-42, 6, 6, stoneLight)
+		ebitenutil.DrawRect(screen, rx+12, groundY-26, 20, 8, stoneGlyph)
+
+		// Musgo trepando nas frestas da rocha
+		ebitenutil.DrawRect(screen, rx+2, groundY-48, 5, 8, mossGreen)
+		ebitenutil.DrawRect(screen, rx+38, groundY-32, 6, 12, mossGreen)
+
+		// Tocha de Pedra Crepitante montada na ruína
+		torchX := rx + 20.0
+		torchY := groundY - 68.0
+		// Suporte da tocha
+		ebitenutil.DrawRect(screen, torchX, torchY+7, 5, 7, color.RGBA{R: 48, G: 42, B: 38, A: 255})
+		ebitenutil.DrawRect(screen, torchX-2, torchY+4, 9, 3, color.RGBA{R: 85, G: 72, B: 52, A: 255})
+
+		// Chama animada com tremulação de 3 camadas em pixel art
+		flicker := (ticks / 4) % 3
+		flameOffset := float64(flicker)
+		// Brilho da tocha no ambiente
+		ebitenutil.DrawRect(screen, torchX-6, torchY-8, 17, 17, color.RGBA{R: 255, G: 195, B: 50, A: 45})
+
+		// Camada externa vermelha da chama
+		ebitenutil.DrawRect(screen, torchX-1, torchY-4+flameOffset*0.5, 7, 8, color.RGBA{R: 230, G: 55, B: 40, A: 255})
+		// Camada média laranja
+		ebitenutil.DrawRect(screen, torchX, torchY-6+flameOffset*0.5, 5, 7, color.RGBA{R: 245, G: 140, B: 25, A: 255})
+		// Núcleo dourado brilhante
+		ebitenutil.DrawRect(screen, torchX+1, torchY-7+flameOffset*0.5, 3, 5, color.RGBA{R: 255, G: 225, B: 85, A: 255})
+		// Fagulhas subindo no ar
+		if flicker == 1 {
+			ebitenutil.DrawRect(screen, torchX+2, torchY-11, 2, 2, color.RGBA{R: 255, G: 200, B: 60, A: 220})
+		}
+	}
+
+	// Solo terroso da selva com musgo, raízes e folhas caídas
+	cEarthDark := color.RGBA{R: 36, G: 24, B: 15, A: 255}
+	cEarthMid := color.RGBA{R: 52, G: 36, B: 22, A: 255}
+	cForestMoss := color.RGBA{R: 48, G: 128, B: 42, A: 255}
+	cLeafBrown := color.RGBA{R: 138, G: 80, B: 32, A: 255}
+
+	ebitenutil.DrawRect(screen, 0, groundY, screenWidth, 60, cEarthDark)
+	ebitenutil.DrawRect(screen, 0, groundY, screenWidth, 4, cEarthMid)
+
+	for x := -math.Mod(b.scrollOffset, 16.0); x < screenWidth; x += 16.0 {
+		// Grama e musgo no topo do solo
+		ebitenutil.DrawRect(screen, x, groundY-1, 11, 3, cForestMoss)
+		ebitenutil.DrawRect(screen, x+2, groundY-2, 5, 2, cForestMoss)
+
+		// Raízes e folhas na terra
+		ebitenutil.DrawRect(screen, x+6, groundY+6, 6, 2, cEarthMid)
+		ebitenutil.DrawRect(screen, x+12, groundY+12, 3, 2, cLeafBrown)
 	}
 }
