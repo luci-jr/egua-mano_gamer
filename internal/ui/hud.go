@@ -119,7 +119,7 @@ func DrawCityFooter(screen *ebiten.Image, screenWidth, screenHeight float64, sta
 	ebitenutil.DebugPrintAt(screen, "★BELEM", 4, int(footerY)+1)
 }
 
-func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, isDoubleJump bool, stageBannerTimer int, isMuted bool, ticks int, relicsCount int, heroName string) {
+func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, isDoubleJump bool, stageBannerTimer int, isMuted bool, ticks int, relicsCount int, heroName string, stageDistance float64) {
 	for i := 0; i < 3; i++ {
 		hx := 8.0 + float64(i*12)
 		DrawHeart(screen, hx, 9, i < hearts)
@@ -128,7 +128,7 @@ func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, 
 	livesText := fmt.Sprintf("x%d %s", lives, heroName)
 	ebitenutil.DebugPrintAt(screen, livesText, 46, 9)
 
-	stageName := "1. SELVA MARAJOARA"
+	stageName := "1. VER-O-PESO"
 	if stage == 2 {
 		stageName = "2. DOCAS"
 	} else if stage == 3 {
@@ -144,8 +144,17 @@ func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, 
 	ebitenutil.DrawRect(screen, 9, 24, 5, 5, color.RGBA{R: 45, G: 195, B: 95, A: 255})
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("RELIQUIAS: %d", relicsCount), 18, 22)
 
+	// Medidor de distância da corrida para a chegada da fase
+	targetDist := 1200
+	currDist := int(stageDistance)
+	if currDist > targetDist {
+		currDist = targetDist
+	}
+	distText := fmt.Sprintf("DIST: %dm/%dm", currDist, targetDist)
+	ebitenutil.DebugPrintAt(screen, distText, 115, 22)
+
 	if isMuted {
-		ebitenutil.DebugPrintAt(screen, "[MUDO]", 170, 22)
+		ebitenutil.DebugPrintAt(screen, "[MUDO]", 226, 22)
 	}
 
 	if stageBannerTimer > 0 {
@@ -156,7 +165,7 @@ func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, 
 		case 3:
 			bannerTitle = "★ FASE 3: THEATRO DA PAZ ★"
 		default:
-			bannerTitle = "★ FASE 1: SELVA & RUINAS MARAJOARAS ★"
+			bannerTitle = "★ FASE 1: MERCADO DO VER-O-PESO ★"
 		}
 		ebitenutil.DrawRect(screen, 20, 50, 280, 22, color.RGBA{R: 20, G: 20, B: 30, A: 210})
 		ebitenutil.DrawRect(screen, 20, 50, 280, 2, color.RGBA{R: 250, G: 200, B: 50, A: 255})
