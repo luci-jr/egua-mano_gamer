@@ -12,23 +12,23 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-//go:embed splash.jpg
-var splashBytes []byte
-var splashImg *ebiten.Image
+//go:embed sao_bras.jpg
+var saoBrasBytes []byte
+var saoBrasImg *ebiten.Image
 
-func getSplashImage() *ebiten.Image {
-	if splashImg != nil {
-		return splashImg
+func getSaoBrasImage() *ebiten.Image {
+	if saoBrasImg != nil {
+		return saoBrasImg
 	}
-	if len(splashBytes) == 0 {
+	if len(saoBrasBytes) == 0 {
 		return nil
 	}
-	img, _, err := image.Decode(bytes.NewReader(splashBytes))
+	img, _, err := image.Decode(bytes.NewReader(saoBrasBytes))
 	if err != nil {
 		return nil
 	}
-	splashImg = ebiten.NewImageFromImage(img)
-	return splashImg
+	saoBrasImg = ebiten.NewImageFromImage(img)
+	return saoBrasImg
 }
 
 func DrawHeart(screen *ebiten.Image, x, y float64, filled bool) {
@@ -101,8 +101,8 @@ func DrawHUD(screen *ebiten.Image, lives int, score int, stage int, isDoubleJump
 	}
 }
 
-func DrawSplashScreen(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int) {
-	sImg := getSplashImage()
+func DrawSaoBrasIntro(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int) {
+	sImg := getSaoBrasImage()
 	if sImg != nil {
 		op := &ebiten.DrawImageOptions{}
 		bounds := sImg.Bounds()
@@ -114,27 +114,27 @@ func DrawSplashScreen(screen *ebiten.Image, screenWidth, screenHeight float64, t
 		ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 15, G: 20, B: 30, A: 255})
 	}
 
-	// Faixa inferior semitransparente para instruções legíveis
-	bannerH := 36.0
+	// Faixa inferior elegante destacando o Mercado de São Brás atual
+	bannerH := 34.0
 	bannerY := screenHeight - bannerH
-	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, bannerH, color.RGBA{R: 8, G: 12, B: 22, A: 215})
+	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, bannerH, color.RGBA{R: 6, G: 10, B: 20, A: 225})
 	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 
-	ebitenutil.DebugPrintAt(screen, "PAIDEGUA GAME - A Aventura da Onca em Belem", 35, int(bannerY)+6)
+	ebitenutil.DebugPrintAt(screen, "★ MERCADO DE SAO BRAS ATUAL - BELEM DO PARA ★", 28, int(bannerY)+5)
 
 	if (ticks/25)%2 == 0 {
-		ebitenutil.DebugPrintAt(screen, ">> PRESSIONE QUALQUER TECLA PARA CONTINUAR <<", 25, int(bannerY)+20)
+		ebitenutil.DebugPrintAt(screen, ">> PRESSIONE ENTER OU QUALQUER TECLA <<", 45, int(bannerY)+18)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "   PRESSIONE QUALQUER TECLA PARA CONTINUAR   ", 25, int(bannerY)+20)
+		ebitenutil.DebugPrintAt(screen, "   PRESSIONE ENTER OU QUALQUER TECLA   ", 45, int(bannerY)+18)
 	}
 }
 
 func DrawTitleScreen(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int) {
-	// Fundo escurecido suave para deixar a onça e o cenário de Belém visíveis ao redor
-	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 10, G: 12, B: 20, A: 135})
+	// Fundo com escurecimento suave para destacar a onça correndo e o cenário ao redor
+	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 10, G: 12, B: 20, A: 110})
 
-	boxW := 220.0
-	boxH := 134.0
+	boxW := 195.0
+	boxH := 108.0
 	boxX := (screenWidth - boxW) / 2.0
 	boxY := (screenHeight - boxH) / 2.0
 
@@ -147,29 +147,27 @@ func DrawTitleScreen(screen *ebiten.Image, screenWidth, screenHeight float64, ti
 	bx := int(boxX)
 	by := int(boxY)
 
-	ebitenutil.DebugPrintAt(screen, "★ PAIDEGUA GAME ★", bx+56, by+8)
-	ebitenutil.DebugPrintAt(screen, "A Aventura da Onca em Belem", bx+28, by+21)
-	ebitenutil.DrawRect(screen, boxX+14, boxY+34, boxW-28, 1, color.RGBA{R: 250, G: 205, B: 55, A: 180})
+	ebitenutil.DebugPrintAt(screen, "★ PAIDEGUA GAME ★", bx+45, by+8)
+	ebitenutil.DrawRect(screen, boxX+10, boxY+22, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
 
-	ebitenutil.DebugPrintAt(screen, "Dev: Luci Junior & Nexus AI", bx+28, by+39)
-	ebitenutil.DebugPrintAt(screen, "Audio: Carimbo 8-bit Procedural", bx+16, by+51)
-	ebitenutil.DebugPrintAt(screen, "Mover: Setas / W-A-S-D", bx+42, by+64)
-	ebitenutil.DebugPrintAt(screen, "Avancar/Recuar: Setas Esq/Dir", bx+22, by+76)
+	ebitenutil.DebugPrintAt(screen, "Dev: Luci Junior & Nexus AI", bx+14, by+26)
+	ebitenutil.DebugPrintAt(screen, "Mover: Setas / W-A-S-D", bx+28, by+41)
+	ebitenutil.DebugPrintAt(screen, "Avancar/Voltar: Dir/Esq", bx+26, by+54)
 
 	if (ticks/30)%2 == 0 {
-		ebitenutil.DebugPrintAt(screen, ">> PRESSIONE ENTER <<", bx+46, by+94)
+		ebitenutil.DebugPrintAt(screen, ">> PRESSIONE ENTER <<", bx+34, by+72)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "   PRESSIONE ENTER   ", bx+46, by+94)
+		ebitenutil.DebugPrintAt(screen, "   PRESSIONE ENTER   ", bx+34, by+72)
 	}
 
-	ebitenutil.DebugPrintAt(screen, "[C] Creditos  |  [ESC] Sair", bx+30, by+113)
+	ebitenutil.DebugPrintAt(screen, "[C] Creditos  |  [ESC] Sair", bx+18, by+91)
 }
 
 func DrawCreditsScreen(screen *ebiten.Image, screenWidth, screenHeight float64) {
-	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 8, G: 10, B: 18, A: 160})
+	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 8, G: 10, B: 18, A: 140})
 
-	boxW := 236.0
-	boxH := 142.0
+	boxW := 210.0
+	boxH := 122.0
 	boxX := (screenWidth - boxW) / 2.0
 	boxY := (screenHeight - boxH) / 2.0
 
@@ -182,18 +180,16 @@ func DrawCreditsScreen(screen *ebiten.Image, screenWidth, screenHeight float64) 
 	bx := int(boxX)
 	by := int(boxY)
 
-	ebitenutil.DebugPrintAt(screen, "★ CREDITOS - PAIDEGUA GAME ★", bx+26, by+8)
-	ebitenutil.DrawRect(screen, boxX+12, boxY+22, boxW-24, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
+	ebitenutil.DebugPrintAt(screen, "★ CREDITOS - PAIDEGUA ★", bx+32, by+8)
+	ebitenutil.DrawRect(screen, boxX+10, boxY+21, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
 
-	ebitenutil.DebugPrintAt(screen, "Desenvolvedor: Lucivaldo Junior", bx+18, by+28)
-	ebitenutil.DebugPrintAt(screen, "Co-criacao IA: Nexus AI Ecosystem", bx+18, by+41)
-	ebitenutil.DebugPrintAt(screen, "               Lucy (Tech Lead Senior)", bx+18, by+54)
-	ebitenutil.DebugPrintAt(screen, "Linguagem:     Go (Golang 1.22+)", bx+18, by+67)
-	ebitenutil.DebugPrintAt(screen, "Game Engine:   Ebitengine v2", bx+18, by+80)
-	ebitenutil.DebugPrintAt(screen, "Trilha Sonora: Carimbo 8-bit Procedural", bx+18, by+93)
-	ebitenutil.DebugPrintAt(screen, "Cenarios:      Belem do Para (Amazonia)", bx+18, by+106)
+	ebitenutil.DebugPrintAt(screen, "Desenvolvedor: Luci Junior", bx+16, by+26)
+	ebitenutil.DebugPrintAt(screen, "Co-criacao IA: Nexus AI (Lucy)", bx+16, by+39)
+	ebitenutil.DebugPrintAt(screen, "Linguagem:     Go + Ebitengine", bx+16, by+52)
+	ebitenutil.DebugPrintAt(screen, "Audio:         Carimbo 8-bit", bx+16, by+65)
+	ebitenutil.DebugPrintAt(screen, "Cenarios:      Belem do Para", bx+16, by+78)
 
-	ebitenutil.DebugPrintAt(screen, "[ENTER / ESC / C] Voltar", bx+42, by+124)
+	ebitenutil.DebugPrintAt(screen, "[ENTER / ESC / C] Voltar", bx+28, by+102)
 }
 
 func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, selectedIndex int, isMuted bool) {

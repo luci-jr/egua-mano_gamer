@@ -31,8 +31,8 @@ type Engine struct {
 	speechBubbleTimer int
 	stage             int
 	stageBannerTimer  int
-	isSplashScreen    bool
-	splashTimer       int
+	isSaoBrasIntro    bool
+	saoBrasTimer      int
 	isTitleScreen     bool
 	isShowingCredits  bool
 	isPaused          bool
@@ -56,8 +56,8 @@ func NewEngine() *Engine {
 		speechBubbleTimer: 0,
 		stage:             1,
 		stageBannerTimer:  120,
-		isSplashScreen:    true,
-		splashTimer:       200,
+		isSaoBrasIntro:    true,
+		saoBrasTimer:      240, // ~4 segundos de visualização da passagem do São Brás
 		isTitleScreen:     false,
 		isShowingCredits:  false,
 		isPaused:          false,
@@ -68,9 +68,9 @@ func NewEngine() *Engine {
 }
 
 func (e *Engine) Update() error {
-	if e.isSplashScreen {
+	if e.isSaoBrasIntro {
 		e.ticks++
-		e.splashTimer--
+		e.saoBrasTimer--
 		anyKeyPressed := false
 		for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
 			if inpututil.IsKeyJustPressed(k) {
@@ -78,8 +78,8 @@ func (e *Engine) Update() error {
 				break
 			}
 		}
-		if e.splashTimer <= 0 || anyKeyPressed {
-			e.isSplashScreen = false
+		if e.saoBrasTimer <= 0 || anyKeyPressed {
+			e.isSaoBrasIntro = false
 			e.isTitleScreen = true
 		}
 		return nil
@@ -371,8 +371,8 @@ func (e *Engine) Update() error {
 }
 
 func (e *Engine) Draw(screen *ebiten.Image) {
-	if e.isSplashScreen {
-		ui.DrawSplashScreen(screen, ScreenWidth, ScreenHeight, e.ticks)
+	if e.isSaoBrasIntro {
+		ui.DrawSaoBrasIntro(screen, ScreenWidth, ScreenHeight, e.ticks)
 		return
 	}
 
