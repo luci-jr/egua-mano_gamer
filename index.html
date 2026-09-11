@@ -249,6 +249,31 @@
       }
     });
 
+    // Objeto global de chaves virtuais lido nativamente pelo Go (WASM)
+    window._virtualKeys = {
+      ArrowLeft: false,
+      ArrowRight: false,
+      Jump: false,
+      JustJump: false,
+      ArrowDown: false,
+      JustDuck: false,
+      Enter: false,
+      Escape: false,
+      ArrowUp: false
+    };
+
+    function setVirtual(key, state) {
+      if (window._virtualKeys) {
+        window._virtualKeys[key] = state;
+        if (key === 'Jump' && state) {
+          window._virtualKeys['JustJump'] = true;
+        }
+        if (key === 'ArrowDown' && state) {
+          window._virtualKeys['JustDuck'] = true;
+        }
+      }
+    }
+
     // Helper para despachar teclas do teclado a partir de eventos touch
     function triggerKey(code, key, keyCode, type) {
       const event = new KeyboardEvent(type, {
@@ -261,24 +286,25 @@
       });
       window.dispatchEvent(event);
       document.dispatchEvent(event);
+      const canvas = document.querySelector('canvas');
+      if (canvas) canvas.dispatchEvent(event);
     }
 
-    function bindTouchButton(elemId, code, key, keyCode) {
+    function bindTouchButton(elemId, code, key, keyCode, vKey) {
       const btn = document.getElementById(elemId);
       if (!btn) return;
 
       const onStart = (e) => {
         e.preventDefault();
-        e.stopPropagation();
         btn.classList.add('active');
+        if (vKey) setVirtual(vKey, true);
         triggerKey(code, key, keyCode, 'keydown');
-        window.focus();
       };
 
       const onEnd = (e) => {
         e.preventDefault();
-        e.stopPropagation();
         btn.classList.remove('active');
+        if (vKey) setVirtual(vKey, false);
         triggerKey(code, key, keyCode, 'keyup');
       };
 
@@ -291,25 +317,33 @@
     }
 
     // Vincula os botões virtuais às teclas
-    bindTouchButton('btn-touch-left', 'ArrowLeft', 'ArrowLeft', 37);
-    bindTouchButton('btn-touch-right', 'ArrowRight', 'ArrowRight', 39);
-    bindTouchButton('btn-touch-jump', 'Space', ' ', 32);
-    bindTouchButton('btn-touch-duck', 'ArrowDown', 'ArrowDown', 40);
-    bindTouchButton('btn-touch-pause', 'Escape', 'Escape', 27);
+    bindTouchButton('btn-touch-left', 'ArrowLeft', 'ArrowLeft', 37, 'ArrowLeft');
+    bindTouchButton('btn-touch-right', 'ArrowRight', 'ArrowRight', 39, 'ArrowRight');
+    bindTouchButton('btn-touch-jump', 'Space', ' ', 32, 'Jump');
+    bindTouchButton('btn-touch-duck', 'ArrowDown', 'ArrowDown', 40, 'ArrowDown');
+    bindTouchButton('btn-touch-pause', 'Escape', 'Escape', 27, 'Escape');
 
     // Toque em qualquer área vazia inicia ou confirma o jogo
     window.addEventListener('touchstart', (e) => {
       if (!e.target.closest('#touch-controls')) {
+        setVirtual('Enter', true);
         triggerKey('Enter', 'Enter', 13, 'keydown');
-        setTimeout(() => triggerKey('Enter', 'Enter', 13, 'keyup'), 80);
+        setTimeout(() => {
+          setVirtual('Enter', false);
+          triggerKey('Enter', 'Enter', 13, 'keyup');
+        }, 80);
       }
     }, { passive: true });
 
     window.addEventListener('click', (e) => {
       window.focus();
       if (!e.target.closest('#touch-controls')) {
+        setVirtual('Enter', true);
         triggerKey('Enter', 'Enter', 13, 'keydown');
-        setTimeout(() => triggerKey('Enter', 'Enter', 13, 'keyup'), 80);
+        setTimeout(() => {
+          setVirtual('Enter', false);
+          triggerKey('Enter', 'Enter', 13, 'keyup');
+        }, 80);
       }
     });
   </script>
