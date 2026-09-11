@@ -7,6 +7,8 @@ import (
 	"image"
 	"image/color"
 	_ "image/jpeg"
+	"math"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -329,50 +331,209 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 	ebitenutil.DebugPrintAt(screen, "[CIMA/BAIXO] | [ENTER] | [ESC]", bx+14, by+int(boxH)-12)
 }
 
-func DrawStageCompleteScreen(screen *ebiten.Image, screenWidth, screenHeight float64, stage int, score int) {
-	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 10, G: 15, B: 25, A: 210})
+func DrawIndigenousWarrior(screen *ebiten.Image, x, y float64, ticks int) {
+	cSkin := color.RGBA{R: 195, G: 125, B: 85, A: 255}
+	cSkinDark := color.RGBA{R: 165, G: 98, B: 65, A: 255}
+	cHair := color.RGBA{R: 18, G: 16, B: 20, A: 255}
+	cFeatherRed := color.RGBA{R: 235, G: 45, B: 40, A: 255}
+	cFeatherBlue := color.RGBA{R: 35, G: 125, B: 240, A: 255}
+	cFeatherYellow := color.RGBA{R: 250, G: 215, B: 45, A: 255}
+	cFeatherWhite := color.RGBA{R: 245, G: 245, B: 250, A: 255}
+	cHeadband := color.RGBA{R: 205, G: 165, B: 90, A: 255}
+	cUrucum := color.RGBA{R: 215, G: 30, B: 30, A: 255}
+	cJenipapo := color.RGBA{R: 25, G: 20, B: 25, A: 255}
+	cSkirt := color.RGBA{R: 180, G: 140, B: 75, A: 255}
+	cNecklace := color.RGBA{R: 235, G: 225, B: 210, A: 255}
 
-	boxX := 20.0
-	boxY := 12.0
-	boxW := screenWidth - 40.0
-	boxH := screenHeight - 24.0
+	sway := math.Sin(float64(ticks)*0.09) * 1.0
 
-	ebitenutil.DrawRect(screen, boxX, boxY, boxW, boxH, color.RGBA{R: 25, G: 30, B: 45, A: 240})
+	// 1. Cocar Amazônico de Penas Coloridas em Leque
+	ebitenutil.DrawRect(screen, x+21, y+2+sway, 5, 18, cFeatherYellow)
+	ebitenutil.DrawRect(screen, x+22, y-2+sway, 3, 5, cFeatherRed)
+	ebitenutil.DrawRect(screen, x+15, y+5+sway, 5, 16, cFeatherBlue)
+	ebitenutil.DrawRect(screen, x+27, y+5+sway, 5, 16, cFeatherBlue)
+	ebitenutil.DrawRect(screen, x+10, y+9+sway, 4, 13, cFeatherRed)
+	ebitenutil.DrawRect(screen, x+33, y+9+sway, 4, 13, cFeatherRed)
+	ebitenutil.DrawRect(screen, x+6, y+14+sway, 4, 10, cFeatherWhite)
+	ebitenutil.DrawRect(screen, x+38, y+14+sway, 4, 10, cFeatherWhite)
+
+	// Testeira de palha trançada com grafismos
+	ebitenutil.DrawRect(screen, x+9, y+21+sway, 30, 4, cHeadband)
+	for d := 0; d < 6; d++ {
+		dx := x + 11 + float64(d*5)
+		ebitenutil.DrawRect(screen, dx, y+22+sway, 2, 2, cUrucum)
+	}
+
+	// 2. Cabeça e Cabelo Preto Liso
+	ebitenutil.DrawRect(screen, x+10, y+24+sway, 4, 25, cHair)
+	ebitenutil.DrawRect(screen, x+34, y+24+sway, 4, 25, cHair)
+	ebitenutil.DrawRect(screen, x+14, y+24+sway, 20, 18, cSkin)
+	ebitenutil.DrawRect(screen, x+17, y+41+sway, 14, 3, cSkin)
+
+	// Pintura facial de Urucum e Olhos
+	ebitenutil.DrawRect(screen, x+15, y+32+sway, 6, 3, cUrucum)
+	ebitenutil.DrawRect(screen, x+27, y+32+sway, 6, 3, cUrucum)
+	ebitenutil.DrawRect(screen, x+17, y+29+sway, 4, 2, color.RGBA{R: 250, G: 250, B: 250, A: 255})
+	ebitenutil.DrawRect(screen, x+19, y+29+sway, 2, 2, cJenipapo)
+	ebitenutil.DrawRect(screen, x+27, y+29+sway, 4, 2, color.RGBA{R: 250, G: 250, B: 250, A: 255})
+	ebitenutil.DrawRect(screen, x+27, y+29+sway, 2, 2, cJenipapo)
+
+	// Nariz e Sorriso de comemoração
+	ebitenutil.DrawRect(screen, x+23, y+33+sway, 2, 4, cSkinDark)
+	ebitenutil.DrawRect(screen, x+20, y+38+sway, 8, 3, color.RGBA{R: 80, G: 20, B: 20, A: 255})
+	ebitenutil.DrawRect(screen, x+21, y+38+sway, 6, 1, color.RGBA{R: 255, G: 255, B: 255, A: 255})
+
+	// 3. Pescoço e Colar de Sementes de Açaí
+	ebitenutil.DrawRect(screen, x+20, y+43+sway, 8, 4, cSkin)
+	ebitenutil.DrawRect(screen, x+16, y+45+sway, 16, 2, cNecklace)
+	ebitenutil.DrawRect(screen, x+23, y+47+sway, 2, 3, cFeatherWhite)
+
+	// 4. Peitoral com Grafismos de Jenipapo
+	ebitenutil.DrawRect(screen, x+15, y+47+sway, 18, 18, cSkin)
+	ebitenutil.DrawRect(screen, x+17, y+52+sway, 14, 2, cJenipapo)
+	ebitenutil.DrawRect(screen, x+19, y+56+sway, 10, 2, cJenipapo)
+
+	// 5. Braço Esquerdo (apoiado, com braçadeira)
+	ebitenutil.DrawRect(screen, x+9, y+48+sway, 6, 16, cSkin)
+	ebitenutil.DrawRect(screen, x+9, y+52+sway, 6, 3, cFeatherRed)
+	ebitenutil.DrawRect(screen, x+11, y+64+sway, 5, 7, cSkin)
+
+	// 6. Braço Direito Erguido em Sinal de Vitória / Saudação
+	ebitenutil.DrawRect(screen, x+33, y+48+sway, 6, 6, cSkin)
+	ebitenutil.DrawRect(screen, x+37, y+34+sway, 6, 15, cSkin)
+	ebitenutil.DrawRect(screen, x+37, y+40+sway, 6, 3, cFeatherYellow)
+	ebitenutil.DrawRect(screen, x+40, y+20+sway, 5, 15, cSkin)
+	ebitenutil.DrawRect(screen, x+39, y+13+sway, 8, 8, cSkin)
+	ebitenutil.DrawRect(screen, x+39, y+10+sway, 2, 4, cSkin)
+	ebitenutil.DrawRect(screen, x+42, y+9+sway, 2, 5, cSkin)
+	ebitenutil.DrawRect(screen, x+45, y+10+sway, 2, 4, cSkin)
+
+	// 7. Saiote de Palha e Fibras
+	ebitenutil.DrawRect(screen, x+13, y+65+sway, 22, 12, cSkirt)
+	for f := 0; f < 5; f++ {
+		fx := x + 15 + float64(f*4)
+		ebitenutil.DrawRect(screen, fx, y+66+sway, 2, 10, color.RGBA{R: 150, G: 110, B: 55, A: 255})
+	}
+
+	// 8. Pernas e Tornozeleiras
+	ebitenutil.DrawRect(screen, x+16, y+77+sway, 6, 14, cSkin)
+	ebitenutil.DrawRect(screen, x+26, y+77+sway, 6, 14, cSkin)
+	ebitenutil.DrawRect(screen, x+16, y+88+sway, 6, 2, cHeadband)
+	ebitenutil.DrawRect(screen, x+26, y+88+sway, 6, 2, cHeadband)
+	ebitenutil.DrawRect(screen, x+14, y+91+sway, 8, 3, cSkinDark)
+	ebitenutil.DrawRect(screen, x+26, y+91+sway, 8, 3, cSkinDark)
+
+	// 9. Plaqueta Identificadora do Tuxaua
+	ebitenutil.DrawRect(screen, x+6, y+96, 36, 12, color.RGBA{R: 14, G: 20, B: 34, A: 245})
+	ebitenutil.DrawRect(screen, x+6, y+96, 36, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, x+6, y+107, 36, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DebugPrintAt(screen, "TUXAUA", int(x)+9, int(y)+97)
+}
+
+func DrawStageCompleteScreen(screen *ebiten.Image, screenWidth, screenHeight float64, stage int, score int, lives int, ticks int) {
+	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 10, G: 15, B: 25, A: 220})
+
+	boxX := 12.0
+	boxY := 8.0
+	boxW := screenWidth - 24.0
+	boxH := screenHeight - 16.0
+
+	ebitenutil.DrawRect(screen, boxX, boxY, boxW, boxH, color.RGBA{R: 22, G: 28, B: 44, A: 245})
 	ebitenutil.DrawRect(screen, boxX, boxY, boxW, 2, color.RGBA{R: 250, G: 210, B: 50, A: 255})
 	ebitenutil.DrawRect(screen, boxX, boxY+boxH, boxW, 2, color.RGBA{R: 250, G: 210, B: 50, A: 255})
 	ebitenutil.DrawRect(screen, boxX, boxY, 2, boxH, color.RGBA{R: 250, G: 210, B: 50, A: 255})
 	ebitenutil.DrawRect(screen, boxX+boxW, boxY, 2, boxH+2, color.RGBA{R: 250, G: 210, B: 50, A: 255})
 
+	// Desenha o Guerreiro Indígena Tuxaua no lado esquerdo
+	DrawIndigenousWarrior(screen, boxX+6, boxY+22, ticks)
+
+	// Painel de Conteúdo e Felicitações à Direita
+	contentX := int(boxX + 66)
+
 	if stage < 3 {
 		completedName := "MERCADO DO VER-O-PESO"
 		nextName := "ESTACAO DAS DOCAS"
+		tuxauaLine1 := "Warana! Mandou paidegua, guerreiro!"
+		tuxauaLine2 := "Superou os perigos do Ver-o-Peso!"
 		if stage == 2 {
 			completedName = "ESTACAO DAS DOCAS"
 			nextName = "THEATRO DA PAZ"
+			tuxauaLine1 = "Egua mano, que corrida veloz!"
+			tuxauaLine2 = "As Docas foram vencidas com bravura!"
 		}
 
-		ebitenutil.DebugPrintAt(screen, "===================================", 45, 26)
-		ebitenutil.DebugPrintAt(screen, "     PARABENS! FASE CONCLUIDA!     ", 45, 40)
-		ebitenutil.DebugPrintAt(screen, "===================================", 45, 54)
-		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Concluido: %s", completedName), 40, 72)
-		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Proxima:   %s", nextName), 40, 88)
-		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Pontuacao Atual: %05d pts", score), 40, 104)
-		ebitenutil.DebugPrintAt(screen, "[ENTER] Proxima Fase", 40, 126)
-		ebitenutil.DebugPrintAt(screen, "[R]     Recomecar do Inicio", 40, 142)
-		ebitenutil.DebugPrintAt(screen, "[ESC]   Finalizar e Fechar o Jogo", 40, 158)
+		// Faixa do Título Superior
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("★ PARABENS! FASE %d CONCLUIDA! ★", stage), contentX+10, int(boxY)+8)
+		ebitenutil.DrawRect(screen, float64(contentX), boxY+22, boxW-72, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
+
+		// Balão de Fala do Índio Tuxaua
+		balloonX := float64(contentX)
+		balloonY := boxY + 28
+		balloonW := boxW - 72
+		balloonH := 46.0
+
+		// Sombra e fundo do balão
+		ebitenutil.DrawRect(screen, balloonX+2, balloonY+2, balloonW, balloonH, color.RGBA{R: 0, G: 0, B: 0, A: 120})
+		ebitenutil.DrawRect(screen, balloonX, balloonY, balloonW, balloonH, color.RGBA{R: 16, G: 24, B: 40, A: 245})
+		ebitenutil.DrawRect(screen, balloonX, balloonY, balloonW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+		ebitenutil.DrawRect(screen, balloonX, balloonY+balloonH, balloonW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+		ebitenutil.DrawRect(screen, balloonX+balloonW, balloonY, 1, balloonH, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+
+		// Rabicho apontando para o índio
+		ebitenutil.DrawRect(screen, balloonX-4, balloonY+12, 4, 3, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+		ebitenutil.DrawRect(screen, balloonX-6, balloonY+13, 3, 2, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+
+		ebitenutil.DebugPrintAt(screen, "TUXAUA DA AMAZONIA:", contentX+8, int(balloonY)+5)
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("\"%s\"", tuxauaLine1), contentX+8, int(balloonY)+18)
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf(" \"%s\"", tuxauaLine2), contentX+8, int(balloonY)+30)
+
+		// Dados da Etapa
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Vencido: %s", completedName), contentX+6, int(boxY)+80)
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Proximo: %s", nextName), contentX+6, int(boxY)+95)
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Pontos:  %05d pts  |  x%d VIDAS", score, lives), contentX+6, int(boxY)+110)
+
+		// Botões de Ação Piscantes
+		if (ticks/25)%2 == 0 {
+			ebitenutil.DebugPrintAt(screen, ">> [CLIQUE / ENTER] PROXIMA FASE <<", contentX+2, int(boxY)+130)
+		} else {
+			ebitenutil.DebugPrintAt(screen, "   [CLIQUE / ENTER] PROXIMA FASE   ", contentX+2, int(boxY)+130)
+		}
+		ebitenutil.DebugPrintAt(screen, "[R] Recomecar   |   [ESC] Sair", contentX+16, int(boxY)+145)
+
 	} else {
-		ebitenutil.DebugPrintAt(screen, "========================================", 42, 18)
-		ebitenutil.DebugPrintAt(screen, "    PARABENS! EXPEDICAO CONCLUIDA!      ", 42, 29)
-		ebitenutil.DebugPrintAt(screen, "========================================", 42, 40)
-		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Pontuacao Maxima: %05d pts", score), 42, 54)
-		ebitenutil.DebugPrintAt(screen, "----------- CREDITOS FINAIS ------------", 42, 67)
-		ebitenutil.DebugPrintAt(screen, "Desenvolvedor: Lucivaldo Junior (Luci)", 42, 80)
-		ebitenutil.DebugPrintAt(screen, "Co-criacao IA: Nexus Squad (Time de IA)", 42, 93)
-		ebitenutil.DebugPrintAt(screen, "Linguagem:     Go (Golang 1.22+)", 42, 106)
-		ebitenutil.DebugPrintAt(screen, "Game Engine:   Ebitengine (v2)", 42, 119)
-		ebitenutil.DebugPrintAt(screen, "Trilha Sonora: Carimbo Procedural 8-bit", 42, 132)
-		ebitenutil.DebugPrintAt(screen, "Localizacao:   Belem do Para - Amazonia", 42, 145)
-		ebitenutil.DebugPrintAt(screen, "[ENTER / R] Jogar Novamente | [ESC] Sair", 32, 168)
+		// Vitória Final da Expedição (Theatro da Paz)
+		ebitenutil.DebugPrintAt(screen, "★ VITORIA TOTAL! EXPEDICAO CONCLUIDA! ★", contentX-8, int(boxY)+8)
+		ebitenutil.DrawRect(screen, float64(contentX), boxY+22, boxW-72, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
+
+		balloonX := float64(contentX)
+		balloonY := boxY + 26
+		balloonW := boxW - 72
+		balloonH := 46.0
+
+		ebitenutil.DrawRect(screen, balloonX+2, balloonY+2, balloonW, balloonH, color.RGBA{R: 0, G: 0, B: 0, A: 120})
+		ebitenutil.DrawRect(screen, balloonX, balloonY, balloonW, balloonH, color.RGBA{R: 16, G: 24, B: 40, A: 245})
+		ebitenutil.DrawRect(screen, balloonX, balloonY, balloonW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+		ebitenutil.DrawRect(screen, balloonX, balloonY+balloonH, balloonW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+		ebitenutil.DrawRect(screen, balloonX+balloonW, balloonY, 1, balloonH, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+
+		ebitenutil.DrawRect(screen, balloonX-4, balloonY+12, 4, 3, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+		ebitenutil.DrawRect(screen, balloonX-6, balloonY+13, 3, 2, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+
+		ebitenutil.DebugPrintAt(screen, "TUXAUA DA AMAZONIA:", contentX+8, int(balloonY)+5)
+		ebitenutil.DebugPrintAt(screen, "\"TRIUNFO TOTAL! Voce e a lenda viva!\"", contentX+8, int(balloonY)+18)
+		ebitenutil.DebugPrintAt(screen, "\"A Onca Paidegua reina em Belem!\"", contentX+8, int(balloonY)+30)
+
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Pontuacao Maxima: %05d pts", score), contentX+6, int(boxY)+78)
+		ebitenutil.DebugPrintAt(screen, "Desenvolvedor: Lucivaldo Junior (Luci)", contentX+6, int(boxY)+92)
+		ebitenutil.DebugPrintAt(screen, "Co-criacao IA: Nexus Squad (AI Team)", contentX+6, int(boxY)+106)
+		ebitenutil.DebugPrintAt(screen, "Localizacao:   Belem do Para - Brasil", contentX+6, int(boxY)+120)
+
+		if (ticks/25)%2 == 0 {
+			ebitenutil.DebugPrintAt(screen, ">> [CLIQUE / ENTER / R] JOGAR NOVAMENTE <<", contentX-6, int(boxY)+136)
+		} else {
+			ebitenutil.DebugPrintAt(screen, "   [CLIQUE / ENTER / R] JOGAR NOVAMENTE   ", contentX-6, int(boxY)+136)
+		}
+		ebitenutil.DebugPrintAt(screen, "[ESC] Fechar o Jogo", contentX+38, int(boxY)+149)
 	}
 }
 
@@ -443,6 +604,14 @@ func DrawSpeechBubble(screen *ebiten.Image, x, y float64, text string) {
 	ebitenutil.DrawRect(screen, tailX, tailY, 5, 2, color.RGBA{R: 250, G: 210, B: 50, A: 255})
 	ebitenutil.DrawRect(screen, tailX+1, tailY+2, 3, 2, color.RGBA{R: 250, G: 210, B: 50, A: 255})
 	ebitenutil.DrawRect(screen, tailX+2, tailY+4, 1, 2, color.RGBA{R: 250, G: 210, B: 50, A: 255})
+
+	// Se a fala for sobre o calor, desenha gotinhas de suor caindo para simbolizar a alta temperatura
+	if strings.Contains(text, "sol pra cada um") {
+		sweatY := tailY + 2.0
+		ebitenutil.DrawRect(screen, tailX+9, sweatY, 2, 3, color.RGBA{R: 90, G: 190, B: 255, A: 240})
+		ebitenutil.DrawRect(screen, tailX+10, sweatY+3, 1, 2, color.RGBA{R: 90, G: 190, B: 255, A: 240})
+		ebitenutil.DrawRect(screen, tailX+15, sweatY-2, 2, 2, color.RGBA{R: 90, G: 190, B: 255, A: 240})
+	}
 
 	// Texto da giria
 	ebitenutil.DebugPrintAt(screen, text, int(x)+7, int(y)+3)

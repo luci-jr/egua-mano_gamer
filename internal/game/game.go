@@ -33,6 +33,7 @@ type Engine struct {
 	hitDelayTimer     int
 	speechBubbleTimer int
 	speechBubbleText  string
+	heatSpeechTimer   int
 	stage             int
 	stageBannerTimer  int
 	isSaoBrasIntro    bool
@@ -63,6 +64,7 @@ func NewEngine() *Engine {
 		hitDelayTimer:     0,
 		speechBubbleTimer: 0,
 		speechBubbleText:  "",
+		heatSpeechTimer:   0,
 		stage:             1,
 		stageBannerTimer:  120,
 		isSaoBrasIntro:    true,
@@ -327,6 +329,16 @@ func (e *Engine) Update() error {
 
 	if e.speechBubbleTimer > 0 {
 		e.speechBubbleTimer--
+	} else {
+		// A cada ~14 a 20 segundos correndo sob o sol de Belém, a onça reclama do calor
+		e.heatSpeechTimer++
+		if e.heatSpeechTimer >= 850 {
+			if e.hitDelayTimer == 0 {
+				e.heatSpeechTimer = 0
+				e.speechBubbleText = "Egua da lua, um sol pra cada um!"
+				e.speechBubbleTimer = 165
+			}
+		}
 	}
 
 	if e.invincibleTicks > 0 {
@@ -536,7 +548,7 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 	}
 
 	if e.isStageComplete {
-		ui.DrawStageCompleteScreen(screen, ScreenWidth, ScreenHeight, e.stage, e.score)
+		ui.DrawStageCompleteScreen(screen, ScreenWidth, ScreenHeight, e.stage, e.score, e.lives, e.ticks)
 	}
 
 	if e.isGameOver {
