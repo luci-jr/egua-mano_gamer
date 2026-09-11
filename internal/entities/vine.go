@@ -129,56 +129,30 @@ type VineManager struct {
 }
 
 func NewVineManager(screenWidth float64) *VineManager {
-	vm := &VineManager{
+	return &VineManager{
 		Vines:       make([]*Vine, 0),
 		screenWidth: screenWidth,
-		spawnTimer:  140,
+		spawnTimer:  0,
 	}
-	// Primeiro cipó de teste à frente
-	vm.SpawnAt(screenWidth + 80.0)
-	return vm
 }
 
 func (vm *VineManager) SpawnAt(x float64) {
-	vm.Vines = append(vm.Vines, NewVine(x))
+	// Desativado a pedido do jogador
 }
 
 func (vm *VineManager) Update(speed float64) {
-	vm.spawnTimer++
-	// Spawna um cipó a cada ~400 ticks (cerca de 6.5 segundos)
-	if vm.spawnTimer >= 390 {
-		vm.spawnTimer = 0
-		vm.SpawnAt(vm.screenWidth + 60.0)
-	}
-
-	alive := vm.Vines[:0]
-	for _, v := range vm.Vines {
-		v.Update(speed)
-		if v.Active {
-			alive = append(alive, v)
-		}
-	}
-	vm.Vines = alive
+	// Desativado
 }
 
 func (vm *VineManager) CheckGrab(playerX, playerY, playerW, playerH float64) *Vine {
-	for _, v := range vm.Vines {
-		if v.CanGrab(playerX, playerY, playerW, playerH) {
-			v.Grabbed = true
-			return v
-		}
-	}
 	return nil
 }
 
 func (vm *VineManager) Draw(screen *ebiten.Image) {
-	for _, v := range vm.Vines {
-		v.Draw(screen)
-	}
+	// Não desenha nada
 }
 
 func (vm *VineManager) Reset() {
 	vm.Vines = vm.Vines[:0]
-	vm.spawnTimer = 140
-	vm.SpawnAt(vm.screenWidth + 90.0)
+	vm.spawnTimer = 0
 }

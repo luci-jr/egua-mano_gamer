@@ -50,6 +50,7 @@ type Engine struct {
 	speechBubbleText  string
 	heatSpeechTimer   int
 	stage             int
+	stageDistance     float64
 	stageBannerTimer  int
 	isSaoBrasIntro    bool
 	saoBrasTimer      int
@@ -84,6 +85,7 @@ func NewEngine() *Engine {
 		audio:             audioMgr,
 		score:             0,
 		relicsCount:       0,
+		stageDistance:     0,
 		ticks:             0,
 		lives:             3,
 		hearts:            3,
@@ -257,6 +259,7 @@ func (e *Engine) Update() error {
 			e.isSaoBrasIntro = false
 			e.isTitleScreen = false
 			e.stage = 1
+			e.stageDistance = 0
 			e.stageBannerTimer = 120
 			e.audio.StopIntroBGM()
 			e.audio.RestartBGM()
@@ -529,6 +532,7 @@ func (e *Engine) Update() error {
 			e.relics.Reset()
 			e.score = 0
 			e.relicsCount = 0
+			e.stageDistance = 0
 			e.mudSinkTimer = 0
 			e.lives = 3
 			e.hearts = 3
@@ -547,6 +551,7 @@ func (e *Engine) Update() error {
 		if continuePressed {
 			if e.stage < 3 {
 				e.stage++
+				e.stageDistance = 0
 				e.stageBannerTimer = 130
 				e.isStageComplete = false
 				e.hearts = 3
@@ -565,6 +570,7 @@ func (e *Engine) Update() error {
 				e.relics.Reset()
 				e.score = 0
 				e.relicsCount = 0
+				e.stageDistance = 0
 				e.mudSinkTimer = 0
 				e.lives = 3
 				e.hearts = 3
@@ -598,6 +604,7 @@ func (e *Engine) Update() error {
 			e.relics.Reset()
 			e.score = 0
 			e.relicsCount = 0
+			e.stageDistance = 0
 			e.mudSinkTimer = 0
 			e.lives = 3
 			e.hearts = 3
@@ -665,20 +672,6 @@ func (e *Engine) Update() error {
 
 	if e.stageBannerTimer > 0 {
 		e.stageBannerTimer--
-	}
-
-	stageTarget := 1000
-	if e.stage == 2 {
-		stageTarget = 2000
-	} else if e.stage == 3 {
-		stageTarget = 3000
-	}
-
-	if e.score >= stageTarget && !e.isStageComplete {
-		e.isStageComplete = true
-		e.audio.PauseBGM()
-		e.audio.PlayStageUp()
-		return nil
 	}
 
 	// Movimentação horizontal do herói (Adiantar e Recuar com Teclado, Botões Virtuais ou Toque no Canvas)
@@ -800,14 +793,7 @@ func (e *Engine) Update() error {
 
 	playerX, playerY, playerW, playerH := e.player.GetBounds(GroundY)
 
-	// Agarrar o cipó pendular se estiver no ar e cruzar com o nó inferior (Estilo Pitfall)
-	if !e.player.IsPlayerSwinging() && e.player.IsPlayerJumping() {
-		if v := e.vines.CheckGrab(playerX, playerY, playerW, playerH); v != nil {
-			e.player.GrabVine(v)
-		}
-	}
-
-	// Colisão de Projéteis (Sementes da Baladeira) contra Inimigos e Obstáculos
+	// Colisão de Projéteis (Sementes da Baladeira / Rugido Sônico) contra Inimigos e Obstáculos
 	for _, proj := range e.projectiles.Projectiles {
 		if !proj.Active {
 			continue
@@ -841,13 +827,26 @@ func (e *Engine) Update() error {
 		}
 	}
 
-	stageProgress := float64(e.score % 1000)
-	currentSpeed := (BaseSpeed + float64(e.stage-1)*0.35 + (stageProgress / 2500.0)) * SpeedMultipliers[e.speedIndex]
+	stageTargetDist := 1200.0
+	stageProgress := e.stageDistance / stageTargetDist
+	if stageProgress > 1.0 {
+		stageProgress = 1.0
+	}
+	currentSpeed := (BaseSpeed + float64(e.stage-1)*0.35 + (stageProgress * 0.6)) * SpeedMultipliers[e.speedIndex]
+	e.stageDistance += currentSpeed * 0.45
 	e.scenery.Update(currentSpeed)
-	e.vines.Update(currentSpeed)
 	e.relics.Update(currentSpeed)
 
-	// Coleta de Relíquias e Tesouros Amazônicos (Muiraquitã, Urna Marajoara, Ouro)
+	// Conclusão de fase baseada EXCLUSIVAMENTE em distância percorrida da corrida
+	if e.stageDistance >= stageTargetDist && !e.isStageComplete {
+		e.isStageComplete = true
+		e.stageDistance = 0
+		e.audio.PauseBGM()
+		e.audio.PlayStageUp()
+		return nil
+	}
+
+	// Coleta de Relíquias e Tesouros Amazônicos (soma pontos e tesouros, SEM mudar de fase!)
 	if collected, r := e.relics.CheckCollection(playerX, playerY, playerW, playerH); collected {
 		e.relicsCount++
 		e.score += r.Value
@@ -865,30 +864,9 @@ func (e *Engine) Update() error {
 
 	hit, hitType := e.obstacles.CheckCollision(playerX, playerY, playerW, playerH)
 	if hit && e.invincibleTicks <= 0 {
-		if hitType == entities.TypeMudPit {
-			// Se o jogador estiver no cipó, sobrevoa a lama movediça em segurança!
-			if !e.player.IsPlayerSwinging() && !e.player.IsPlayerJumping() {
-				e.mudSinkTimer++
-				if e.selectedHero == entities.HeroOnca {
-					e.speechBubbleText = "LAMA SUJA! PULE RAPIDO!"
-				} else {
-					e.speechBubbleText = "LAMA MOVEDICA! PULE!"
-				}
-				e.speechBubbleTimer = 35
-				if e.mudSinkTimer%14 == 0 {
-					e.audio.PlayDuck()
-				}
-				if e.mudSinkTimer >= 42 {
-					e.hearts--
-					e.shakeTimer = 12
-					e.mudSinkTimer = 0
-					e.audio.PlayHit()
-				}
-			}
-		} else {
-			e.mudSinkTimer = 0
-			e.hearts--
-			e.shakeTimer = 14
+		e.mudSinkTimer = 0
+		e.hearts--
+		e.shakeTimer = 14
 			if e.hearts <= 0 {
 				e.lives--
 				if e.lives <= 0 {
@@ -933,9 +911,6 @@ func (e *Engine) Update() error {
 				e.audio.PlayHit()
 			}
 		}
-	} else if !hit {
-		e.mudSinkTimer = 0
-	}
 
 	return nil
 }
@@ -996,7 +971,7 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 	e.projectiles.Draw(screen, e.ticks)
 
 	isDoubleJump := e.player.GetJumpCount() == 2
-	ui.DrawHUD(screen, e.lives, e.hearts, e.score, e.stage, isDoubleJump, e.stageBannerTimer, e.audio.IsMuted(), e.ticks, e.relicsCount, heroName)
+	ui.DrawHUD(screen, e.lives, e.hearts, e.score, e.stage, isDoubleJump, e.stageBannerTimer, e.audio.IsMuted(), e.ticks, e.relicsCount, heroName, e.stageDistance)
 
 	if e.isShowingCredits {
 		ui.DrawCreditsScreen(screen, ScreenWidth, ScreenHeight)

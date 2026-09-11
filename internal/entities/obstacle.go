@@ -400,7 +400,7 @@ func (m *ObstacleManager) Update(speed float64) int {
 					}
 				}
 				obs.X = furthestX + 140.0 + float64(rand.Intn(50))
-				obs.Type = ObstacleType(rand.Intn(5))
+				obs.Type = ObstacleType(rand.Intn(4))
 				obs.collided = false
 				obs.Defeated = false
 				obs.DefeatTicks = 0
@@ -418,7 +418,7 @@ func (m *ObstacleManager) Update(speed float64) int {
 				}
 			}
 			obs.X = furthestX + 140.0 + float64(rand.Intn(50))
-			obs.Type = ObstacleType(rand.Intn(5))
+			obs.Type = ObstacleType(rand.Intn(4))
 			obs.collided = false
 			obs.Defeated = false
 			obs.DefeatTicks = 0
@@ -440,7 +440,7 @@ func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH floa
 
 func (m *ObstacleManager) CheckProjectileHit(projX, projY, projW, projH float64) (bool, float64, float64, ObstacleType) {
 	for _, obs := range m.Obstacles {
-		if !obs.Defeated && obs.Type != TypeMudPit && obs.X > -20 && obs.X < m.screenWidth+20 {
+		if !obs.Defeated && obs.X > -20 && obs.X < m.screenWidth+20 {
 			ox, oy, ow, oh := obs.GetBounds()
 			overlapX := projX < ox+ow && projX+projW > ox
 			overlapY := projY < oy+oh && projY+projH > oy
@@ -464,7 +464,7 @@ func (m *ObstacleManager) Draw(screen *ebiten.Image, ticks int, stage int) {
 
 func (m *ObstacleManager) Reset() {
 	spacing := 165.0
-	types := []ObstacleType{TypeGround, TypeAir, TypeJacare, TypeSnake, TypeMudPit}
+	types := []ObstacleType{TypeGround, TypeAir, TypeJacare, TypeSnake}
 	for i, obs := range m.Obstacles {
 		obs.X = m.screenWidth + 25.0 + float64(i)*spacing
 		obs.Type = types[i%len(types)]
