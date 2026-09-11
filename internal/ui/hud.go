@@ -123,9 +123,9 @@ func DrawSaoBrasIntro(screen *ebiten.Image, screenWidth, screenHeight float64, t
 	ebitenutil.DebugPrintAt(screen, "★ MERCADO DE SAO BRAS ATUAL - BELEM DO PARA ★", 28, int(bannerY)+5)
 
 	if (ticks/25)%2 == 0 {
-		ebitenutil.DebugPrintAt(screen, ">> PRESSIONE ENTER OU QUALQUER TECLA <<", 45, int(bannerY)+18)
+		ebitenutil.DebugPrintAt(screen, ">> TOQUE NA TELA OU APERTE ENTER <<", 45, int(bannerY)+18)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "   PRESSIONE ENTER OU QUALQUER TECLA   ", 45, int(bannerY)+18)
+		ebitenutil.DebugPrintAt(screen, "   TOQUE NA TELA OU APERTE ENTER   ", 45, int(bannerY)+18)
 	}
 }
 
@@ -155,9 +155,9 @@ func DrawTitleScreen(screen *ebiten.Image, screenWidth, screenHeight float64, ti
 	ebitenutil.DebugPrintAt(screen, "Avancar/Voltar: Dir/Esq", bx+26, by+54)
 
 	if (ticks/30)%2 == 0 {
-		ebitenutil.DebugPrintAt(screen, ">> PRESSIONE ENTER <<", bx+34, by+72)
+		ebitenutil.DebugPrintAt(screen, ">> TOQUE OU APERTE ENTER <<", bx+20, by+72)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "   PRESSIONE ENTER   ", bx+34, by+72)
+		ebitenutil.DebugPrintAt(screen, "   TOQUE OU APERTE ENTER   ", bx+20, by+72)
 	}
 
 	ebitenutil.DebugPrintAt(screen, "[C] Creditos  |  [ESC] Sair", bx+18, by+91)

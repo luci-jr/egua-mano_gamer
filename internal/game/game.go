@@ -57,7 +57,7 @@ func NewEngine() *Engine {
 		stage:             1,
 		stageBannerTimer:  120,
 		isSaoBrasIntro:    true,
-		saoBrasTimer:      240, // ~4 segundos de visualização da passagem do São Brás
+		saoBrasTimer:      450, // ~7.5 segundos de visualização da passagem do São Brás
 		isTitleScreen:     false,
 		isShowingCredits:  false,
 		isPaused:          false,
@@ -67,18 +67,29 @@ func NewEngine() *Engine {
 	}
 }
 
+func isPointerJustPressed() bool {
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) ||
+		inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
+		return true
+	}
+	touches := inpututil.AppendJustPressedTouchIDs(nil)
+	return len(touches) > 0
+}
+
 func (e *Engine) Update() error {
 	if e.isSaoBrasIntro {
 		e.ticks++
 		e.saoBrasTimer--
-		anyKeyPressed := false
-		for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
-			if inpututil.IsKeyJustPressed(k) {
-				anyKeyPressed = true
-				break
+		anyInput := isPointerJustPressed()
+		if !anyInput {
+			for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
+				if inpututil.IsKeyJustPressed(k) {
+					anyInput = true
+					break
+				}
 			}
 		}
-		if e.saoBrasTimer <= 0 || anyKeyPressed {
+		if e.saoBrasTimer <= 0 || anyInput {
 			e.isSaoBrasIntro = false
 			e.isTitleScreen = true
 		}
@@ -86,7 +97,8 @@ func (e *Engine) Update() error {
 	}
 
 	if e.isShowingCredits {
-		exitCredits := inpututil.IsKeyJustPressed(ebiten.KeyEscape) ||
+		exitCredits := isPointerJustPressed() ||
+			inpututil.IsKeyJustPressed(ebiten.KeyEscape) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
@@ -110,7 +122,8 @@ func (e *Engine) Update() error {
 			return ebiten.Termination
 		}
 
-		startPressed := inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
+		startPressed := isPointerJustPressed() ||
+			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeySpace)
 
@@ -191,7 +204,8 @@ func (e *Engine) Update() error {
 			return nil
 		}
 
-		continuePressed := inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
+		continuePressed := isPointerJustPressed() ||
+			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeySpace)
 
@@ -225,7 +239,8 @@ func (e *Engine) Update() error {
 			return ebiten.Termination
 		}
 
-		restartPressed := inpututil.IsKeyJustPressed(ebiten.KeyR) ||
+		restartPressed := isPointerJustPressed() ||
+			inpututil.IsKeyJustPressed(ebiten.KeyR) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeySpace)

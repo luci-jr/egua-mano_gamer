@@ -5,7 +5,7 @@
 > Um jogo de ação arcade retrô-moderno construído 100% em **Go** com **Ebitengine (v2)**, ambientado nos cenários históricos e culturais de **Belém do Pará**.
 >
 > 🕹️ **Jogue agora online no navegador (WebAssembly):**  
-> 👉 **[https://luci-jr.github.io/paidegua-game/](https://luci-jr.github.io/paidegua-game/)** *(Zero instalação, compatível com qualquer PC!)*
+> 👉 **[https://luci-jr.github.io/paidegua-game/](https://luci-jr.github.io/paidegua-game/)** *(Zero instalação, compatível com PC e Celular / Smartphone Android & iOS!)*
 
 ---
 
@@ -17,22 +17,21 @@ O protagonista é uma **Onça-Pintada Brasileira** que percorre os cartões post
 
 ---
 
-## 🎮 Mecânicas & Jogabilidade
+## 🎮 Mecânicas & Jogabilidade (PC & Celular)
 
-| Comando | Ação | Descrição |
-| :--- | :--- | :--- |
-| `Seta para a Direita` ou `D` | **Adiantar (Andar para Frente)** | A onça avança na tela horizontalmente com limite seguro, permitindo melhor posicionamento e esquiva. |
-| `Seta para a Esquerda` ou `A` | **Recuar (Andar para Trás)** | A onça recua na tela horizontalmente para ganhar tempo e espaço contra obstáculos. |
-| `Espaço`, `Seta para Cima` ou `W` | **Pulo com Rugido** | A onça salta soltando um rugido felino gutural. Possui **altura variável** (segure para pular mais alto). |
-| `Espaço / Cima / W` (2x no ar) | **Pulo Duplo (*Double Jump*)** | Aciona um segundo impulso potente no ar com rugido duplo e efeito de partículas. |
-| `Seta para Baixo` ou `S` (no chão) | **Abaixar / Rastejar** | Diminui o hitbox pela metade (de 22px para 12px), ideal para passar sob os pássaros. |
-| `Seta para Baixo` ou `S` (no ar) | **Queda Rápida (*Fast Drop*)** | Acelera a descida em direção ao solo para antecipar o próximo movimento. |
-| `Enter` ou `Espaço` | **Iniciar / Confirmar Opção / Avançar** | Avança da tela de apresentação, inicia o jogo no menu compacto, confirma opções e avança de fase. |
-| `C` | **Ver Créditos** | Abre a tela de créditos com dados do Desenvolvedor, Linguagem (Go), Engine e Trilha Sonora. |
-| `Esc` | **Menu de Pausa Interativo** | Abre o menu com: **Continuar**, **Reiniciar Aventura**, alternar **Som (Mudo / Ligado)**, **Ver Créditos** e **Fechar o Jogo**. |
-| `Setas Cima / Baixo` | **Navegação do Menu** | Percorre os itens do Menu de Pausa. |
-| `R` | **Recomeçar Rápido** | Reinicia imediatamente a aventura a partir da Fase 1 na tela de conclusão ou Game Over. |
-| **Ao sofrer dano** | **Hitstop & "Égua mano!..."** | Ao perder um coração, ocorre um breve congelamento (*hit-stop*), efeito sonoro cômico regional e um balão de fala dizendo *"Égua mano!..."* sobre a onça. |
+| Comando (Teclado) | Controle Touch (Celular) | Ação | Descrição |
+| :--- | :--- | :--- | :--- |
+| `Seta Direita` ou `D` | Botão virtual **`►`** | **Adiantar (Andar para Frente)** | A onça avança na tela horizontalmente com limite seguro. |
+| `Seta Esquerda` ou `A` | Botão virtual **`◄`** | **Recuar (Andar para Trás)** | A onça recua na tela horizontalmente para ganhar tempo. |
+| `Espaço` / `Cima` / `W` | Botão virtual **`▲ PULO`** | **Pulo com Rugido** | Salta soltando rugido felino gutural com altura variável. |
+| `Espaço / Cima` (2x) | Tocar **`▲ PULO`** (2x) | **Pulo Duplo (*Double Jump*)** | Impulso no ar com rugido duplo e faíscas. |
+| `Seta Baixo` ou `S` | Botão virtual **`▼ BAIXO`** | **Abaixar / Rastejar** | Reduz o hitbox pela metade (passa sob pássaros). |
+| `Seta Baixo` (no ar) | Botão **`▼ BAIXO`** (no ar) | **Queda Rápida (*Fast Drop*)** | Acelera a descida ao solo. |
+| `Enter`, `Espaço` ou Clique | **Toque na Tela** | **Iniciar / Avançar / Confirmar** | Inicia na tela de São Brás, confirma opções e avança fases. |
+| `Esc` | Botão virtual **`⏸ PAUSA`** | **Menu de Pausa Interativo** | Abre o menu com som, reinício e créditos. |
+| `C` | Opção do Menu | **Ver Créditos** | Informações sobre desenvolvedor, IA, Go e música. |
+| `R` ou Clique | Toque na tela | **Recomeçar Rápido** | Reinicia imediatamente na tela de conclusão ou Game Over. |
+| **Ao sofrer dano** | Automático | **Hitstop & "Égua mano!..."** | Congelamento (*hitstop*), som regional e balão de fala. |
 
 ---
 
