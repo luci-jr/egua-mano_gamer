@@ -79,34 +79,28 @@ func isPointerJustPressed() bool {
 		return true
 	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) ||
-		inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) ||
-		ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+		inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
 		return true
 	}
 	touches := inpututil.AppendJustPressedTouchIDs(nil)
-	if len(touches) > 0 {
-		return true
-	}
-	allTouches := ebiten.AppendTouchIDs(nil)
-	return len(allTouches) > 0
+	return len(touches) > 0
 }
 
 func (e *Engine) Update() error {
 	if e.isSaoBrasIntro {
 		e.ticks++
-		e.saoBrasTimer--
-		anyInput := isPointerJustPressed()
-		if !anyInput {
-			for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
-				if inpututil.IsKeyJustPressed(k) {
-					anyInput = true
-					break
-				}
-			}
+		if inpututil.IsKeyJustPressed(ebiten.KeyC) {
+			e.isShowingCredits = true
+			return nil
 		}
-		if e.saoBrasTimer <= 0 || anyInput {
+
+		// O jogo só inicia quando houver um clique explícito na janela do jogo ou toque
+		if isPointerJustPressed() {
 			e.isSaoBrasIntro = false
-			e.isTitleScreen = true
+			e.isTitleScreen = false
+			e.stage = 1
+			e.stageBannerTimer = 120
+			e.audio.RestartBGM()
 		}
 		return nil
 	}
@@ -120,7 +114,7 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeyC)
 		if exitCredits {
 			e.isShowingCredits = false
-			if !e.isPaused && !e.isTitleScreen && !e.isGameOver && !e.isStageComplete && !e.audio.IsMuted() {
+			if !e.isPaused && !e.isTitleScreen && !e.isSaoBrasIntro && !e.isGameOver && !e.isStageComplete && !e.audio.IsMuted() {
 				e.audio.ResumeBGM()
 			}
 		}
@@ -145,6 +139,7 @@ func (e *Engine) Update() error {
 		if startPressed {
 			e.isTitleScreen = false
 			e.stageBannerTimer = 120
+			e.audio.RestartBGM()
 			return nil
 		}
 
