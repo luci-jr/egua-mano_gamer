@@ -373,8 +373,11 @@ func (g *Garoto) Draw(screen *ebiten.Image, groundY float64, ticks int, invincib
 	cShirtLight := color.RGBA{R: 70, G: 165, B: 245, A: 255}  // Brilho da camisa
 	cBelt := color.RGBA{R: 110, G: 65, B: 35, A: 255}         // Cinto de couro
 	cBuckle := color.RGBA{R: 245, G: 200, B: 55, A: 255}      // Fivela dourada
-	cPants := color.RGBA{R: 175, G: 145, B: 100, A: 255}      // Bermuda cáqui
-	cPantsDark := color.RGBA{R: 140, G: 110, B: 70, A: 255}   // Sombra da bermuda
+	cPants := color.RGBA{R: 190, G: 160, B: 110, A: 255}      // Bermuda cáqui
+	cPantsDark := color.RGBA{R: 135, G: 105, B: 65, A: 255}   // Sombra da bermuda
+	cSandalDark := color.RGBA{R: 60, G: 32, B: 18, A: 255}     // Couro escuro da sandália
+	cSandalLight := color.RGBA{R: 175, G: 110, B: 55, A: 255}  // Tira de couro da sandália
+	cSandalSole := color.RGBA{R: 245, G: 240, B: 225, A: 255}  // Sola clara de alto contraste com o chão
 	cWood := color.RGBA{R: 145, G: 85, B: 40, A: 255}         // Madeira da baladeira
 	cRubber := color.RGBA{R: 230, G: 110, B: 50, A: 255}      // Elástico da baladeira
 	cVine := color.RGBA{R: 85, G: 130, B: 45, A: 255}         // Rolo de cipó nas costas
@@ -428,10 +431,15 @@ func (g *Garoto) Draw(screen *ebiten.Image, groundY float64, ticks int, invincib
 		if g.SwingingVine != nil {
 			legOffset = g.SwingingVine.Angle * 7.0
 		}
-		drawBox(3-legOffset, 18, 5, 5, cPants)
-		drawBox(2-legOffset*1.2, 23, 4, 4, cSkin)
-		drawBox(8+legOffset, 18, 5, 4, cPantsDark)
-		drawBox(9+legOffset*1.2, 22, 4, 3, cSkin)
+		drawBox(3-legOffset, 17, 5, 4, cPants)
+		drawBox(2-legOffset*1.2, 21, 4, 4, cSkin)
+		drawBox(1-legOffset*1.3, 24, 5, 3, cSandalDark)
+		drawBox(1-legOffset*1.3, 26, 5, 2, cSandalSole)
+
+		drawBox(8+legOffset, 17, 5, 4, cPantsDark)
+		drawBox(9+legOffset*1.2, 21, 4, 4, cSkinDark)
+		drawBox(10+legOffset*1.3, 24, 5, 3, cSandalDark)
+		drawBox(10+legOffset*1.3, 26, 5, 2, cSandalSole)
 		return
 	}
 
@@ -452,9 +460,14 @@ func (g *Garoto) Draw(screen *ebiten.Image, groundY float64, ticks int, invincib
 		drawBox(2, crouchOffsetY+7, 10, 5, cShirt)
 		drawBox(1, crouchOffsetY+10, 11, 2, cBelt)
 
-		// Pernas dobradas no chão
-		drawBox(0, crouchOffsetY+11, 14, 4, cPants)
-		drawBox(11, crouchOffsetY+13, 4, 2, cSkin)
+		// Pernas dobradas em cócoras com pés e solas claras visíveis
+		drawBox(1, crouchOffsetY+9, 12, 4, cPants)
+		drawBox(0, crouchOffsetY+11, 6, 4, cSkin)
+		drawBox(7, crouchOffsetY+11, 6, 4, cSkinDark)
+		drawBox(-1, crouchOffsetY+13, 6, 3, cSandalDark)
+		drawBox(-1, crouchOffsetY+15, 6, 1, cSandalSole)
+		drawBox(7, crouchOffsetY+13, 6, 3, cSandalDark)
+		drawBox(7, crouchOffsetY+15, 6, 1, cSandalSole)
 
 		// Baladeira armada horizontalmente na frente
 		drawBox(13, crouchOffsetY+7, 4, 4, cWood)
@@ -499,11 +512,18 @@ func (g *Garoto) Draw(screen *ebiten.Image, groundY float64, ticks int, invincib
 			drawBox(15, 10, 2, 2, cRubber)
 		}
 
-		// Pernas encolhidas dinamicamente
-		drawBox(1, 19, 5, 5, cPants)
-		drawBox(7, 19, 5, 4, cPantsDark)
-		drawBox(2, 24, 4, 3, cSkin)
-		drawBox(8, 23, 4, 3, cSkin)
+		// Pernas abertas no ar em salto acrobático 16-bit com sandálias delineadas
+		// Perna dianteira dobrada com joelho erguido
+		drawBox(6, 17, 6, 4, cPants)
+		drawBox(9, 19, 5, 4, cSkin)
+		drawBox(10, 22, 5, 3, cSandalDark)
+		drawBox(10, 24, 5, 2, cSandalSole)
+
+		// Perna traseira esticada para trás no salto
+		drawBox(-1, 17, 5, 4, cPantsDark)
+		drawBox(-4, 20, 5, 4, cSkinDark)
+		drawBox(-6, 23, 5, 3, cSandalDark)
+		drawBox(-6, 25, 5, 2, cSandalSole)
 		return
 	}
 
@@ -559,22 +579,81 @@ func (g *Garoto) Draw(screen *ebiten.Image, groundY float64, ticks int, invincib
 		}
 	}
 
-	// Pernas & Animação de Passadas
+	// Pernas & Animação de Passadas Expressivas (estilo galope da onça com passada ampla)
+	if !g.IsRunning {
+		// Postura em pé firme (Idle respirando) com base sólida e pés no chão
+		drawBox(1, 17+bobY, 5, 4, cPantsDark)
+		drawBox(7, 17+bobY, 5, 4, cPants)
+		drawBox(2, 20+bobY, 4, 5, cSkinDark)
+		drawBox(8, 20+bobY, 4, 5, cSkin)
+		drawBox(1, 24+bobY, 5, 3, cSandalDark)
+		drawBox(1, 26+bobY, 6, 2, cSandalSole)
+		drawBox(7, 24+bobY, 5, 3, cSandalDark)
+		drawBox(7, 26+bobY, 6, 2, cSandalSole)
+		return
+	}
+
+	// Ciclo de corrida de 4 quadros amplo e dinâmico
 	switch legFrame {
+	case 0:
+		// Passo 1: Passada aberta máxima - Perna dianteira esticada à frente, traseira empurrando atrás
+		// Perna Traseira
+		drawBox(-2, 17+bobY, 5, 4, cPantsDark)
+		drawBox(-4, 20+bobY, 5, 4, cSkinDark)
+		drawBox(-6, 23+bobY, 5, 3, cSandalDark)
+		drawBox(-5, 23+bobY, 2, 2, cSandalLight)
+		drawBox(-6, 25+bobY, 5, 2, cSandalSole)
+
+		// Perna Dianteira
+		drawBox(6, 17+bobY, 6, 4, cPants)
+		drawBox(10, 20+bobY, 5, 5, cSkin)
+		drawBox(11, 24+bobY, 6, 3, cSandalDark)
+		drawBox(12, 24+bobY, 3, 2, cSandalLight)
+		drawBox(11, 26+bobY, 7, 2, cSandalSole)
+
 	case 1:
-		drawBox(7, 19, 5, 5, cPants)
-		drawBox(9, 24, 4, 4, cSkin)
-		drawBox(1, 19, 5, 4, cPantsDark)
-		drawBox(0, 23, 4, 3, cSkin)
+		// Passo 2: Passagem - Perna de apoio sob o corpo, perna traseira avançando dobrada no ar
+		// Perna de Apoio
+		drawBox(4, 17+bobY, 6, 4, cPants)
+		drawBox(5, 20+bobY, 5, 5, cSkin)
+		drawBox(4, 24+bobY, 6, 3, cSandalDark)
+		drawBox(5, 24+bobY, 3, 1, cSandalLight)
+		drawBox(4, 26+bobY, 7, 2, cSandalSole)
+
+		// Perna Traseira Avançando
+		drawBox(0, 17+bobY, 5, 4, cPantsDark)
+		drawBox(-1, 20+bobY, 5, 4, cSkinDark)
+		drawBox(-3, 23+bobY, 4, 3, cSandalDark)
+		drawBox(-3, 25+bobY, 4, 2, cSandalSole)
+
+	case 2:
+		// Passo 3: Passada aberta máxima invertida - Perna esquerda à frente, direita atrás
+		// Perna Traseira
+		drawBox(-2, 17+bobY, 5, 4, cPants)
+		drawBox(-4, 20+bobY, 5, 4, cSkin)
+		drawBox(-6, 23+bobY, 5, 3, cSandalDark)
+		drawBox(-5, 23+bobY, 2, 2, cSandalLight)
+		drawBox(-6, 25+bobY, 5, 2, cSandalSole)
+
+		// Perna Dianteira
+		drawBox(6, 17+bobY, 6, 4, cPantsDark)
+		drawBox(10, 20+bobY, 5, 5, cSkinDark)
+		drawBox(11, 24+bobY, 6, 3, cSandalDark)
+		drawBox(12, 24+bobY, 3, 2, cSandalLight)
+		drawBox(11, 26+bobY, 7, 2, cSandalSole)
+
 	case 3:
-		drawBox(1, 19, 5, 5, cPantsDark)
-		drawBox(0, 24, 4, 4, cSkin)
-		drawBox(7, 19, 5, 4, cPants)
-		drawBox(8, 23, 4, 3, cSkin)
-	default:
-		drawBox(2, 19, 5, 5, cPants)
-		drawBox(3, 24, 4, 4, cSkin)
-		drawBox(7, 19, 5, 5, cPantsDark)
-		drawBox(7, 24, 4, 4, cSkin)
+		// Passo 4: Passagem invertida
+		// Perna de Apoio
+		drawBox(4, 17+bobY, 6, 4, cPantsDark)
+		drawBox(5, 20+bobY, 5, 5, cSkinDark)
+		drawBox(4, 24+bobY, 6, 3, cSandalDark)
+		drawBox(4, 26+bobY, 7, 2, cSandalSole)
+
+		// Perna Traseira Avançando
+		drawBox(0, 17+bobY, 5, 4, cPants)
+		drawBox(-1, 20+bobY, 5, 4, cSkin)
+		drawBox(-3, 23+bobY, 4, 3, cSandalDark)
+		drawBox(-3, 25+bobY, 4, 2, cSandalSole)
 	}
 }

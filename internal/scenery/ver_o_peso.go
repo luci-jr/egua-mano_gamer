@@ -66,7 +66,7 @@ func (b *Background) Draw(screen *ebiten.Image, screenWidth, groundY float64, ti
 	}
 }
 
-// drawLoopingImage desenha o background em looping horizontal infinito com efeito parallax
+// drawLoopingImage desenha o background panorâmico 8-bit em looping horizontal contínuo (parallax infinito)
 func (b *Background) drawLoopingImage(screen *ebiten.Image, bg *ebiten.Image, screenWidth, groundY float64, parallaxSpeed float64) {
 	if bg == nil {
 		return
@@ -76,7 +76,7 @@ func (b *Background) drawLoopingImage(screen *ebiten.Image, bg *ebiten.Image, sc
 	imgH := float64(bounds.Dy())
 
 	scaleX := screenWidth / imgW
-	// A imagem tem 210 de altura total e cobre o fundo até a tela inteira (210)
+	// Escala para cobrir toda a tela vertical (210 pixels)
 	scaleY := (groundY + 55.0) / imgH
 
 	offset := math.Mod(b.scrollOffset*parallaxSpeed, screenWidth)
@@ -100,56 +100,31 @@ func (b *Background) drawLoopingImage(screen *ebiten.Image, bg *ebiten.Image, sc
 // ==========================================
 func (b *Background) drawVerOPeso(screen *ebiten.Image, screenWidth, groundY float64, ticks int) {
 	if b.imgFase1 != nil {
-		// Imagem real 8-bit do Ver-o-Peso (Mercado de Ferro e Baía do Guajará)
-		b.drawLoopingImage(screen, b.imgFase1, screenWidth, groundY, 0.40)
+		// 1. Cenário panorâmico real 8-bit do Ver-o-Peso (Mercado de Ferro e Baía do Guajará ao pôr do sol)
+		b.drawLoopingImage(screen, b.imgFase1, screenWidth, groundY, 0.45)
 
-		// Aves típicas de Belém (urubus e garças distantes no céu)
-		cBird := color.RGBA{R: 20, G: 24, B: 30, A: 220}
+		// 2. Revoada característica de urubus e garças de Belém cortando o céu dourado
+		cBird := color.RGBA{R: 28, G: 20, B: 24, A: 210}
 		for bird := 0; bird < 4; bird++ {
-			bx := math.Mod(float64(bird*95)+float64(ticks)*0.45, screenWidth+40) - 20
-			by := 24.0 + math.Sin(float64(ticks+bird*40)*0.04)*10.0 + float64(bird*6)
-			flap := (ticks + bird*7) / 8
+			bx := math.Mod(float64(bird*90)+float64(ticks)*0.45, screenWidth+40) - 20
+			by := 18.0 + math.Sin(float64(ticks+bird*35)*0.04)*8.0 + float64(bird*5)
+			flap := (ticks + bird*7) / 7
 			drawSkyBird(screen, bx, by, flap, cBird)
 		}
 
-		// Postes coloniais vitorianos de ferro fundido de Belém (Belle Époque)
+		// 3. Postes coloniais vitorianos de ferro fundido do cais (Belle Époque) em primeiro plano
 		lampIron := color.RGBA{R: 28, G: 32, B: 42, A: 255}
 		lampGlow := color.RGBA{R: 255, G: 215, B: 90, A: 220}
-		lampLightBeam := color.RGBA{R: 255, G: 220, B: 120, A: 35}
+		lampLightBeam := color.RGBA{R: 255, G: 220, B: 120, A: 25}
 
 		for p := 0; p < 3; p++ {
-			px := float64(p*130) + 40.0 - math.Mod(b.scrollOffset*0.65, 130.0)
-			// Haste do poste colonial
+			px := float64(p*130) + 50.0 - math.Mod(b.scrollOffset*0.75, 130.0)
 			ebitenutil.DrawRect(screen, px, groundY-46, 2, 46, lampIron)
 			ebitenutil.DrawRect(screen, px-2, groundY-48, 6, 2, lampIron)
 			ebitenutil.DrawRect(screen, px-1, groundY-50, 4, 3, lampIron)
-			// Lanterna acesa
 			ebitenutil.DrawRect(screen, px-1, groundY-47, 4, 3, lampGlow)
-			// Cone sutil de luz sobre o calçadão
-			ebitenutil.DrawRect(screen, px-6, groundY-44, 14, 44, lampLightBeam)
+			ebitenutil.DrawRect(screen, px-5, groundY-44, 12, 44, lampLightBeam)
 		}
-
-		// Chão: Cais de pedra de cantaria histórica do Ver-o-Peso
-		cStoneDark := color.RGBA{R: 52, G: 54, B: 58, A: 255}
-		cStoneMid := color.RGBA{R: 72, G: 76, B: 82, A: 255}
-		cStoneLight := color.RGBA{R: 98, G: 104, B: 112, A: 255}
-		cWaterEdge := color.RGBA{R: 35, G: 70, B: 85, A: 255}
-
-		ebitenutil.DrawRect(screen, 0, groundY, screenWidth, 55, cStoneDark)
-		ebitenutil.DrawRect(screen, 0, groundY, screenWidth, 3, cStoneLight)
-
-		// Lajes de pedra do cais em scroll
-		for x := -math.Mod(b.scrollOffset, 24.0); x < screenWidth; x += 24.0 {
-			ebitenutil.DrawRect(screen, x, groundY+4, 22, 10, cStoneMid)
-			ebitenutil.DrawRect(screen, x+2, groundY+5, 18, 2, cStoneLight)
-			ebitenutil.DrawRect(screen, x+12, groundY+18, 22, 11, cStoneMid)
-			ebitenutil.DrawRect(screen, x+14, groundY+19, 18, 2, cStoneLight)
-			ebitenutil.DrawRect(screen, x, groundY+33, 22, 11, cStoneMid)
-		}
-
-		// Borda da Baía com água no limite inferior
-		ebitenutil.DrawRect(screen, 0, groundY+49, screenWidth, 6, cWaterEdge)
-		ebitenutil.DrawRect(screen, 0, groundY+48, screenWidth, 1, color.RGBA{R: 90, G: 145, B: 170, A: 200})
 		return
 	}
 
@@ -162,48 +137,21 @@ func (b *Background) drawVerOPeso(screen *ebiten.Image, screenWidth, groundY flo
 // ==========================================
 func (b *Background) drawDocas(screen *ebiten.Image, screenWidth, groundY float64, ticks int) {
 	if b.imgFase2 != nil {
-		// Imagem real 8-bit da Estação das Docas (Galpões ingleses e Guindastes)
-		b.drawLoopingImage(screen, b.imgFase2, screenWidth, groundY, 0.40)
+		// 1. Cenário panorâmico real 8-bit das Docas (Galpões ingleses vermelhos, guindaste amarelo e cais)
+		b.drawLoopingImage(screen, b.imgFase2, screenWidth, groundY, 0.45)
 
-		// Luminárias industriais baixas do cais das Docas
-		cDocasLamp := color.RGBA{R: 38, G: 42, B: 48, A: 255}
-		cAmberGlow := color.RGBA{R: 255, G: 180, B: 60, A: 190}
+		// 2. Luminárias industriais de ferro do cais das Docas com luz âmbar em primeiro plano
+		cDocasLamp := color.RGBA{R: 35, G: 38, B: 44, A: 255}
+		cAmberGlow := color.RGBA{R: 255, G: 185, B: 65, A: 210}
+		cAmberBeam := color.RGBA{R: 255, G: 190, B: 70, A: 25}
+
 		for p := 0; p < 3; p++ {
-			px := float64(p*140) + 60.0 - math.Mod(b.scrollOffset*0.65, 140.0)
-			ebitenutil.DrawRect(screen, px, groundY-26, 3, 26, cDocasLamp)
-			ebitenutil.DrawRect(screen, px-2, groundY-28, 7, 3, cDocasLamp)
-			ebitenutil.DrawRect(screen, px-1, groundY-26, 5, 4, cAmberGlow)
+			px := float64(p*140) + 60.0 - math.Mod(b.scrollOffset*0.75, 140.0)
+			ebitenutil.DrawRect(screen, px, groundY-32, 2, 32, cDocasLamp)
+			ebitenutil.DrawRect(screen, px-2, groundY-35, 6, 3, cDocasLamp)
+			ebitenutil.DrawRect(screen, px-1, groundY-34, 4, 3, cAmberGlow)
+			ebitenutil.DrawRect(screen, px-4, groundY-31, 10, 31, cAmberBeam)
 		}
-
-		// Chão: Famoso Deck de Madeira de Lei (Ipê/Itaúba) das Docas e Trilhos dos Guindastes
-		cWoodDark := color.RGBA{R: 78, G: 46, B: 30, A: 255}
-		cWoodMid := color.RGBA{R: 110, G: 68, B: 44, A: 255}
-		cWoodLight := color.RGBA{R: 138, G: 86, B: 56, A: 255}
-		cRailMetal := color.RGBA{R: 45, G: 50, B: 55, A: 255}
-		cRailShine := color.RGBA{R: 165, G: 175, B: 185, A: 255}
-
-		ebitenutil.DrawRect(screen, 0, groundY, screenWidth, 55, cWoodDark)
-
-		// Réguas do deck de madeira com juntas
-		for y := groundY; y < groundY+55; y += 6.0 {
-			ebitenutil.DrawRect(screen, 0, y, screenWidth, 5, cWoodMid)
-			ebitenutil.DrawRect(screen, 0, y, screenWidth, 1, cWoodLight)
-			ebitenutil.DrawRect(screen, 0, y+5, screenWidth, 1, cWoodDark)
-		}
-
-		// Parafusos e nós da madeira em movimento
-		for x := -math.Mod(b.scrollOffset, 30.0); x < screenWidth; x += 30.0 {
-			ebitenutil.DrawRect(screen, x, groundY+2, 2, 2, cWoodDark)
-			ebitenutil.DrawRect(screen, x+14, groundY+14, 2, 2, cWoodDark)
-			ebitenutil.DrawRect(screen, x+4, groundY+26, 2, 2, cWoodDark)
-			ebitenutil.DrawRect(screen, x+18, groundY+38, 2, 2, cWoodDark)
-		}
-
-		// Trilho de ferro fundido do guindaste inglês
-		ebitenutil.DrawRect(screen, 0, groundY+8, screenWidth, 4, cRailMetal)
-		ebitenutil.DrawRect(screen, 0, groundY+8, screenWidth, 1, cRailShine)
-		ebitenutil.DrawRect(screen, 0, groundY+20, screenWidth, 4, cRailMetal)
-		ebitenutil.DrawRect(screen, 0, groundY+20, screenWidth, 1, cRailShine)
 		return
 	}
 
@@ -218,44 +166,21 @@ func (b *Background) drawDocas(screen *ebiten.Image, screenWidth, groundY float6
 // ==========================================
 func (b *Background) drawTheatroDaPaz(screen *ebiten.Image, screenWidth, groundY float64, ticks int) {
 	if b.imgFase3 != nil {
-		// Imagem real 8-bit do Theatro da Paz (Fachada neoclássica histórica e Praça da República)
-		b.drawLoopingImage(screen, b.imgFase3, screenWidth, groundY, 0.40)
+		// 1. Cenário panorâmico real 8-bit do Theatro da Paz (Fachada neoclássica, mangueiras e pedras portuguesas)
+		b.drawLoopingImage(screen, b.imgFase3, screenWidth, groundY, 0.45)
 
-		// Postes republicanos de ferro com globo de iluminação
-		cRepIron := color.RGBA{R: 32, G: 36, B: 40, A: 255}
-		cGlobeWhite := color.RGBA{R: 250, G: 245, B: 220, A: 240}
+		// 2. Postes republicanos de ferro com globo de iluminação da Praça da República em primeiro plano
+		cRepIron := color.RGBA{R: 30, G: 34, B: 38, A: 255}
+		cGlobeWhite := color.RGBA{R: 255, G: 250, B: 230, A: 240}
+		cGlobeBeam := color.RGBA{R: 255, G: 245, B: 200, A: 20}
+
 		for p := 0; p < 3; p++ {
-			px := float64(p*135) + 50.0 - math.Mod(b.scrollOffset*0.65, 135.0)
-			ebitenutil.DrawRect(screen, px, groundY-44, 2, 44, cRepIron)
-			ebitenutil.DrawRect(screen, px-2, groundY-46, 6, 2, cRepIron)
-			ebitenutil.DrawRect(screen, px-2, groundY-52, 6, 6, cGlobeWhite)
+			px := float64(p*135) + 45.0 - math.Mod(b.scrollOffset*0.75, 135.0)
+			ebitenutil.DrawRect(screen, px, groundY-46, 2, 46, cRepIron)
+			ebitenutil.DrawRect(screen, px-2, groundY-48, 6, 2, cRepIron)
+			ebitenutil.DrawRect(screen, px-2, groundY-54, 6, 6, cGlobeWhite)
+			ebitenutil.DrawRect(screen, px-6, groundY-46, 14, 46, cGlobeBeam)
 		}
-
-		// Chão: Calçadão clássico de pedras portuguesas preto e branco (Mosaico da Praça da República)
-		cStoneWhite := color.RGBA{R: 228, G: 228, B: 222, A: 255}
-		cStoneBlack := color.RGBA{R: 42, G: 44, B: 48, A: 255}
-		cBaseGrey := color.RGBA{R: 90, G: 92, B: 96, A: 255}
-		cGrassGreen := color.RGBA{R: 35, G: 95, B: 45, A: 255}
-
-		ebitenutil.DrawRect(screen, 0, groundY, screenWidth, 55, cBaseGrey)
-
-		// Mosaico geométrico ondulado em pixel art
-		step := 16.0
-		for x := -math.Mod(b.scrollOffset, step*2); x < screenWidth; x += step {
-			ebitenutil.DrawRect(screen, x, groundY+2, 7, 7, cStoneWhite)
-			ebitenutil.DrawRect(screen, x+8, groundY+2, 7, 7, cStoneBlack)
-			ebitenutil.DrawRect(screen, x, groundY+10, 7, 7, cStoneBlack)
-			ebitenutil.DrawRect(screen, x+8, groundY+10, 7, 7, cStoneWhite)
-			ebitenutil.DrawRect(screen, x, groundY+18, 7, 7, cStoneWhite)
-			ebitenutil.DrawRect(screen, x+8, groundY+18, 7, 7, cStoneBlack)
-			ebitenutil.DrawRect(screen, x, groundY+26, 7, 7, cStoneBlack)
-			ebitenutil.DrawRect(screen, x+8, groundY+26, 7, 7, cStoneWhite)
-		}
-
-		// Meio-fio e gramado da praça no rodapé
-		ebitenutil.DrawRect(screen, 0, groundY+36, screenWidth, 4, color.RGBA{R: 160, G: 160, B: 165, A: 255})
-		ebitenutil.DrawRect(screen, 0, groundY+40, screenWidth, 15, cGrassGreen)
-		ebitenutil.DrawRect(screen, 0, groundY+40, screenWidth, 2, color.RGBA{R: 55, G: 135, B: 65, A: 255})
 		return
 	}
 
