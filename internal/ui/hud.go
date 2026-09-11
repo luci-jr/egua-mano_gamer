@@ -701,7 +701,7 @@ func DrawCreditsScreen(screen *ebiten.Image, screenWidth, screenHeight float64) 
 	ebitenutil.DebugPrintAt(screen, "Co-criacao IA: Nexus AI (Lucy)", bx+14, by+38)
 	ebitenutil.DebugPrintAt(screen, "Linguagem:     Go (Golang)", bx+14, by+50)
 	ebitenutil.DebugPrintAt(screen, "Game Engine:   Ebitengine v2", bx+14, by+62)
-	ebitenutil.DebugPrintAt(screen, "Audio:         Carimbo 8-bit", bx+14, by+74)
+	ebitenutil.DebugPrintAt(screen, "Trilha Sonora: Pinduca (Carimbo)", bx+14, by+74)
 	ebitenutil.DebugPrintAt(screen, "Cenarios:      Belem do Para", bx+14, by+86)
 
 	ebitenutil.DebugPrintAt(screen, "[ENTER / ESC / C] Voltar", bx+30, by+112)

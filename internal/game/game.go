@@ -853,16 +853,16 @@ func (e *Engine) Update() error {
 			burstColor := color.RGBA{R: 215, G: 50, B: 55, A: 255}
 			switch obsType {
 			case entities.TypeAir:
-				scoreBonus = 100
+				scoreBonus = 50
 				burstColor = color.RGBA{R: 240, G: 240, B: 250, A: 255} // Penas
 			case entities.TypeJacare:
-				scoreBonus = 120
+				scoreBonus = 60
 				burstColor = color.RGBA{R: 45, G: 160, B: 55, A: 255} // Escamas
 			case entities.TypeSnake:
-				scoreBonus = 90
+				scoreBonus = 40
 				burstColor = color.RGBA{R: 245, G: 180, B: 35, A: 255} // Coral
 			default:
-				scoreBonus = 50
+				scoreBonus = 20
 				burstColor = color.RGBA{R: 120, G: 45, B: 140, A: 255} // Açaí
 			}
 
@@ -901,9 +901,10 @@ func (e *Engine) Update() error {
 	}
 
 	if passed := e.obstacles.Update(currentSpeed); passed > 0 {
-		e.score += passed * 25
+		e.score += passed * 10
 	}
-	if e.ticks%6 == 0 {
+	// Pontuação por sobrevivência equilibrada: +1 ponto por segundo (60 ticks)
+	if e.ticks%60 == 0 {
 		e.score += 1
 	}
 
