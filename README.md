@@ -45,6 +45,10 @@ O jogo possui um sistema balanceado de sobrevivência arcade retrô:
   * Cada colisão com obstáculo desconta **1 coração** (a onça grita `"EGUA MANO!..."` com congelamento suave de tela e invencibilidade temporária).
   * Ao perder os **3 corações** da vida corrente, o jogador perde **1 vida**, e os **3 corações são recarregados** para a nova vida (`x2 VIDAS`, depois `x1 VIDAS`).
   * Ao esgotar todas as 3 vidas (`x0 VIDAS`), a onça tomba e dispara o clássico balão paraense: `"Levei o farelo mano, mancada!"` na tela de Game Over.
+* **Calor Amazônico em Pista:**
+  * Periodicamente na corrida, a onça reclama do mormaço de Belém soltando o balão: `"Égua da lua, um sol pra cada um!"` com gotinhas de suor em pixel art.
+* **Parabéns do Tuxaua Indígena:**
+  * Ao atingir a pontuação de cada fase, o **Guerreiro Indígena Tuxaua** surge em destaque em pixel art com cocar majestoso de penas de arara e saúda o jogador com mensagens de vitória e bênção da floresta!
 
 ---
 
