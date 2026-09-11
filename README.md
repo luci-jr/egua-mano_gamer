@@ -28,18 +28,23 @@ Na nova versão inspirada em clássicos arcade dos anos 90, o jogador pode **esc
 
 ---
 
-## 🕹️ Menu Interativo & Configurações de Jogo
+## 🕹️ Tela de Abertura Cinematográfica & Menu Interativo (VER. 2.4.0)
 
-Tanto na **Tela de Abertura (Belém do Pará & Baía do Guajará)** quanto no **Menu de Pausa (`Esc`)**, o jogador conta com um painel completo de controle:
+O jogo inicia com uma **apresentação de abertura arcade clássica** (estilo *Pitfall / Super Metroid / Contra*):
+* **Fundo Panorâmico de Belém:** Mercado do Ver-o-Peso e a Baía do Guajará ao entardecer com reflexos dourados na água.
+* **Revoada em Tempo Real:** Urubus negros e garças brancas amazônicas voando continuamente pelo céu em pixel art animado.
+* **Abertura Limpa:** O menu de opções e configurações surge apenas após o jogador pressionar **Enter** ou tocar na tela (podendo retornar à capa limpa a qualquer momento com `ESC`).
+
+Tanto no **Menu de Aventura** quanto no **Menu de Pausa (`Esc`)**, o jogador conta com um painel completo de controle:
 
 * **▶ INICIAR AVENTURA:** Abre a **Tela de Seleção de Personagem** para escolher entre Garoto Curumim ou Onça-Pintada.
 * **🐾 HERÓI: [ GAROTO CURUMIM / ONÇA-PINTADA ]:** Alterna o herói ativo diretamente com `Esquerda/Direita` ou clicando no menu.
 * **🔊 SOM: [ LIGADO / MUDO ]:** Alterna instantaneamente a trilha de carimbó e todos os efeitos sonoros procedurais.
 * **⚡ VELOCIDADE DO JOGO:** Calibre o ritmo da ação em tempo real com 4 perfis distintos:
-  * `0.8x CALMO`: Ritmo relaxado para aprendizado e exploração.
-  * `1.0x NORMAL`: Velocidade equilibrada de design oficial.
-  * `1.3x RAPIDO`: Ação acelerada e reflexos apurados.
-  * `1.6x TURBO`: Desafio extremo estilo arcade frenético!
+  * `0.6x CALMO`: Ritmo cadenciado para treino e exploração cuidadosa.
+  * `0.8x NORMAL`: **Velocidade oficial padrão**, perfeitamente equilibrada para a travessia e esquivas.
+  * `1.0x RAPIDO`: Ação dinâmica e reflexos apurados.
+  * `1.3x TURBO`: Desafio extremo estilo arcade frenético!
 * **★ VER CRÉDITOS:** Apresenta a autoria, stack técnica (Go + Ebitengine v2) e co-criação com IA.
 
 ---
