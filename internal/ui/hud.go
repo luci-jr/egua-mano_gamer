@@ -59,7 +59,65 @@ func DrawHeart(screen *ebiten.Image, x, y float64, filled bool) {
 	}
 }
 
-func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, isDoubleJump bool, stageBannerTimer int, isMuted bool) {
+func getCuriosityText(stage int) string {
+	switch stage {
+	case 2: // Estação das Docas
+		return "★ ESTACAO DAS DOCAS: Armazens de ferro ingleses de 1897 restaurados na orla de Belem!  " +
+			"★ GUINDASTES: Importados no sec. XX, hoje marcos historicos do porto!  " +
+			"★ ILHA DO COMBU: Polo de cacau nativo e turismo ecologico a 10 min de barco!  " +
+			"★ CARIMBO: Ritmo e danca tradicional paraense patrimonio cultural do Brasil!  " +
+			"★ CHUVA DA TARDE: O belemense marca compromissos 'antes ou depois da chuva'!  " +
+			"★ SORVETES TIPICOS: Saboreie acai, cupuacu, bacuri, tapereba e castanha nas Docas!  "
+	case 3: // Theatro da Paz
+		return "★ THEATRO DA PAZ: Fundado em 1878 na Belle Epoque, inspirado no Scala de Milao!  " +
+			"★ CIDADE DAS MANGUEIRAS: Belem ganhou este titulo pelas arvores plantadas no sec. XIX!  " +
+			"★ CIRIO DE NAZARE: O Natal dos paraenses reune mais de 2 milhoes de devotos!  " +
+			"★ PRACA DA REPUBLICA: Grande praca colonial que abriga o Theatro no coracao da cidade!  " +
+			"★ ONCA-PINTADA: Rainha da Amazonia com a mordida mais potente entre todos os felinos!  " +
+			"★ PAIDEGUA: Expressao genuina do Para para algo excelente, sensacional e autentico!  "
+	default: // Mercado do Ver-o-Peso
+		return "★ VER-O-PESO: Fundado em 1627, e a maior feira a ceu aberto da America Latina!  " +
+			"★ ACAI PURO: No Para, o acai e consumido tradicionalmente com peixe frito e farinha!  " +
+			"★ TACACA: Servido na cuia quente com tucupi e folhas de jambu que amortecem os labios!  " +
+			"★ JACARE-ACU: O gigante dos rios amazonicos alcanca mais de 4 metros de comprimento!  " +
+			"★ BAIA DO GUAJARA: Aguas onde atracam diariamente os barcos com pescado e acai!  " +
+			"★ PANEIRO: Cesto tipico de palha trancada usado para carregar o acai colhido!  "
+	}
+}
+
+func DrawCityFooter(screen *ebiten.Image, screenWidth, screenHeight float64, stage int, ticks int) {
+	footerH := 14.0
+	footerY := screenHeight - footerH
+
+	// Fundo escuro do rodapé com transparência suave
+	ebitenutil.DrawRect(screen, 0, footerY, screenWidth, footerH, color.RGBA{R: 8, G: 12, B: 22, A: 235})
+	// Filete dourado divisório superior
+	ebitenutil.DrawRect(screen, 0, footerY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 220})
+
+	fullText := getCuriosityText(stage)
+	textWidth := len(fullText) * 6
+	if textWidth == 0 {
+		return
+	}
+
+	// Rolagem contínua suave (1 pixel por frame)
+	scrollOffset := ticks % textWidth
+	baseX := 52 - scrollOffset
+
+	// Desenha a primeira repetição
+	ebitenutil.DebugPrintAt(screen, fullText, baseX, int(footerY)+1)
+	// Desenha a segunda repetição para manter o fluxo contínuo
+	if baseX+textWidth < int(screenWidth) {
+		ebitenutil.DebugPrintAt(screen, fullText, baseX+textWidth, int(footerY)+1)
+	}
+
+	// Badge fixa que mascara o texto que passa sob ela
+	ebitenutil.DrawRect(screen, 0, footerY, 48, footerH, color.RGBA{R: 16, G: 26, B: 46, A: 255})
+	ebitenutil.DrawRect(screen, 48, footerY, 1, footerH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DebugPrintAt(screen, "★BELEM", 4, int(footerY)+1)
+}
+
+func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, isDoubleJump bool, stageBannerTimer int, isMuted bool, ticks int) {
 	for i := 0; i < 3; i++ {
 		hx := 8.0 + float64(i*12)
 		DrawHeart(screen, hx, 9, i < hearts)
@@ -98,6 +156,9 @@ func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, 
 		ebitenutil.DrawRect(screen, 30, 70, 260, 2, color.RGBA{R: 250, G: 200, B: 50, A: 255})
 		ebitenutil.DebugPrintAt(screen, bannerTitle, 45, 55)
 	}
+
+	// Rodapé cultural com curiosidades dinâmicas de Belém do Pará
+	DrawCityFooter(screen, float64(screen.Bounds().Dx()), float64(screen.Bounds().Dy()), stage, ticks)
 }
 
 func DrawSaoBrasIntro(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int, isAudioPlaying bool) {
@@ -113,25 +174,46 @@ func DrawSaoBrasIntro(screen *ebiten.Image, screenWidth, screenHeight float64, t
 		ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 15, G: 20, B: 30, A: 255})
 	}
 
-	// Faixa inferior elegante destacando o Mercado de São Brás atual
-	bannerH := 36.0
+	// Faixa inferior ampla com curiosidades históricas de São Brás e Belém
+	bannerH := 45.0
 	bannerY := screenHeight - bannerH
-	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, bannerH, color.RGBA{R: 6, G: 10, B: 20, A: 230})
+	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, bannerH, color.RGBA{R: 6, G: 10, B: 20, A: 240})
 	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 
 	if isAudioPlaying {
-		ebitenutil.DebugPrintAt(screen, "★ MERCADO DE SAO BRAS (TRILHA DE APRESENTACAO) ★", 24, int(bannerY)+4)
+		ebitenutil.DebugPrintAt(screen, "★ MERCADO DE SAO BRAS (TRILHA DE APRESENTACAO) ★", 24, int(bannerY)+3)
+	} else {
+		ebitenutil.DebugPrintAt(screen, "★ MERCADO DE SAO BRAS ATUAL (BELEM - PA) ★", 34, int(bannerY)+3)
+	}
+
+	// Linha 2: Letreiro de curiosidade histórica de São Brás
+	sbCuriosities := "★ SAO BRAS: Inaugurado em 1911 pelo arquiteto George Saint-Clair!  " +
+		"★ ARQUITETURA: Fachada historica com ferro europeu e azulejos raros!  " +
+		"★ MEMORIA: Erguido ao lado da antiga ferrovia Belem-Braganca!  " +
+		"★ NOVO SAO BRAS: Polo cultural, gastronomico e historico revitalizado!  "
+	sbTextWidth := len(sbCuriosities) * 6
+	sbOffset := ticks % sbTextWidth
+	sbBaseX := 52 - sbOffset
+	ebitenutil.DebugPrintAt(screen, sbCuriosities, sbBaseX, int(bannerY)+16)
+	if sbBaseX+sbTextWidth < int(screenWidth) {
+		ebitenutil.DebugPrintAt(screen, sbCuriosities, sbBaseX+sbTextWidth, int(bannerY)+16)
+	}
+	ebitenutil.DrawRect(screen, 0, bannerY+15, 48, 14, color.RGBA{R: 16, G: 26, B: 46, A: 255})
+	ebitenutil.DrawRect(screen, 48, bannerY+15, 1, 14, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DebugPrintAt(screen, "★FATO", 6, int(bannerY)+16)
+
+	// Linha 3: Botão de largada piscante
+	if isAudioPlaying {
 		if (ticks/25)%2 == 0 {
-			ebitenutil.DebugPrintAt(screen, ">> CLIQUE NA JANELA PARA COMEÇAR A CORRIDA <<", 30, int(bannerY)+19)
+			ebitenutil.DebugPrintAt(screen, ">> CLIQUE NA JANELA PARA COMEÇAR A CORRIDA <<", 30, int(bannerY)+30)
 		} else {
-			ebitenutil.DebugPrintAt(screen, "   CLIQUE NA JANELA PARA COMEÇAR A CORRIDA   ", 30, int(bannerY)+19)
+			ebitenutil.DebugPrintAt(screen, "   CLIQUE NA JANELA PARA COMEÇAR A CORRIDA   ", 30, int(bannerY)+30)
 		}
 	} else {
-		ebitenutil.DebugPrintAt(screen, "★ MERCADO DE SAO BRAS ATUAL (BELEM - PA) ★", 34, int(bannerY)+4)
 		if (ticks/25)%2 == 0 {
-			ebitenutil.DebugPrintAt(screen, ">> CLIQUE NA JANELA DO JOGO PARA INICIAR <<", 33, int(bannerY)+19)
+			ebitenutil.DebugPrintAt(screen, ">> CLIQUE NA JANELA DO JOGO PARA INICIAR <<", 33, int(bannerY)+30)
 		} else {
-			ebitenutil.DebugPrintAt(screen, "   CLIQUE NA JANELA DO JOGO PARA INICIAR   ", 33, int(bannerY)+19)
+			ebitenutil.DebugPrintAt(screen, "   CLIQUE NA JANELA DO JOGO PARA INICIAR   ", 33, int(bannerY)+30)
 		}
 	}
 }

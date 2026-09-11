@@ -79,6 +79,43 @@
       font-family: monospace;
     }
 
+    /* Barra de Curiosidades Culturais de Belém */
+    #trivia-bar {
+      position: fixed;
+      bottom: 44px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(250, 204, 21, 0.4);
+      border-radius: 20px;
+      padding: 4px 16px;
+      color: #e2e8f0;
+      font-size: 12px;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 90vw;
+      pointer-events: none;
+    }
+    .trivia-badge {
+      background: #ca8a04;
+      color: #0f172a;
+      font-weight: bold;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    #trivia-text {
+      color: #fef08a;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 620px;
+      transition: opacity 0.3s ease;
+    }
+
     /* Controles Virtuais Touch para Celulares e Tablets */
     #touch-controls {
       display: none;
@@ -95,6 +132,21 @@
       }
       #controls-bar {
         display: none;
+      }
+      #trivia-bar {
+        bottom: auto;
+        top: 8px;
+        padding: 4px 10px;
+        max-width: 94vw;
+        gap: 6px;
+      }
+      .trivia-badge {
+        font-size: 10px;
+        padding: 1px 6px;
+      }
+      #trivia-text {
+        font-size: 11px;
+        max-width: 250px;
       }
     }
 
@@ -221,6 +273,10 @@
         ▲<span class="btn-sub">PULO</span>
       </button>
     </div>
+  <!-- Barra de Curiosidades Culturais de Belém do Pará -->
+  <div id="trivia-bar">
+    <span class="trivia-badge">🏛️ BELÉM</span>
+    <span id="trivia-text">O Mercado do Ver-o-Peso (1627) é a maior feira a céu aberto da América Latina!</span>
   </div>
 
   <div id="controls-bar">
@@ -346,6 +402,35 @@
         }, 80);
       }
     });
+
+    // Curiosidades Históricas e Culturais de Belém do Pará
+    const belemTrivia = [
+      "O Mercado do Ver-o-Peso (1627) é a maior feira a céu aberto da América Latina!",
+      "Belém é conhecida carinhosamente como a 'Cidade das Mangueiras', plantadas no século XIX.",
+      "O açaí paraense tradicional é consumido puro na cuia com peixe frito e farinha d'água!",
+      "O Theatro da Paz (1878) é uma joia neoclássica inspirada no Teatro Scala de Milão.",
+      "O Mercado de São Brás (1911) foi revitalizado como grande polo cultural e gastronômico!",
+      "A Estação das Docas preserva armazéns de ferro ingleses de 1897 e guindastes portuários históricos.",
+      "O Círio de Nazaré reúne mais de 2 milhões de fiéis nas ruas no 2º domingo de outubro!",
+      "O Tacacá leva tucupi e folhas de jambu, que amortecem suavemente a boca graças ao espilantol.",
+      "A expressão paraense 'Paidégua' é usada para descrever algo excelente, sensacional e autêntico!",
+      "Em Belém, é tradicional marcar encontros 'antes ou depois da chuva da tarde'.",
+      "A Ilha do Combú fica em frente a Belém e produz chocolates artesanais com cacau nativo.",
+      "A Onça-Pintada é o maior felino das Américas e rainha suprema das florestas amazônicas!",
+      "O Carimbó, ritmo tradicional paraense marcado pelo curimbó, é Patrimônio Cultural do Brasil!",
+      "O Jacaré-Açu pode ultrapassar 4,5 metros de comprimento nos igarapés e rios do Pará!"
+    ];
+    let triviaIdx = 0;
+    const triviaElem = document.getElementById('trivia-text');
+    setInterval(() => {
+      if (!triviaElem) return;
+      triviaElem.style.opacity = '0';
+      setTimeout(() => {
+        triviaIdx = (triviaIdx + 1) % belemTrivia.length;
+        triviaElem.textContent = belemTrivia[triviaIdx];
+        triviaElem.style.opacity = '1';
+      }, 300);
+    }, 6000);
   </script>
 </body>
 </html>

@@ -498,6 +498,7 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 
 	if e.isTitleScreen {
 		e.onca.Draw(screen, GroundY, e.ticks, 0)
+		ui.DrawCityFooter(screen, ScreenWidth, ScreenHeight, 1, e.ticks)
 		if e.isShowingCredits {
 			ui.DrawCreditsScreen(screen, ScreenWidth, ScreenHeight)
 		} else {
@@ -508,10 +509,13 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 
 	e.onca.Draw(screen, GroundY, e.ticks, e.invincibleTicks)
 
-	if e.speechBubbleTimer > 0 {
+	if e.speechBubbleTimer > 0 && e.speechBubbleText != "" {
 		oncaX, oncaY, _, _ := e.onca.GetBounds(GroundY)
-		bubbleX := oncaX + 8
-		if e.isGameOver {
+		bubbleX := oncaX - 10
+		if bubbleX < 10 {
+			bubbleX = 10
+		}
+		if bubbleX+float64(len(e.speechBubbleText)*6) > ScreenWidth-10 {
 			bubbleX = oncaX - 25
 		}
 		ui.DrawSpeechBubble(screen, bubbleX, oncaY-24, e.speechBubbleText)
@@ -520,7 +524,7 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 	e.obstacles.Draw(screen, e.ticks, e.stage)
 
 	isDoubleJump := e.onca.JumpCount == 2
-	ui.DrawHUD(screen, e.lives, e.hearts, e.score, e.stage, isDoubleJump, e.stageBannerTimer, e.audio.IsMuted())
+	ui.DrawHUD(screen, e.lives, e.hearts, e.score, e.stage, isDoubleJump, e.stageBannerTimer, e.audio.IsMuted(), e.ticks)
 
 	if e.isShowingCredits {
 		ui.DrawCreditsScreen(screen, ScreenWidth, ScreenHeight)

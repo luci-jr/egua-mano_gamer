@@ -92,6 +92,16 @@ O jogo conta com fluxo dinâmico de múltiplos obstáculos na tela simultaneamen
 
 ---
 
+## 🏛️ Rodapé com Curiosidades Culturais de Belém do Pará
+
+Durante o jogo e nas telas de apresentação, o rodapé exibe um letreiro digital contínuo com fatos históricos, culturais e ambientais sobre Belém:
+* **Fase 1 (Ver-o-Peso):** Fatos sobre a fundação da feira livre em 1627, a tradição do açaí puro com peixe frito, o tacacá com jambu adormecedor e a fauna dos rios amazônicos.
+* **Fase 2 (Estação das Docas):** Fatos sobre a restauração dos armazéns de ferro ingleses de 1897, os guindastes históricos, o ecoturismo na Ilha do Combú e a chuva da tarde.
+* **Fase 3 (Theatro da Paz):** Fatos sobre a Belle Époque amazônica, o Theatro da Paz (1878), o Círio de Nazaré, a história da "Cidade das Mangueiras" e a gíria "Paidégua".
+* **Tela de Abertura (Mercado de São Brás):** Curiosidades sobre a inauguração em 1911 pelo arquiteto George Saint-Clair, arquitetura de ferro e sua grande revitalização.
+
+---
+
 ## 📸 Galeria Visual do Jogo
 
 | Tela Inicial / Arcade | Mercado do Ver-o-Peso (Fase 1) |
