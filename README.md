@@ -1,6 +1,6 @@
 # 🐆 Paidégua Game: A Aventura da Onça em Belém do Pará
 
-![Paidégua Game Gameplay](assets/gameplay.jpg)
+![Paidégua Game - Menu Inicial](assets/menu_inicial.jpg)
 
 > Um jogo de ação arcade retrô-moderno construído 100% em **Go** com **Ebitengine (v2)**, ambientado nos cenários históricos e culturais de **Belém do Pará**.
 >
@@ -27,7 +27,7 @@ O protagonista é uma **Onça-Pintada Brasileira** que percorre os cartões post
 | `Espaço / Cima` (2x) | Tocar **`▲ PULO`** (2x) | **Pulo Duplo (*Double Jump*)** | Impulso no ar com rugido duplo e faíscas. |
 | `Seta Baixo` ou `S` | Botão virtual **`▼ BAIXO`** | **Abaixar / Rastejar** | Reduz o hitbox pela metade (passa sob pássaros). |
 | `Seta Baixo` (no ar) | Botão **`▼ BAIXO`** (no ar) | **Queda Rápida (*Fast Drop*)** | Acelera a descida ao solo. |
-| `Enter`, `Espaço` ou Clique | **Toque na Tela** | **Iniciar / Avançar / Confirmar** | Inicia na tela de São Brás, confirma opções e avança fases. |
+| Clique na Janela / Toque | **Toque na Tela / Clique** | **Iniciar o Jogo** | O jogo aguarda na tela de São Brás e só inicia após um clique explícito na janela. |
 | `Esc` | Botão virtual **`⏸ PAUSA`** | **Menu de Pausa Interativo** | Abre o menu com som, reinício e créditos. |
 | `C` | Opção do Menu | **Ver Créditos** | Informações sobre desenvolvedor, IA, Go e música. |
 | `R` ou Clique | Toque na tela | **Recomeçar Rápido** | Reinicia imediatamente na tela de conclusão ou Game Over. |
@@ -48,7 +48,7 @@ O jogo possui um sistema balanceado de sobrevivência arcade retrô:
 
 ---
 
-## 🏛️ As 3 Fases de Belém do Pará (1000 Pontos por Fase)
+## 🏛️ As 3 Fases Ilustradas de Belém do Pará
 
 O jogo conta com fluxo dinâmico de múltiplos obstáculos na tela simultaneamente com espaçamento inteligente (`ObstacleManager`), permitindo conquistar pelo menos **1000 pontos por fase**:
 
@@ -57,6 +57,8 @@ O jogo conta com fluxo dinâmico de múltiplos obstáculos na tela simultaneamen
 ```
 
 ### 🐟 1. Mercado do Ver-o-Peso (0 a 1000 pontos)
+![Fase 1: Mercado do Ver-o-Peso](assets/fase1_ver_o_peso.jpg)
+
 * **Cenário:** O crepúsculo alaranjado sobre a **Baía do Guajará**, barcos de madeira navegando, **Mercado de Ferro com cúpulas neogóticas** e calçadão de pedras.
 * **Obstáculos Temáticos:**
   * 🧺 **Paneiro de Açaí:** Cesto tradicional de palha trançada com açaí roxo *(Pular)*.
@@ -64,7 +66,11 @@ O jogo conta com fluxo dinâmico de múltiplos obstáculos na tela simultaneamen
   * 🐊 **Jacaré-Açu da Amazônia:** Réptil com bocarra aberta e dentes brancos afiados *(Pular)*.
   * 🐍 **Cobra-Coral da Floresta:** Serpente rápida ondulando no solo com língua bífida *(Pular)*.
 
+---
+
 ### ⚓ 2. Estação das Docas (1001 a 2000 pontos)
+![Fase 2: Estação das Docas](assets/fase2_estacao_das_docas.jpg)
+
 * **Cenário:** Os emblemáticos **galpões ingleses de ferro vermelho**, os imponentes **guindastes portuários amarelos** e o deck de madeira à beira da baía.
 * **Obstáculos Temáticos:**
   * 🐊 **Jacaré no Cais das Docas:** O temível réptil que subiu da Baía do Guajará *(Pular)*.
@@ -72,13 +78,29 @@ O jogo conta com fluxo dinâmico de múltiplos obstáculos na tela simultaneamen
   * 🕊️ **Gaivota da Baía:** Pássaro rasante com asas animadas *(Abaixar / Rastejar)*.
   * 🧺 **Paneiro de Açaí:** Cesto com frutos amazônicos *(Pular)*.
 
+---
+
 ### 🎭 3. Theatro da Paz & Mangueiras (2001 a 3000 pontos - Vitória Final!)
+![Fase 3: Theatro da Paz](assets/fase3_theatro_da_paz.jpg)
+
 * **Cenário:** Fachada neoclássica do **Theatro da Paz**, **Mangueiras centenárias de Belém** com mangas douradas e calçada de pedras portuguesas.
 * **Obstáculos Temáticos:**
   * 🥭 **Cesto de Castanhas e Frutos:** Cesto artesanal com castanhas e cupuaçus *(Pular)*.
   * 🦜 **Arara / Maritaca Amazônica:** Ave verde e amarela sobrevoando veloz *(Abaixar / Rastejar)*.
   * 🐊 **Jacaré-Açu:** Desafio reptiliano nos arredores da Praça da República *(Pular)*.
   * 🐍 **Cobra da Amazônia:** Serpente rasteira em alta velocidade *(Pular)*.
+
+---
+
+## 📸 Galeria Visual do Jogo
+
+| Tela Inicial / Arcade | Mercado do Ver-o-Peso (Fase 1) |
+| :---: | :---: |
+| ![Menu Inicial](assets/menu_inicial.jpg) | ![Fase 1](assets/fase1_ver_o_peso.jpg) |
+
+| Estação das Docas (Fase 2) | Theatro da Paz (Fase 3) |
+| :---: | :---: |
+| ![Fase 2](assets/fase2_estacao_das_docas.jpg) | ![Fase 3](assets/fase3_theatro_da_paz.jpg) |
 
 ---
 
@@ -104,6 +126,10 @@ paidegua-game/
 │   └── game/
 │       └── game.go              # Game Loop (Update, Draw, Layout do Ebitengine)
 ├── assets/
+│   ├── menu_inicial.jpg         # Screenshot da Tela Inicial Arcade
+│   ├── fase1_ver_o_peso.jpg     # Screenshot do Mercado do Ver-o-Peso
+│   ├── fase2_estacao_das_docas.jpg # Screenshot da Estação das Docas
+│   ├── fase3_theatro_da_paz.jpg # Screenshot do Theatro da Paz
 │   ├── gameplay.jpg             # Mockup visual do jogo
 │   └── ver_o_peso_bg.jpg        # Background panorâmico em pixel art
 ├── GUIA_APRENDIZADO.md          # Guia técnico passo a passo completo

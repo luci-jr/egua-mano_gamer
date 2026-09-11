@@ -121,9 +121,9 @@ func DrawSaoBrasIntro(screen *ebiten.Image, screenWidth, screenHeight float64, t
 	ebitenutil.DebugPrintAt(screen, "★ MERCADO DE SAO BRAS ATUAL - BELEM DO PARA ★", 35, int(bannerY)+5)
 
 	if (ticks/25)%2 == 0 {
-		ebitenutil.DebugPrintAt(screen, ">> TOQUE OU CLIQUE NA TELA PARA INICIAR <<", 44, int(bannerY)+18)
+		ebitenutil.DebugPrintAt(screen, ">> CLIQUE NA JANELA DO JOGO PARA INICIAR <<", 38, int(bannerY)+18)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "   TOQUE OU CLIQUE NA TELA PARA INICIAR   ", 44, int(bannerY)+18)
+		ebitenutil.DebugPrintAt(screen, "   CLIQUE NA JANELA DO JOGO PARA INICIAR   ", 38, int(bannerY)+18)
 	}
 }
 
