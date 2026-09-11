@@ -305,8 +305,12 @@
       }
     }, { passive: true });
 
-    window.addEventListener('click', () => {
+    window.addEventListener('click', (e) => {
       window.focus();
+      if (!e.target.closest('#touch-controls')) {
+        triggerKey('Enter', 'Enter', 13, 'keydown');
+        setTimeout(() => triggerKey('Enter', 'Enter', 13, 'keyup'), 80);
+      }
     });
   </script>
 </body>
