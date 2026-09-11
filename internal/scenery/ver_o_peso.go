@@ -1,14 +1,19 @@
 package scenery
 
 import (
+	"bytes"
+	_ "embed"
+	"image"
 	"image/color"
 	_ "image/jpeg"
 	_ "image/png"
-	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
+
+//go:embed ver_o_peso_bg.jpg
+var bgJpgBytes []byte
 
 type Background struct {
 	scrollOffset float64
@@ -18,19 +23,10 @@ type Background struct {
 func NewBackground() *Background {
 	b := &Background{scrollOffset: 0}
 
-	paths := []string{
-		"assets/ver_o_peso_bg.jpg",
-		"../assets/ver_o_peso_bg.jpg",
-		"../../assets/ver_o_peso_bg.jpg",
-	}
-
-	for _, p := range paths {
-		if _, err := os.Stat(p); err == nil {
-			img, _, err := ebitenutil.NewImageFromFile(p)
-			if err == nil {
-				b.bgImage = img
-				break
-			}
+	if len(bgJpgBytes) > 0 {
+		img, _, err := image.Decode(bytes.NewReader(bgJpgBytes))
+		if err == nil {
+			b.bgImage = ebiten.NewImageFromImage(img)
 		}
 	}
 

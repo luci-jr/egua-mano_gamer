@@ -3,6 +3,9 @@
 ![Paidégua Game Gameplay](assets/gameplay.jpg)
 
 > Um jogo de ação arcade retrô-moderno construído 100% em **Go** com **Ebitengine (v2)**, ambientado nos cenários históricos e culturais de **Belém do Pará**.
+>
+> 🕹️ **Jogue agora online no navegador (WebAssembly):**  
+> 👉 **[https://luci-jr.github.io/paidegua-game/](https://luci-jr.github.io/paidegua-game/)** *(Zero instalação, compatível com qualquer PC!)*
 
 ---
 
@@ -114,21 +117,25 @@ Ao invés de carregar arquivos `.wav` ou `.mp3` pesados, todos os efeitos e mús
 ### Pré-requisitos
 * **Go** versão 1.22 ou superior instalada.
 
-### Execução Imediata
+### 🌐 1. Jogar Online no Navegador (WebAssembly)
+Basta abrir o link oficial do jogo hospedado no GitHub Pages:
+👉 **[https://luci-jr.github.io/paidegua-game/](https://luci-jr.github.io/paidegua-game/)**
+
+Para testar a versão WebAssembly localmente:
+```bash
+GOOS=js GOARCH=wasm go build -o docs/game.wasm ./cmd/runner
+python3 -m http.server 8080 --directory docs
+# Abra http://localhost:8080 no seu navegador
+```
+
+### 💻 2. Execução Nativa Desktop (Linux / Mac / Windows)
 Abra o terminal na pasta do projeto e rode:
 
 ```bash
-# Opção 1: Execução direta pela raiz
-go run main.go
-
-# Opção 2: Execução pelo ponto de entrada oficial
+# Opção A: Execução direta
 go run ./cmd/runner
-```
 
-### Compilar o Binário Nativo
-Para gerar o executável autônomo do jogo:
-
-```bash
+# Opção B: Compilar o binário autônomo
 go build -o paidegua-game ./cmd/runner
 ./paidegua-game
 ```
