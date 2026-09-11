@@ -12,9 +12,9 @@ import (
 type RelicType int
 
 const (
-	RelicMuiraquita RelicType = 0 // Sapinho sagrado de jade verde (+250 pts)
-	RelicUrna       RelicType = 1 // Vaso ancestral de cerâmica marajoara (+500 pts)
-	RelicOuro       RelicType = 2 // Pepita de ouro do Tapajós (+150 pts)
+	RelicMuiraquita RelicType = 0 // Sapinho sagrado de jade verde (+100 pts)
+	RelicUrna       RelicType = 1 // Vaso ancestral de cerâmica marajoara (+200 pts)
+	RelicOuro       RelicType = 2 // Pepita de ouro do Tapajós (+50 pts)
 )
 
 type Relic struct {
@@ -28,12 +28,12 @@ type Relic struct {
 }
 
 func NewRelic(x, baseY float64, rType RelicType) *Relic {
-	val := 250
+	val := 100
 	switch rType {
 	case RelicUrna:
-		val = 500
+		val = 200
 	case RelicOuro:
-		val = 150
+		val = 50
 	}
 	return &Relic{
 		X:        x,

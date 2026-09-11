@@ -2,10 +2,15 @@ package audio
 
 import (
 	"bytes"
+	_ "embed"
 	"math"
 
 	ebitenaudio "github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
 )
+
+//go:embed carimbo_bgm.mp3
+var carimboBGMData []byte
 
 const sampleRate = 44100
 
@@ -495,13 +500,31 @@ func NewManager() *Manager {
 		isIntroActive: false,
 	}
 
-	bgmBytes := createCarimboBGM()
-	bgmLoop := ebitenaudio.NewInfiniteLoop(bytes.NewReader(bgmBytes), int64(len(bgmBytes)))
-	bgmPlayer, err := ctx.NewPlayer(bgmLoop)
-	if err == nil {
-		bgmPlayer.SetVolume(0.32)
-		m.bgmPlayer = bgmPlayer
+	// 1. Música Principal de Aventura: Autêntico Carimbó Paraense (Pinduca - A Dança do Carimbó)
+	var bgmPlayer *ebitenaudio.Player
+	if len(carimboBGMData) > 0 {
+		stream, err := mp3.DecodeWithSampleRate(sampleRate, bytes.NewReader(carimboBGMData))
+		if err == nil {
+			bgmLoop := ebitenaudio.NewInfiniteLoop(stream, stream.Length())
+			p, err := ctx.NewPlayer(bgmLoop)
+			if err == nil {
+				p.SetVolume(0.40)
+				bgmPlayer = p
+			}
+		}
 	}
+
+	// Fallback procedural sintetizado se o MP3 não estiver disponível
+	if bgmPlayer == nil {
+		bgmBytes := createCarimboBGM()
+		bgmLoop := ebitenaudio.NewInfiniteLoop(bytes.NewReader(bgmBytes), int64(len(bgmBytes)))
+		p, err := ctx.NewPlayer(bgmLoop)
+		if err == nil {
+			p.SetVolume(0.32)
+			bgmPlayer = p
+		}
+	}
+	m.bgmPlayer = bgmPlayer
 
 	introBytes := createSaoBrasIntroBGM()
 	introLoop := ebitenaudio.NewInfiniteLoop(bytes.NewReader(introBytes), int64(len(introBytes)))

@@ -13,7 +13,7 @@
 
 **Paidégua Game** foi concebido e desenvolvido por **Lucivaldo Junior** em co-criação com o **Nexus AI Ecosystem** (seu time de agentes autônomos de IA, sob liderança técnica de **Lucy - Tech Lead Sênior**). O projeto alia rigor de engenharia de software em Go às melhores práticas do **Standard Go Project Layout** (`cmd/` e `internal/`), integrando síntese de áudio procedural e física refinada de plataforma estilo 16-bit dos anos 90.
 
-O protagonista é um corajoso **Garoto Aventureiro Paraense**, equipado com sua clássica **baladeira de madeira (estilingue que dispara sementes de açaí)**, faixa vermelha retrô e cipó a tiracolo, desbravando a selva e os cartões postais de Belém do Pará ao som de um autêntico **Carimbó Chiptune 8-bit**.
+O protagonista é um corajoso **Garoto Aventureiro Paraense**, equipado com sua clássica **baladeira de madeira (estilingue que dispara sementes de açaí)**, faixa vermelha retrô e cipó a tiracolo, desbravando a selva e os cartões postais de Belém do Pará ao som de um autêntico e vibrante **Carimbó Paraense** (*Pinduca - A Dança do Carimbó*).
 
 ---
 
@@ -88,10 +88,10 @@ O jogo possui um sistema balanceado de sobrevivência arcade retrô:
 ## 🏛️ As 3 Fases de Belém do Pará
 
 ```text
-[ FASE 1: Ver-o-Peso (1000 pts) ] ──> [ FASE 2: Estação das Docas (2000 pts) ] ──> [ FASE 3: Theatro da Paz (3000 pts) ]
+[ FASE 1: Ver-o-Peso (1200 m) ] ──> [ FASE 2: Estação das Docas (1200 m) ] ──> [ FASE 3: Theatro da Paz (1200 m - Vitória!) ]
 ```
 
-### 🐟 1. Mercado do Ver-o-Peso (0 a 1000 pontos)
+### 🐟 1. Mercado do Ver-o-Peso (0 a 1200 metros)
 ![Fase 1: Mercado do Ver-o-Peso](assets/fase1_ver_o_peso.jpg)
 * **Cenário:** O crepúsculo sobre a **Baía do Guajará**, barcos tradicionais, **Mercado de Ferro com cúpulas neogóticas** e calçadão histórico.
 * **Inimigos & Desafios:**
@@ -102,7 +102,7 @@ O jogo possui um sistema balanceado de sobrevivência arcade retrô:
 
 ---
 
-### ⚓ 2. Estação das Docas (1001 a 2000 pontos)
+### ⚓ 2. Estação das Docas (0 a 1200 metros)
 ![Fase 2: Estação das Docas](assets/fase2_estacao_das_docas.jpg)
 * **Cenário:** Os emblemáticos **galpões ingleses de ferro vermelho**, os imponentes **guindastes portuários amarelos** e o deck de madeira à beira da baía.
 * **Inimigos & Desafios:**
@@ -113,7 +113,7 @@ O jogo possui um sistema balanceado de sobrevivência arcade retrô:
 
 ---
 
-### 🎭 3. Theatro da Paz & Mangueiras (2001 a 3000 pontos - Vitória Final!)
+### 🎭 3. Theatro da Paz & Mangueiras (0 a 1200 metros - Vitória Final!)
 ![Fase 3: Theatro da Paz](assets/fase3_theatro_da_paz.jpg)
 * **Cenário:** Fachada neoclássica do **Theatro da Paz**, **Mangueiras centenárias de Belém** com mangas douradas e calçada de pedras portuguesas.
 * **Inimigos & Desafios:**
