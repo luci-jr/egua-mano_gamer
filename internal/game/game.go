@@ -29,6 +29,7 @@ type Engine struct {
 	shakeTimer        int
 	hitDelayTimer     int
 	speechBubbleTimer int
+	speechBubbleText  string
 	stage             int
 	stageBannerTimer  int
 	isSaoBrasIntro    bool
@@ -54,6 +55,7 @@ func NewEngine() *Engine {
 		shakeTimer:        0,
 		hitDelayTimer:     0,
 		speechBubbleTimer: 0,
+		speechBubbleText:  "",
 		stage:             1,
 		stageBannerTimer:  120,
 		isSaoBrasIntro:    true,
@@ -186,6 +188,8 @@ func (e *Engine) Update() error {
 				e.lives = 3
 				e.stage = 1
 				e.stageBannerTimer = 120
+				e.speechBubbleTimer = 0
+				e.speechBubbleText = ""
 				e.isPaused = false
 				e.audio.RestartBGM()
 			case 2:
@@ -267,6 +271,8 @@ func (e *Engine) Update() error {
 			e.stageBannerTimer = 120
 			e.invincibleTicks = 0
 			e.shakeTimer = 0
+			e.speechBubbleTimer = 0
+			e.speechBubbleText = ""
 			e.isPaused = false
 			e.isGameOver = false
 			e.audio.RestartBGM()
@@ -423,12 +429,16 @@ func (e *Engine) Update() error {
 	if e.obstacle.CheckCollision(oncaX, oncaY, oncaW, oncaH) && e.invincibleTicks <= 0 {
 		e.lives--
 		e.shakeTimer = 14
-		e.speechBubbleTimer = 65
 		if e.lives <= 0 {
+			e.lives = 0
 			e.isGameOver = true
+			e.speechBubbleText = "Levei o farelo mano, mancada!"
+			e.speechBubbleTimer = 999999
 			e.audio.PauseBGM()
 			e.audio.PlayGameOver()
 		} else {
+			e.speechBubbleText = "EGUA MANO!..."
+			e.speechBubbleTimer = 65
 			e.hitDelayTimer = 22
 			e.invincibleTicks = 75
 			e.audio.PlayHit()
@@ -460,7 +470,11 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 
 	if e.speechBubbleTimer > 0 {
 		oncaX, oncaY, _, _ := e.onca.GetBounds(GroundY)
-		ui.DrawSpeechBubble(screen, oncaX+8, oncaY-24, "EGUA MANO!...")
+		bubbleX := oncaX + 8
+		if e.isGameOver {
+			bubbleX = oncaX - 25
+		}
+		ui.DrawSpeechBubble(screen, bubbleX, oncaY-24, e.speechBubbleText)
 	}
 
 	e.obstacle.Draw(screen, e.ticks, e.stage)

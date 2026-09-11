@@ -1,4 +1,38 @@
+# Binários e arquivos compilados nativos
 paidegua-game
+paidegua-game.exe
 runner
 runner-game
 *.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Arquivos e diretórios temporários de build
+/dist/
+/build/
+/tmp/
+
+# Arquivos de Log
+*.log
+
+# Configurações de IDEs e Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.bak
+.history/
+
+# Arquivos gerados pelo Sistema Operacional
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

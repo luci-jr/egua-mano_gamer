@@ -287,10 +287,21 @@ func DrawStageCompleteScreen(screen *ebiten.Image, screenWidth, screenHeight flo
 }
 
 func DrawGameOverScreen(screen *ebiten.Image, screenWidth, screenHeight float64, finalScore int, stage int) {
-	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 0, G: 0, B: 0, A: 175})
-	ebitenutil.DebugPrintAt(screen, "===================================", 45, 65)
-	ebitenutil.DebugPrintAt(screen, "             GAME OVER             ", 45, 80)
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("         PONTOS: %05d           ", finalScore), 45, 95)
+	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 5, G: 5, B: 12, A: 140})
+
+	boxW := 216.0
+	boxH := 76.0
+	boxX := (screenWidth - boxW) / 2.0
+	boxY := 18.0
+
+	ebitenutil.DrawRect(screen, boxX, boxY, boxW, boxH, color.RGBA{R: 28, G: 16, B: 24, A: 245})
+	ebitenutil.DrawRect(screen, boxX, boxY, boxW, 2, color.RGBA{R: 240, G: 65, B: 65, A: 255})
+	ebitenutil.DrawRect(screen, boxX, boxY+boxH, boxW, 2, color.RGBA{R: 240, G: 65, B: 65, A: 255})
+	ebitenutil.DrawRect(screen, boxX, boxY, 2, boxH, color.RGBA{R: 240, G: 65, B: 65, A: 255})
+	ebitenutil.DrawRect(screen, boxX+boxW, boxY, 2, boxH+2, color.RGBA{R: 240, G: 65, B: 65, A: 255})
+
+	bx := int(boxX)
+	by := int(boxY)
 
 	stgStr := "VER-O-PESO"
 	if stage == 2 {
@@ -298,17 +309,28 @@ func DrawGameOverScreen(screen *ebiten.Image, screenWidth, screenHeight float64,
 	} else if stage == 3 {
 		stgStr = "THEATRO DA PAZ"
 	}
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("      ALCANCOU: %s", stgStr), 45, 110)
-	ebitenutil.DebugPrintAt(screen, "   Aperte ENTER ou R para jogar    ", 45, 125)
-	ebitenutil.DebugPrintAt(screen, "===================================", 45, 140)
+
+	ebitenutil.DebugPrintAt(screen, "★ GAME OVER ★", bx+64, by+8)
+	ebitenutil.DrawRect(screen, boxX+10, boxY+21, boxW-20, 1, color.RGBA{R: 240, G: 65, B: 65, A: 160})
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Pontos: %05d  |  %s", finalScore, stgStr), bx+14, by+27)
+	ebitenutil.DebugPrintAt(screen, "[ENTER / R] Jogar Novamente", bx+24, by+44)
+	ebitenutil.DebugPrintAt(screen, "[ESC] Voltar ao Menu", bx+42, by+58)
 }
 
 func DrawSpeechBubble(screen *ebiten.Image, x, y float64, text string) {
 	w := float64(len(text)*6 + 14)
 	h := 18.0
 
+	origX := x
+	if x+w > 334.0 {
+		x = 334.0 - w
+	}
+	if x < 6.0 {
+		x = 6.0
+	}
+
 	// Sombra suave do balao
-	ebitenutil.DrawRect(screen, x+2, y+2, w, h, color.RGBA{R: 0, G: 0, B: 0, A: 130})
+	ebitenutil.DrawRect(screen, x+2, y+2, w, h, color.RGBA{R: 0, G: 0, B: 0, A: 140})
 
 	// Fundo do balao (estilo quadrinhos retro paraense)
 	ebitenutil.DrawRect(screen, x, y, w, h, color.RGBA{R: 20, G: 25, B: 40, A: 245})
@@ -320,7 +342,13 @@ func DrawSpeechBubble(screen *ebiten.Image, x, y float64, text string) {
 	ebitenutil.DrawRect(screen, x+w-1, y, 1, h, color.RGBA{R: 250, G: 210, B: 50, A: 255})
 
 	// Rabicho do balao apontando para baixo (cabeca da onca)
-	tailX := x + 14.0
+	tailX := origX + 14.0
+	if tailX < x+8 {
+		tailX = x + 8
+	}
+	if tailX > x+w-12 {
+		tailX = x + w - 12
+	}
 	tailY := y + h
 	ebitenutil.DrawRect(screen, tailX, tailY, 5, 2, color.RGBA{R: 250, G: 210, B: 50, A: 255})
 	ebitenutil.DrawRect(screen, tailX+1, tailY+2, 3, 2, color.RGBA{R: 250, G: 210, B: 50, A: 255})
