@@ -729,12 +729,28 @@ func (e *Engine) Update() error {
 	if e.speechBubbleTimer > 0 {
 		e.speechBubbleTimer--
 	} else {
-		// A cada ~14 a 20 segundos correndo sob o sol de Belém, a onça reclama do calor
+		// A cada ~14 a 20 segundos correndo pela cidade de Belém, o herói solta um brado de aventura regional
 		e.heatSpeechTimer++
 		if e.heatSpeechTimer >= 850 {
 			if e.hitDelayTimer == 0 {
 				e.heatSpeechTimer = 0
-				e.speechBubbleText = "Egua da lua, um sol pra cada um!"
+				if e.selectedHero == entities.HeroOnca {
+					oncaPhrases := []string{
+						"RRRAUW! Ninguem segura a onca!",
+						"A cidade e as matas me pertencem!",
+						"Sentiram o poder do rugido?!",
+						"Bote certeiro, mano!",
+					}
+					e.speechBubbleText = oncaPhrases[(e.ticks/60)%len(oncaPhrases)]
+				} else {
+					garotoPhrases := []string{
+						"Bora voando, maninho!",
+						"O carimbo de Belem ta paidegua!",
+						"Vou passar o rodo nesses bichos!",
+						"Acai na tigela da forca!",
+					}
+					e.speechBubbleText = garotoPhrases[(e.ticks/60)%len(garotoPhrases)]
+				}
 				e.speechBubbleTimer = 165
 			}
 		}

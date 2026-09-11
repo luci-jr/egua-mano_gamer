@@ -355,6 +355,7 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 
 	posX := o.X
 
+	// Paleta cromática da Onça-Pintada
 	cGold := color.RGBA{R: 235, G: 160, B: 35, A: 255}
 	cGoldLight := color.RGBA{R: 248, G: 185, B: 65, A: 255}
 	cCream := color.RGBA{R: 245, G: 230, B: 195, A: 255}
@@ -363,89 +364,76 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 	cEye := color.RGBA{R: 85, G: 205, B: 110, A: 255}
 	cEarPink := color.RGBA{R: 215, G: 120, B: 120, A: 255}
 	cNose := color.RGBA{R: 70, G: 30, B: 30, A: 255}
+	cMouthDark := color.RGBA{R: 140, G: 25, B: 25, A: 255}
+	cTongue := color.RGBA{R: 220, G: 50, B: 60, A: 255}
+	cTooth := color.RGBA{R: 255, G: 255, B: 250, A: 255}
+	cRoarWave1 := color.RGBA{R: 255, G: 215, B: 50, A: 220}
+	cRoarWave2 := color.RGBA{R: 255, G: 160, B: 30, A: 180}
+	cRoarWave3 := color.RGBA{R: 255, G: 90, B: 25, A: 140}
 
-	drawRosette := func(rx, ry float64) {
-		ebitenutil.DrawRect(screen, rx, ry, 5, 4, cSpotBlack)
-		ebitenutil.DrawRect(screen, rx+1, ry+1, 3, 2, cSpotCenter)
+	// Helper com espelhamento horizontal relativo ao centro da onça
+	centerX := posX + 19.0
+	drawBox := func(relX, relY, w, h float64, oncaBaseY float64, col color.Color) {
+		var finalX float64
+		if o.FacingRight {
+			finalX = centerX - 19.0 + relX
+		} else {
+			finalX = centerX + 19.0 - relX - w
+		}
+		ebitenutil.DrawRect(screen, finalX, oncaBaseY+relY, w, h, col)
 	}
 
-	// 0. ESTADO: BALANÇANDO NO CIPÓ (Onça pendurada estilo Pitfall)
-	if o.IsSwinging {
-		oncaY := groundY - 26.0 + o.Y
-		// Cipó descendo
-		cVine := color.RGBA{R: 85, G: 130, B: 45, A: 255}
-		ebitenutil.DrawRect(screen, posX+14, oncaY-8, 3, 14, cVine)
-
-		// Patas dianteiras agarradas ao cipó
-		ebitenutil.DrawRect(screen, posX+11, oncaY-2, 4, 6, cGold)
-		ebitenutil.DrawRect(screen, posX+15, oncaY-2, 4, 6, cGold)
-		ebitenutil.DrawRect(screen, posX+11, oncaY-4, 8, 3, cCream)
-
-		// Cabeça erguida
-		headX := posX + 16
-		headY := oncaY + 2
-		ebitenutil.DrawRect(screen, headX, headY, 10, 9, cGold)
-		ebitenutil.DrawRect(screen, headX+1, headY+1, 8, 6, cGoldLight)
-		ebitenutil.DrawRect(screen, headX+5, headY+5, 5, 4, cCream)
-		ebitenutil.DrawRect(screen, headX+8, headY+4, 2, 2, cNose)
-		ebitenutil.DrawRect(screen, headX+5, headY+2, 2, 2, cEye)
-		ebitenutil.DrawRect(screen, headX+2, headY-2, 3, 3, cEarPink)
-
-		// Corpo inclinado pendurado verticalmente
-		ebitenutil.DrawRect(screen, posX+8, oncaY+6, 14, 16, cGold)
-		ebitenutil.DrawRect(screen, posX+9, oncaY+7, 12, 14, cGoldLight)
-		ebitenutil.DrawRect(screen, posX+10, oncaY+10, 8, 10, cCream)
-		drawRosette(posX+10, oncaY+8)
-		drawRosette(posX+12, oncaY+14)
-
-		// Patas traseiras abraçando o cipó
-		ebitenutil.DrawRect(screen, posX+10, oncaY+20, 5, 5, cGold)
-		ebitenutil.DrawRect(screen, posX+15, oncaY+20, 5, 5, cGold)
-
-		// Rabo curvado no ar
-		tailWave := math.Sin(float64(ticks)*0.2) * 2.0
-		ebitenutil.DrawRect(screen, posX+4+tailWave, oncaY+18, 5, 3, cGold)
-		ebitenutil.DrawRect(screen, posX+2+tailWave, oncaY+20, 4, 4, cSpotBlack)
-		return
+	drawRosette := func(rx, ry float64, oncaBaseY float64) {
+		drawBox(rx, ry, 5, 4, oncaBaseY, cSpotBlack)
+		drawBox(rx+1, ry+1, 3, 2, oncaBaseY, cSpotCenter)
 	}
 
+	// 1. ESTADO: AGACHADA (Crouching)
 	if o.IsCrouching {
 		oncaY := groundY - 12.0 + o.Y
 
-		ebitenutil.DrawRect(screen, posX, oncaY+2, 38, 9, cGold)
-		ebitenutil.DrawRect(screen, posX+4, oncaY+3, 30, 6, cGoldLight)
-		ebitenutil.DrawRect(screen, posX+6, oncaY+8, 26, 3, cCream)
+		drawBox(0, 2, 38, 9, oncaY, cGold)
+		drawBox(4, 3, 30, 6, oncaY, cGoldLight)
+		drawBox(6, 8, 26, 3, oncaY, cCream)
 
-		drawRosette(posX+8, oncaY+3)
-		drawRosette(posX+18, oncaY+3)
-		drawRosette(posX+28, oncaY+4)
+		drawRosette(8, 3, oncaY)
+		drawRosette(18, 3, oncaY)
+		drawRosette(28, 4, oncaY)
 
-		headX := posX + 34
-		headY := oncaY + 1
-		ebitenutil.DrawRect(screen, headX, headY, 9, 8, cGold)
-		ebitenutil.DrawRect(screen, headX+3, headY+5, 6, 4, cCream)
-		ebitenutil.DrawRect(screen, headX+9, headY+4, 2, 3, cNose)
-		ebitenutil.DrawRect(screen, headX+5, headY+2, 3, 3, cEye)
-		ebitenutil.DrawRect(screen, headX+6, headY+2, 1, 3, color.RGBA{R: 10, G: 10, B: 10, A: 255})
-		ebitenutil.DrawRect(screen, headX-2, headY-1, 4, 3, cSpotBlack)
-		ebitenutil.DrawRect(screen, headX-1, headY, 2, 2, cEarPink)
+		headRelX := 32.0
+		headRelY := 1.0
+		drawBox(headRelX, headRelY, 9, 8, oncaY, cGold)
+		drawBox(headRelX+3, headRelY+5, 6, 4, oncaY, cCream)
+		drawBox(headRelX+5, headRelY+2, 3, 3, oncaY, cEye)
+		drawBox(headRelX+6, headRelY+2, 1, 3, oncaY, color.RGBA{R: 10, G: 10, B: 10, A: 255})
+		drawBox(headRelX-2, headRelY-1, 4, 3, oncaY, cSpotBlack)
+		drawBox(headRelX-1, headRelY, 2, 2, oncaY, cEarPink)
 
-		step := float64((ticks / 4) % 2)
-		ebitenutil.DrawRect(screen, posX+4+step*2, oncaY+9, 7, 3, cGold)
-		ebitenutil.DrawRect(screen, posX+3+step*2, oncaY+11, 8, 2, cCream)
-		ebitenutil.DrawRect(screen, posX+30-step*2, oncaY+9, 7, 3, cGold)
-		ebitenutil.DrawRect(screen, posX+31-step*2, oncaY+11, 8, 2, cCream)
-
-		ebitenutil.DrawRect(screen, posX-12, oncaY+5, 13, 3, cGold)
-		ebitenutil.DrawRect(screen, posX-15, oncaY+4, 4, 3, cSpotBlack)
-
+		// Ataque agachada
 		if o.IsAttacking {
-			ebitenutil.DrawRect(screen, headX+10, headY+4, 2, 4, color.RGBA{R: 200, G: 50, B: 50, A: 255})
-			ebitenutil.DrawRect(screen, headX+12, headY+3, 2, 6, color.RGBA{R: 255, G: 200, B: 50, A: 200})
+			drawBox(headRelX+8, headRelY+4, 4, 4, oncaY, cMouthDark)
+			drawBox(headRelX+9, headRelY+6, 2, 2, oncaY, cTongue)
+			drawBox(headRelX+10, headRelY+3, 1, 3, oncaY, cTooth)
+			drawBox(headRelX+12, headRelY+2, 2, 6, oncaY, cRoarWave1)
+			drawBox(headRelX+15, headRelY+1, 2, 8, oncaY, cRoarWave2)
+		} else {
+			drawBox(headRelX+8, headRelY+4, 2, 3, oncaY, cNose)
 		}
+
+		// Patas agachadas
+		step := float64((ticks / 4) % 2)
+		drawBox(4+step*2, 9, 7, 3, oncaY, cGold)
+		drawBox(3+step*2, 11, 8, 2, oncaY, cCream)
+		drawBox(28-step*2, 9, 7, 3, oncaY, cGold)
+		drawBox(29-step*2, 11, 8, 2, oncaY, cCream)
+
+		// Rabo abaixado
+		drawBox(-10, 5, 11, 3, oncaY, cGold)
+		drawBox(-13, 4, 4, 3, oncaY, cSpotBlack)
 		return
 	}
 
+	// 2. ESTADO: EM PÉ / CORRENDO / SALTANDO
 	oncaY := groundY - 22.0 + o.Y
 	gallopFrame := (ticks / 5) % 4
 	if o.IsJumping {
@@ -457,83 +445,129 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 		bodyYOffset = 1.0
 	}
 
-	ebitenutil.DrawRect(screen, posX+3, oncaY+4+bodyYOffset, 27, 12, cGold)
-	ebitenutil.DrawRect(screen, posX+5, oncaY+5+bodyYOffset, 23, 8, cGoldLight)
-	ebitenutil.DrawRect(screen, posX+6, oncaY+13+bodyYOffset, 20, 4, cCream)
+	// Tronco da Onça
+	drawBox(3, 4+bodyYOffset, 27, 12, oncaY, cGold)
+	drawBox(5, 5+bodyYOffset, 23, 8, oncaY, cGoldLight)
+	drawBox(6, 13+bodyYOffset, 20, 4, oncaY, cCream)
 
-	drawRosette(posX+6, oncaY+6+bodyYOffset)
-	drawRosette(posX+14, oncaY+7+bodyYOffset)
-	drawRosette(posX+21, oncaY+6+bodyYOffset)
-	ebitenutil.DrawRect(screen, posX+10, oncaY+12+bodyYOffset, 3, 2, cSpotBlack)
-	ebitenutil.DrawRect(screen, posX+18, oncaY+12+bodyYOffset, 3, 2, cSpotBlack)
+	drawRosette(6, 6+bodyYOffset, oncaY)
+	drawRosette(14, 7+bodyYOffset, oncaY)
+	drawRosette(21, 6+bodyYOffset, oncaY)
+	drawBox(10, 12+bodyYOffset, 3, 2, oncaY, cSpotBlack)
+	drawBox(18, 12+bodyYOffset, 3, 2, oncaY, cSpotBlack)
 
-	headX := posX + 26
-	headY := oncaY + 2 + bodyYOffset
-	ebitenutil.DrawRect(screen, headX, headY, 10, 10, cGold)
-	ebitenutil.DrawRect(screen, headX+1, headY+1, 8, 7, cGoldLight)
-	ebitenutil.DrawRect(screen, headX+4, headY+6, 6, 5, cCream)
-	ebitenutil.DrawRect(screen, headX+9, headY+5, 2, 3, cNose)
-
-	ebitenutil.DrawRect(screen, headX+5, headY+3, 3, 3, cEye)
-	ebitenutil.DrawRect(screen, headX+6, headY+3, 1, 3, color.RGBA{R: 15, G: 15, B: 15, A: 255})
-	ebitenutil.DrawRect(screen, headX+5, headY+2, 1, 1, color.RGBA{R: 255, G: 255, B: 255, A: 255})
-
-	ebitenutil.DrawRect(screen, headX+1, headY-3, 4, 4, cSpotBlack)
-	ebitenutil.DrawRect(screen, headX+2, headY-2, 2, 3, cEarPink)
-
-	if o.IsAttacking {
-		// Boca rugindo e onda sônica
-		ebitenutil.DrawRect(screen, headX+10, headY+5, 3, 5, color.RGBA{R: 180, G: 30, B: 30, A: 255})
-		ebitenutil.DrawRect(screen, headX+11, headY+6, 1, 3, color.RGBA{R: 250, G: 240, B: 240, A: 255}) // Caninos
-		ebitenutil.DrawRect(screen, headX+13, headY+4, 2, 7, color.RGBA{R: 255, G: 215, B: 50, A: 220})
-		ebitenutil.DrawRect(screen, headX+16, headY+2, 2, 11, color.RGBA{R: 255, G: 160, B: 30, A: 170})
+	// Cabeça da Onça
+	headRelX := 26.0
+	headRelY := 2.0 + bodyYOffset
+	if o.AimUp {
+		headRelY = -3.0 + bodyYOffset
 	}
 
+	drawBox(headRelX, headRelY, 10, 10, oncaY, cGold)
+	drawBox(headRelX+1, headRelY+1, 8, 7, oncaY, cGoldLight)
+	drawBox(headRelX+4, headRelY+6, 6, 5, oncaY, cCream)
+
+	// Orelha
+	drawBox(headRelX+1, headRelY-3, 4, 4, oncaY, cSpotBlack)
+	drawBox(headRelX+2, headRelY-2, 2, 3, oncaY, cEarPink)
+
+	// Olhos (semicerrados em fúria se atacando)
+	if o.IsAttacking {
+		drawBox(headRelX+5, headRelY+3, 3, 2, oncaY, cEye)
+		drawBox(headRelX+6, headRelY+3, 1, 2, oncaY, color.RGBA{R: 10, G: 10, B: 10, A: 255})
+	} else {
+		drawBox(headRelX+5, headRelY+3, 3, 3, oncaY, cEye)
+		drawBox(headRelX+6, headRelY+3, 1, 3, oncaY, color.RGBA{R: 15, G: 15, B: 15, A: 255})
+		drawBox(headRelX+5, headRelY+2, 1, 1, oncaY, color.RGBA{R: 255, G: 255, B: 255, A: 255})
+	}
+
+	// Animação de Focinho e Boca no Ataque
+	if o.IsAttacking {
+		if o.AimUp {
+			// Rugido para cima (Anti-aéreo)
+			drawBox(headRelX+3, headRelY-4, 5, 4, oncaY, cMouthDark)
+			drawBox(headRelX+4, headRelY-3, 3, 2, oncaY, cTongue)
+			drawBox(headRelX+3, headRelY-4, 1, 2, oncaY, cTooth)
+			drawBox(headRelX+7, headRelY-4, 1, 2, oncaY, cTooth)
+			// Ondas sônicas verticais subindo
+			drawBox(headRelX+1, headRelY-7, 8, 2, oncaY, cRoarWave1)
+			drawBox(headRelX-1, headRelY-11, 12, 2, oncaY, cRoarWave2)
+			drawBox(headRelX-3, headRelY-15, 16, 2, oncaY, cRoarWave3)
+		} else {
+			// Rugido horizontal com mandíbula escancarada e bote
+			drawBox(headRelX+8, headRelY+3, 4, 3, oncaY, cGold)
+			drawBox(headRelX+10, headRelY+2, 2, 2, oncaY, cNose)
+			// Interior da boca
+			drawBox(headRelX+8, headRelY+5, 5, 6, oncaY, cMouthDark)
+			drawBox(headRelX+9, headRelY+8, 3, 2, oncaY, cTongue)
+			// Caninos afiados
+			drawBox(headRelX+11, headRelY+5, 1, 3, oncaY, cTooth)
+			drawBox(headRelX+11, headRelY+8, 1, 2, oncaY, cTooth)
+			// Mandíbula inferior abaixada
+			drawBox(headRelX+8, headRelY+10, 4, 2, oncaY, cGold)
+
+			// Bote da pata dianteira com garras afiadas estendidas
+			drawBox(headRelX+2, headRelY+10, 7, 4, oncaY, cGold)
+			drawBox(headRelX+8, headRelY+10, 2, 1, oncaY, cTooth) // Garra 1
+			drawBox(headRelX+8, headRelY+12, 2, 1, oncaY, cTooth) // Garra 2
+
+			// Ondas sônicas concêntricas do Rugido
+			drawBox(headRelX+14, headRelY+3, 2, 8, oncaY, cRoarWave1)
+			drawBox(headRelX+17, headRelY+1, 2, 12, oncaY, cRoarWave2)
+			drawBox(headRelX+21, headRelY-1, 2, 16, oncaY, cRoarWave3)
+		}
+	} else {
+		// Focinho relaxado
+		drawBox(headRelX+9, headRelY+5, 2, 3, oncaY, cNose)
+	}
+
+	// Cauda (Rabo balançando)
 	tailWave := math.Sin(float64(ticks)*0.25) * 1.8
 	if o.IsJumping {
 		tailWave = -2.5
 	}
-	ebitenutil.DrawRect(screen, posX-1, oncaY+9+bodyYOffset, 5, 4, cGold)
-	ebitenutil.DrawRect(screen, posX-5, oncaY+5+bodyYOffset, 5, 5, cGold)
-	ebitenutil.DrawRect(screen, posX-7, oncaY+tailWave+bodyYOffset, 4, 6, cGold)
-	ebitenutil.DrawRect(screen, posX-5, oncaY-3+tailWave+bodyYOffset, 4, 5, cSpotBlack)
-	ebitenutil.DrawRect(screen, posX-3, oncaY-4+tailWave+bodyYOffset, 3, 3, cSpotBlack)
+	drawBox(-1, 9+bodyYOffset, 5, 4, oncaY, cGold)
+	drawBox(-5, 5+bodyYOffset, 5, 5, oncaY, cGold)
+	drawBox(-7, tailWave+bodyYOffset, 4, 6, oncaY, cGold)
+	drawBox(-5, -3+tailWave+bodyYOffset, 4, 5, oncaY, cSpotBlack)
+	drawBox(-3, -4+tailWave+bodyYOffset, 3, 3, oncaY, cSpotBlack)
 
+	// Patas animadas com ciclo de galope 4-frames
 	switch gallopFrame {
 	case 0:
-		ebitenutil.DrawRect(screen, posX-2, oncaY+14, 6, 6, cGold)
-		ebitenutil.DrawRect(screen, posX-5, oncaY+18, 5, 5, cGold)
-		ebitenutil.DrawRect(screen, posX-7, oncaY+21, 5, 2, cCream)
+		drawBox(-2, 14, 6, 6, oncaY, cGold)
+		drawBox(-5, 18, 5, 5, oncaY, cGold)
+		drawBox(-7, 21, 5, 2, oncaY, cCream)
 
-		ebitenutil.DrawRect(screen, posX+24, oncaY+13, 6, 6, cGold)
-		ebitenutil.DrawRect(screen, posX+28, oncaY+17, 5, 5, cGold)
-		ebitenutil.DrawRect(screen, posX+30, oncaY+21, 5, 2, cCream)
+		drawBox(24, 13, 6, 6, oncaY, cGold)
+		drawBox(28, 17, 5, 5, oncaY, cGold)
+		drawBox(30, 21, 5, 2, oncaY, cCream)
 
 	case 1:
-		ebitenutil.DrawRect(screen, posX+2, oncaY+15, 6, 5, cGold)
-		ebitenutil.DrawRect(screen, posX+1, oncaY+18, 5, 4, cGold)
-		ebitenutil.DrawRect(screen, posX, oncaY+21, 5, 2, cCream)
+		drawBox(2, 15, 6, 5, oncaY, cGold)
+		drawBox(1, 18, 5, 4, oncaY, cGold)
+		drawBox(0, 21, 5, 2, oncaY, cCream)
 
-		ebitenutil.DrawRect(screen, posX+22, oncaY+14, 6, 5, cGold)
-		ebitenutil.DrawRect(screen, posX+25, oncaY+17, 5, 5, cGold)
-		ebitenutil.DrawRect(screen, posX+26, oncaY+21, 5, 2, cCream)
+		drawBox(22, 14, 6, 5, oncaY, cGold)
+		drawBox(25, 17, 5, 5, oncaY, cGold)
+		drawBox(26, 21, 5, 2, oncaY, cCream)
 
 	case 2:
-		ebitenutil.DrawRect(screen, posX+8, oncaY+14, 6, 5, cGold)
-		ebitenutil.DrawRect(screen, posX+10, oncaY+17, 5, 5, cGold)
-		ebitenutil.DrawRect(screen, posX+11, oncaY+21, 5, 2, cCream)
+		drawBox(8, 14, 6, 5, oncaY, cGold)
+		drawBox(10, 17, 5, 5, oncaY, cGold)
+		drawBox(11, 21, 5, 2, oncaY, cCream)
 
-		ebitenutil.DrawRect(screen, posX+17, oncaY+14, 6, 5, cGold)
-		ebitenutil.DrawRect(screen, posX+18, oncaY+17, 5, 5, cGold)
-		ebitenutil.DrawRect(screen, posX+19, oncaY+21, 5, 2, cCream)
+		drawBox(17, 14, 6, 5, oncaY, cGold)
+		drawBox(18, 17, 5, 5, oncaY, cGold)
+		drawBox(19, 21, 5, 2, oncaY, cCream)
 
 	case 3:
-		ebitenutil.DrawRect(screen, posX+5, oncaY+14, 6, 5, cGold)
-		ebitenutil.DrawRect(screen, posX+3, oncaY+18, 5, 4, cGold)
-		ebitenutil.DrawRect(screen, posX+2, oncaY+21, 5, 2, cCream)
+		drawBox(5, 14, 6, 5, oncaY, cGold)
+		drawBox(3, 18, 5, 4, oncaY, cGold)
+		drawBox(2, 21, 5, 2, oncaY, cCream)
 
-		ebitenutil.DrawRect(screen, posX+20, oncaY+13, 6, 6, cGold)
-		ebitenutil.DrawRect(screen, posX+23, oncaY+17, 5, 5, cGold)
-		ebitenutil.DrawRect(screen, posX+24, oncaY+21, 5, 2, cCream)
+		drawBox(20, 13, 6, 6, oncaY, cGold)
+		drawBox(23, 17, 5, 5, oncaY, cGold)
+		drawBox(24, 21, 5, 2, oncaY, cCream)
 	}
 }
