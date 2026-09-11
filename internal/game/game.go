@@ -57,7 +57,7 @@ func NewEngine() *Engine {
 		stage:             1,
 		stageBannerTimer:  120,
 		isSaoBrasIntro:    true,
-		saoBrasTimer:      450, // ~7.5 segundos de visualização da passagem do São Brás
+		saoBrasTimer:      900, // ~15 segundos de visualização (ou avança com toque/clique/tecla)
 		isTitleScreen:     false,
 		isShowingCredits:  false,
 		isPaused:          false,
@@ -69,11 +69,16 @@ func NewEngine() *Engine {
 
 func isPointerJustPressed() bool {
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) ||
-		inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) {
+		inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) ||
+		ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		return true
 	}
 	touches := inpututil.AppendJustPressedTouchIDs(nil)
-	return len(touches) > 0
+	if len(touches) > 0 {
+		return true
+	}
+	allTouches := ebiten.AppendTouchIDs(nil)
+	return len(allTouches) > 0
 }
 
 func (e *Engine) Update() error {

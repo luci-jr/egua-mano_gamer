@@ -119,13 +119,12 @@ func DrawSaoBrasIntro(screen *ebiten.Image, screenWidth, screenHeight float64, t
 	bannerY := screenHeight - bannerH
 	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, bannerH, color.RGBA{R: 6, G: 10, B: 20, A: 225})
 	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-
-	ebitenutil.DebugPrintAt(screen, "★ MERCADO DE SAO BRAS ATUAL - BELEM DO PARA ★", 28, int(bannerY)+5)
+	ebitenutil.DebugPrintAt(screen, "★ MERCADO DE SAO BRAS ATUAL - BELEM DO PARA ★", 35, int(bannerY)+5)
 
 	if (ticks/25)%2 == 0 {
-		ebitenutil.DebugPrintAt(screen, ">> TOQUE NA TELA OU APERTE ENTER <<", 45, int(bannerY)+18)
+		ebitenutil.DebugPrintAt(screen, ">> TOQUE OU CLIQUE NA TELA PARA INICIAR <<", 44, int(bannerY)+18)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "   TOQUE NA TELA OU APERTE ENTER   ", 45, int(bannerY)+18)
+		ebitenutil.DebugPrintAt(screen, "   TOQUE OU CLIQUE NA TELA PARA INICIAR   ", 44, int(bannerY)+18)
 	}
 }
 
