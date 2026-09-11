@@ -13,11 +13,12 @@ import (
 )
 
 const (
-	ScreenWidth  = 340.0
-	ScreenHeight = 210.0
-	GroundY      = 155.0
-	BaseSpeed    = 2.3
-	GameVersion  = "VER. 2.4.0"
+	ScreenWidth         = 340.0
+	ScreenHeight        = 210.0
+	GroundY             = 155.0
+	BaseSpeed           = 2.3
+	StageTargetDistance = 2800.0
+	GameVersion         = "VER. 2.4.0"
 )
 
 var (
@@ -53,6 +54,9 @@ type Engine struct {
 	stage             int
 	stageDistance     float64
 	stageBannerTimer  int
+	isLoadingStage    bool
+	loadingTimer      int
+	targetStage       int
 	isTitleCover      bool
 	isSaoBrasIntro    bool
 	saoBrasTimer      int
@@ -189,6 +193,42 @@ func (e *Engine) Update() error {
 			e.isTitleCover = false
 			e.isSaoBrasIntro = true
 			e.audio.PlayShot()
+			return nil
+		}
+		return nil
+	}
+
+	// 1.8. Tela de Carregamento Náutica / Viagem Cultural por Belém (Transição entre Fases)
+	if e.isLoadingStage {
+		e.ticks++
+		e.loadingTimer--
+
+		skipLoading := isPointerJustPressed() ||
+			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
+			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
+			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
+			getVirtualKey("Enter") ||
+			getVirtualKey("Space")
+
+		if getVirtualKey("Enter") {
+			resetVirtualKey("Enter")
+		}
+		if getVirtualKey("Space") {
+			resetVirtualKey("Space")
+		}
+
+		if skipLoading || e.loadingTimer <= 0 {
+			e.isLoadingStage = false
+			e.stage = e.targetStage
+			e.stageDistance = 0
+			e.stageBannerTimer = 130
+			e.hearts = 3
+			e.projectiles.Reset()
+			e.obstacles.Reset()
+			e.relics.Reset()
+			if !e.audio.IsMuted() {
+				e.audio.ResumeBGM()
+			}
 			return nil
 		}
 		return nil
@@ -595,18 +635,11 @@ func (e *Engine) Update() error {
 
 		if continuePressed {
 			if e.stage < 3 {
-				e.stage++
-				e.stageDistance = 0
-				e.stageBannerTimer = 130
 				e.isStageComplete = false
-				e.hearts = 3
-				e.projectiles.Reset()
-				e.obstacles.Reset()
-				e.vines.Reset()
-				e.relics.Reset()
-				if !e.audio.IsMuted() {
-					e.audio.ResumeBGM()
-				}
+				e.isLoadingStage = true
+				e.targetStage = e.stage + 1
+				e.loadingTimer = 180 // ~3 segundos navegando no barco Popopó pela Baía do Guajará
+				return nil
 			} else {
 				e.player.Reset()
 				e.projectiles.Reset()
@@ -872,13 +905,13 @@ func (e *Engine) Update() error {
 		}
 	}
 
-	stageTargetDist := 1200.0
+	stageTargetDist := StageTargetDistance
 	stageProgress := e.stageDistance / stageTargetDist
 	if stageProgress > 1.0 {
 		stageProgress = 1.0
 	}
 	currentSpeed := (BaseSpeed + float64(e.stage-1)*0.35 + (stageProgress * 0.6)) * SpeedMultipliers[e.speedIndex]
-	e.stageDistance += currentSpeed * 0.45
+	e.stageDistance += currentSpeed * 0.30
 	e.scenery.Update(currentSpeed)
 	e.relics.Update(currentSpeed)
 
@@ -989,8 +1022,13 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 		return
 	}
 
+	if e.isLoadingStage {
+		progress := 1.0 - float64(e.loadingTimer)/180.0
+		ui.DrawStageTransitionLoadingScreen(screen, ScreenWidth, ScreenHeight, e.ticks, e.targetStage, progress)
+		return
+	}
+
 	e.scenery.Draw(screen, ScreenWidth, GroundY, e.ticks, e.stage)
-	e.vines.Draw(screen)
 	e.relics.Draw(screen, e.ticks)
 
 	if e.isTitleScreen {
@@ -1048,7 +1086,7 @@ func (e *Engine) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 func Start() error {
 	ebiten.SetWindowSize(680, 420)
-	ebiten.SetWindowTitle("Pai D'Égua Game: Aventura Amazônica")
+	ebiten.SetWindowTitle("PaiD'egua Runner - Uma Aventura em Belém do Pará")
 
 	engine := NewEngine()
 	return ebiten.RunGame(engine)
