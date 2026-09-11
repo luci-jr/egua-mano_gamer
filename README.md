@@ -30,6 +30,7 @@ O protagonista é uma **Onça-Pintada Brasileira** que percorre os cartões post
 | `Esc` | **Menu de Pausa Interativo** | Abre o menu com: **Continuar**, **Reiniciar Aventura**, alternar **Som (Mudo / Ligado)**, **Ver Créditos** e **Fechar o Jogo**. |
 | `Setas Cima / Baixo` | **Navegação do Menu** | Percorre os itens do Menu de Pausa. |
 | `R` | **Recomeçar Rápido** | Reinicia imediatamente a aventura a partir da Fase 1 na tela de conclusão ou Game Over. |
+| **Ao sofrer dano** | **Hitstop & "Égua mano!..."** | Ao perder um coração, ocorre um breve congelamento (*hit-stop*), efeito sonoro cômico regional e um balão de fala dizendo *"Égua mano!..."* sobre a onça. |
 
 ---
 

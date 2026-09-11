@@ -15,6 +15,7 @@ type Manager struct {
 	sndDoubleRoar []byte
 	sndDuck       []byte
 	sndHit        []byte
+	sndEguaMano   []byte
 	sndGameOver   []byte
 	sndStageUp    []byte
 	bgmPlayer     *ebitenaudio.Player
@@ -79,6 +80,35 @@ func createHitPunch() []byte {
 
 		envelope := math.Exp(-4.5 * t)
 		sample := int16(tone * envelope * 0.35 * 32767.0)
+
+		idx := i * 4
+		buf[idx] = byte(sample)
+		buf[idx+1] = byte(sample >> 8)
+		buf[idx+2] = byte(sample)
+		buf[idx+3] = byte(sample >> 8)
+	}
+	return buf
+}
+
+func createEguaManoSfx() []byte {
+	durationMs := 360
+	numSamples := sampleRate * durationMs / 1000
+	buf := make([]byte, numSamples*4)
+	phase := 0.0
+	vibPhase := 0.0
+
+	for i := 0; i < numSamples; i++ {
+		t := float64(i) / float64(numSamples)
+
+		freq := (380.0 - 230.0*math.Pow(t, 0.65)) + 32.0*math.Sin(vibPhase)
+		phase += 2.0 * math.Pi * freq / float64(sampleRate)
+		vibPhase += 2.0 * math.Pi * 18.0 / float64(sampleRate)
+
+		tone := math.Sin(phase) + 0.35*math.Sin(phase*2.0)
+
+		attack := math.Min(1.0, float64(i)/float64(sampleRate*0.012))
+		decay := math.Exp(-2.8 * t)
+		sample := int16(tone * attack * decay * 0.38 * 32767.0)
 
 		idx := i * 4
 		buf[idx] = byte(sample)
@@ -226,6 +256,7 @@ func NewManager() *Manager {
 		sndDoubleRoar: createRoar(true),
 		sndDuck:       createSmoothTone(260, 160, 70, 0.1),
 		sndHit:        createHitPunch(),
+		sndEguaMano:   createEguaManoSfx(),
 		sndGameOver:   createSmoothTone(320, 95, 450, 0.3),
 		sndStageUp:    createStageUpJingle(),
 		isMuted:       false,
@@ -283,7 +314,12 @@ func (m *Manager) PlayHit() {
 	if m.isMuted || m.ctx == nil {
 		return
 	}
-	m.ctx.NewPlayerFromBytes(m.sndHit).Play()
+	if len(m.sndEguaMano) > 0 {
+		m.ctx.NewPlayerFromBytes(m.sndEguaMano).Play()
+	}
+	if len(m.sndHit) > 0 {
+		m.ctx.NewPlayerFromBytes(m.sndHit).Play()
+	}
 }
 
 func (m *Manager) PlayGameOver() {

@@ -27,6 +27,8 @@ type Engine struct {
 	lives            int
 	invincibleTicks  int
 	shakeTimer       int
+	hitDelayTimer    int
+	speechBubbleTimer int
 	stage            int
 	stageBannerTimer int
 	isTitleScreen    bool
@@ -48,6 +50,8 @@ func NewEngine() *Engine {
 		lives:            3,
 		invincibleTicks:  0,
 		shakeTimer:       0,
+		hitDelayTimer:    0,
+		speechBubbleTimer: 0,
 		stage:            1,
 		stageBannerTimer: 120,
 		isTitleScreen:    true,
@@ -235,6 +239,21 @@ func (e *Engine) Update() error {
 
 	e.ticks++
 
+	if e.hitDelayTimer > 0 {
+		e.hitDelayTimer--
+		if e.shakeTimer > 0 {
+			e.shakeTimer--
+		}
+		if e.speechBubbleTimer > 0 {
+			e.speechBubbleTimer--
+		}
+		return nil
+	}
+
+	if e.speechBubbleTimer > 0 {
+		e.speechBubbleTimer--
+	}
+
 	if e.invincibleTicks > 0 {
 		e.invincibleTicks--
 	}
@@ -300,13 +319,15 @@ func (e *Engine) Update() error {
 	oncaX, oncaY, oncaW, oncaH := e.onca.GetBounds(GroundY)
 	if e.obstacle.CheckCollision(oncaX, oncaY, oncaW, oncaH) && e.invincibleTicks <= 0 {
 		e.lives--
-		e.shakeTimer = 10
+		e.shakeTimer = 14
+		e.speechBubbleTimer = 65
 		if e.lives <= 0 {
 			e.isGameOver = true
 			e.audio.PauseBGM()
 			e.audio.PlayGameOver()
 		} else {
-			e.invincibleTicks = 60
+			e.hitDelayTimer = 22
+			e.invincibleTicks = 75
 			e.audio.PlayHit()
 		}
 	}
@@ -327,6 +348,12 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 	}
 
 	e.onca.Draw(screen, GroundY, e.ticks, e.invincibleTicks)
+
+	if e.speechBubbleTimer > 0 {
+		oncaX, oncaY, _, _ := e.onca.GetBounds(GroundY)
+		ui.DrawSpeechBubble(screen, oncaX+8, oncaY-24, "EGUA MANO!...")
+	}
+
 	e.obstacle.Draw(screen, e.ticks, e.stage)
 
 	isDoubleJump := e.onca.JumpCount == 2
