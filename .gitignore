@@ -36,3 +36,6 @@ runner-game
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Arquivos locais / privados
+GUIA_APRENDIZADO.md
