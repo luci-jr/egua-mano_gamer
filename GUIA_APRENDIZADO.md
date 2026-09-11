@@ -129,6 +129,7 @@ Substituímos os blocos geométricos simplórios por um desenho com anatomia rea
   * **Coyote Time:** Tolerância de alguns milissegundos para saltar após sair do chão.
   * **Sistema de Partículas:** Poeira procedural sob as patas na aterrissagem e no rastejo.
   * **Screen Shake:** Tremor suave da tela ao sofrer impacto.
+  * **Hit-stop & Balão "Égua mano!...":** Ao perder um coração, a simulação congela brevemente por 22 ticks (~0.35s), toca um efeito sonoro cômico característico e exibe um balão de fala retrô com a gíria paraense sobre a onça.
 
 ---
 

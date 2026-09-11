@@ -251,3 +251,30 @@ func DrawGameOverScreen(screen *ebiten.Image, screenWidth, screenHeight float64,
 	ebitenutil.DebugPrintAt(screen, "   Aperte ENTER ou R para jogar    ", 45, 125)
 	ebitenutil.DebugPrintAt(screen, "===================================", 45, 140)
 }
+
+func DrawSpeechBubble(screen *ebiten.Image, x, y float64, text string) {
+	w := float64(len(text)*6 + 14)
+	h := 18.0
+
+	// Sombra suave do balao
+	ebitenutil.DrawRect(screen, x+2, y+2, w, h, color.RGBA{R: 0, G: 0, B: 0, A: 130})
+
+	// Fundo do balao (estilo quadrinhos retro paraense)
+	ebitenutil.DrawRect(screen, x, y, w, h, color.RGBA{R: 20, G: 25, B: 40, A: 245})
+
+	// Borda dourada de destaque
+	ebitenutil.DrawRect(screen, x, y, w, 1, color.RGBA{R: 250, G: 210, B: 50, A: 255})
+	ebitenutil.DrawRect(screen, x, y+h-1, w, 1, color.RGBA{R: 250, G: 210, B: 50, A: 255})
+	ebitenutil.DrawRect(screen, x, y, 1, h, color.RGBA{R: 250, G: 210, B: 50, A: 255})
+	ebitenutil.DrawRect(screen, x+w-1, y, 1, h, color.RGBA{R: 250, G: 210, B: 50, A: 255})
+
+	// Rabicho do balao apontando para baixo (cabeca da onca)
+	tailX := x + 14.0
+	tailY := y + h
+	ebitenutil.DrawRect(screen, tailX, tailY, 5, 2, color.RGBA{R: 250, G: 210, B: 50, A: 255})
+	ebitenutil.DrawRect(screen, tailX+1, tailY+2, 3, 2, color.RGBA{R: 250, G: 210, B: 50, A: 255})
+	ebitenutil.DrawRect(screen, tailX+2, tailY+4, 1, 2, color.RGBA{R: 250, G: 210, B: 50, A: 255})
+
+	// Texto da giria
+	ebitenutil.DebugPrintAt(screen, text, int(x)+7, int(y)+3)
+}
