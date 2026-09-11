@@ -68,6 +68,10 @@ func NewEngine() *Engine {
 }
 
 func isPointerJustPressed() bool {
+	if getVirtualKey("Enter") {
+		resetVirtualKey("Enter")
+		return true
+	}
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) ||
 		inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonRight) ||
 		ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
@@ -145,14 +149,17 @@ func (e *Engine) Update() error {
 	}
 
 	if e.isPaused {
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || getVirtualKey("ArrowUp") {
+			resetVirtualKey("ArrowUp")
 			e.pauseMenuIndex = (e.pauseMenuIndex - 1 + 5) % 5
 		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || getVirtualKey("ArrowDown") {
+			resetVirtualKey("ArrowDown")
 			e.pauseMenuIndex = (e.pauseMenuIndex + 1) % 5
 		}
 
-		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") {
+			resetVirtualKey("Escape")
 			e.isPaused = false
 			if !e.audio.IsMuted() {
 				e.audio.ResumeBGM()
@@ -160,7 +167,8 @@ func (e *Engine) Update() error {
 			return nil
 		}
 
-		selectPressed := inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
+		selectPressed := isPointerJustPressed() ||
+			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeySpace)
 
@@ -272,7 +280,8 @@ func (e *Engine) Update() error {
 		return nil
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") {
+		resetVirtualKey("Escape")
 		e.isPaused = true
 		e.pauseMenuIndex = 0
 		e.audio.PauseBGM()
@@ -322,20 +331,65 @@ func (e *Engine) Update() error {
 		return nil
 	}
 
-	// Movimentação horizontal da Onça (Adiantar com Seta Direita/D, Voltar com Seta Esquerda/A)
+	// Movimentação horizontal da Onça (Adiantar e Recuar com Teclado, Botões Virtuais ou Toque no Canvas)
 	moveSpeed := 2.2
-	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) || ebiten.IsKeyPressed(ebiten.KeyD) {
+	moveForward := ebiten.IsKeyPressed(ebiten.KeyArrowRight) || ebiten.IsKeyPressed(ebiten.KeyD) || getVirtualKey("ArrowRight")
+	moveBackward := ebiten.IsKeyPressed(ebiten.KeyArrowLeft) || ebiten.IsKeyPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft")
+
+	duckKey := ebiten.IsKeyPressed(ebiten.KeyArrowDown) || ebiten.IsKeyPressed(ebiten.KeyS) || getVirtualKey("ArrowDown")
+	duckJustPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS)
+
+	jumpJustPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) ||
+		inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyW) ||
+		getVirtualKey("JustJump")
+	if getVirtualKey("JustJump") {
+		resetVirtualKey("JustJump")
+	}
+
+	jumpHolding := ebiten.IsKeyPressed(ebiten.KeyArrowUp) ||
+		ebiten.IsKeyPressed(ebiten.KeySpace) ||
+		ebiten.IsKeyPressed(ebiten.KeyW) ||
+		getVirtualKey("Jump")
+
+	// Mapeamento de toques nativos direto na tela do celular
+	touches := ebiten.AppendTouchIDs(nil)
+	for _, id := range touches {
+		tx, ty := ebiten.TouchPosition(id)
+		if tx < 80 {
+			moveBackward = true
+		} else if tx >= 80 && tx < 170 {
+			moveForward = true
+		} else if tx >= 170 {
+			if ty < 135 {
+				jumpHolding = true
+			} else {
+				duckKey = true
+			}
+		}
+	}
+	justTouches := inpututil.AppendJustPressedTouchIDs(nil)
+	for _, id := range justTouches {
+		tx, ty := ebiten.TouchPosition(id)
+		if tx >= 170 && ty < 135 {
+			jumpJustPressed = true
+		} else if tx >= 170 && ty >= 135 {
+			duckJustPressed = true
+		}
+	}
+
+	if moveForward {
 		e.onca.MoveForward(moveSpeed)
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) || ebiten.IsKeyPressed(ebiten.KeyA) {
+	if moveBackward {
 		e.onca.MoveBackward(moveSpeed)
 	}
 
-	if (inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS)) && !e.onca.IsJumping {
+	if duckJustPressed && !e.onca.IsJumping {
 		e.audio.PlayDuck()
 	}
 
-	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
+	if duckKey {
 		if e.onca.IsJumping {
 			e.onca.FastDrop()
 		} else {
@@ -345,20 +399,14 @@ func (e *Engine) Update() error {
 		e.onca.SetCrouch(false)
 	}
 
-	jumpPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) ||
-		inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
-		inpututil.IsKeyJustPressed(ebiten.KeyW)
-	if jumpPressed {
+	if jumpJustPressed {
 		jumped, isDouble := e.onca.Jump()
 		if jumped {
 			e.audio.PlayRoar(isDouble)
 		}
 	}
 
-	jumpReleased := inpututil.IsKeyJustReleased(ebiten.KeyArrowUp) ||
-		inpututil.IsKeyJustReleased(ebiten.KeySpace) ||
-		inpututil.IsKeyJustReleased(ebiten.KeyW)
-	if jumpReleased {
+	if !jumpHolding && e.onca.JumpHolding {
 		e.onca.ReleaseJump()
 	}
 
