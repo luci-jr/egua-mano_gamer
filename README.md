@@ -36,31 +36,49 @@ O protagonista é uma **Onça-Pintada Brasileira** que percorre os cartões post
 
 ---
 
-## 🏛️ As 3 Fases de Belém do Pará
+## 💖 Sistema de Vidas & Corações (3 Vidas x 3 Erros)
 
-O jogo possui progressão dinâmica de cenários e metas de conclusão por pontuação:
+O jogo possui um sistema balanceado de sobrevivência arcade retrô:
+* **3 Vidas Totais (`x3 VIDAS` no HUD):** A onça possui 3 vidas no total.
+* **3 Corações por Vida:** Os 3 corações em pixel art no topo da tela representam a resistência da vida atual.
+* **Mecânica de Dano:**
+  * Cada colisão com obstáculo desconta **1 coração** (a onça grita `"EGUA MANO!..."` com congelamento suave de tela e invencibilidade temporária).
+  * Ao perder os **3 corações** da vida corrente, o jogador perde **1 vida**, e os **3 corações são recarregados** para a nova vida (`x2 VIDAS`, depois `x1 VIDAS`).
+  * Ao esgotar todas as 3 vidas (`x0 VIDAS`), a onça tomba e dispara o clássico balão paraense: `"Levei o farelo mano, mancada!"` na tela de Game Over.
+
+---
+
+## 🏛️ As 3 Fases de Belém do Pará (1000 Pontos por Fase)
+
+O jogo conta com fluxo dinâmico de múltiplos obstáculos na tela simultaneamente com espaçamento inteligente (`ObstacleManager`), permitindo conquistar pelo menos **1000 pontos por fase**:
 
 ```text
-[ FASE 1: Ver-o-Peso (100 pts) ] ──> [ FASE 2: Estação das Docas (200 pts) ] ──> [ FASE 3: Theatro da Paz (300 pts) ]
+[ FASE 1: Ver-o-Peso (1000 pts) ] ──> [ FASE 2: Estação das Docas (2000 pts) ] ──> [ FASE 3: Theatro da Paz (3000 pts) ]
 ```
 
-### 🐟 1. Mercado do Ver-o-Peso (0 a 100 pontos)
-* **Cenário:** O crepúsculo alaranjado sobre a **Baía do Guajará**, barcos de madeira tradicionais da Amazônia navegando, o icônico **Mercado de Ferro com cúpulas azuis neogóticas** e calçadão de paralelepípedos.
-* **Obstáculos:**
-  * 🧺 **Paneiro de Açaí no Chão:** Cesto tradicional trançado com açaí roxo escuro *(Exige PULAR)*.
-  * 🦅 **Urubu do Ver-o-Peso no Ar:** O pássaro clássico do mercado do peixe voando a meia altura *(Exige ABAIXAR)*.
+### 🐟 1. Mercado do Ver-o-Peso (0 a 1000 pontos)
+* **Cenário:** O crepúsculo alaranjado sobre a **Baía do Guajará**, barcos de madeira navegando, **Mercado de Ferro com cúpulas neogóticas** e calçadão de pedras.
+* **Obstáculos Temáticos:**
+  * 🧺 **Paneiro de Açaí:** Cesto de palha trançada transbordando açaí roxo *(Pular)*.
+  * 🦅 **Urubu do Ver-o-Peso:** Voando a meia altura *(Abaixar / Rastejar)*.
+  * 📦 **Pilha Dupla de Paneiros:** Obstáculo alto com folhas de açaizeiro *(Pulo Alto ou Pulo Duplo)*.
+  * 🌧️ **Poça da Chuva das 4h:** Poça d'água paraense com reflexo azul e respingos *(Pulo Rápido)*.
 
-### ⚓ 2. Estação das Docas (101 a 200 pontos)
-* **Cenário:** Os emblemáticos **galpões ingleses de ferro vermelho**, os imponentes **guindastes portuários amarelos** na beira do cais e o piso em deck de madeira.
-* **Obstáculos:**
-  * 🪵 **Barril de Carvalho/Cerveja das Docas:** Barril rústico com aros dourados no chão *(Exige PULAR)*.
-  * 🕊️ **Gaivota Fluvial:** Pássaro branco com pontas pretas voando sobre a orla *(Exige ABAIXAR)*.
+### ⚓ 2. Estação das Docas (1001 a 2000 pontos)
+* **Cenário:** Os emblemáticos **galpões ingleses de ferro vermelho**, os imponentes **guindastes portuários amarelos** e o deck de madeira.
+* **Obstáculos Temáticos:**
+  * 🪵 **Caixote de Carga:** Madeira naval reforçada no cais *(Pular)*.
+  * 🕊️ **Gaivota da Baía:** Pássaro rasante com asas animadas *(Abaixar / Rastejar)*.
+  * 🏗️ **Pilha Dupla de Caixas Portuárias:** Alta torre de carga com faixas de aço *(Pulo Duplo)*.
+  * 🌊 **Poça Salina da Maré:** Água esmeralda do Guajará na beirada *(Pulo Rápido)*.
 
-### 🎭 3. Theatro da Paz & Mangueiras (201 a 300 pontos - Vitória Final!)
-* **Cenário:** A imponente fachada neoclássica do **Theatro da Paz**, as frondosas **Mangueiras centenárias de Belém** repletas de mangas amarelas e a clássica **calçada de pedras portuguesas geométricas**.
-* **Obstáculos:**
-  * 🥭 **Cesto de Mangas Caídas:** Frutas maduras espalhadas no solo *(Exige PULAR)*.
-  * 🦜 **Maritaca Verde:** Ave veloz cruzando as copas da Praça da República *(Exige ABAIXAR)*.
+### 🎭 3. Theatro da Paz & Mangueiras (2001 a 3000 pontos - Vitória Final!)
+* **Cenário:** Fachada neoclássica do **Theatro da Paz**, **Mangueiras centenárias de Belém** com mangas douradas e calçada de pedras portuguesas.
+* **Obstáculos Temáticos:**
+  * 🥭 **Cesto de Castanhas e Frutos:** Cesto artesanal com castanhas e cupuaçus *(Pular)*.
+  * 🦜 **Arara / Maritaca Amazônica:** Ave verde e amarela sobrevoando veloz *(Abaixar / Rastejar)*.
+  * 🏛️ **Pilha de Cestas Nobres:** Obstáculo vertical ornamentado *(Pulo Duplo)*.
+  * 💧 **Poça Espelhada da Praça:** Reflexo d'água límpida nas pedras portuguesas *(Pulo Rápido)*.
 
 ---
 
