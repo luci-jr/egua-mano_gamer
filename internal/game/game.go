@@ -22,48 +22,69 @@ type Engine struct {
 	scenery         *scenery.Background
 	audio           *audio.Manager
 
-	score            int
-	ticks            int
-	lives            int
-	invincibleTicks  int
-	shakeTimer       int
-	hitDelayTimer    int
+	score             int
+	ticks             int
+	lives             int
+	invincibleTicks   int
+	shakeTimer        int
+	hitDelayTimer     int
 	speechBubbleTimer int
-	stage            int
-	stageBannerTimer int
-	isTitleScreen    bool
-	isShowingCredits bool
-	isPaused         bool
-	pauseMenuIndex   int
-	isGameOver       bool
-	isStageComplete  bool
+	stage             int
+	stageBannerTimer  int
+	isSplashScreen    bool
+	splashTimer       int
+	isTitleScreen     bool
+	isShowingCredits  bool
+	isPaused          bool
+	pauseMenuIndex    int
+	isGameOver        bool
+	isStageComplete   bool
 }
 
 func NewEngine() *Engine {
 	return &Engine{
-		onca:             entities.NewOnca(),
-		obstacle:         entities.NewObstacle(ScreenWidth, GroundY),
-		scenery:          scenery.NewBackground(),
-		audio:            audio.NewManager(),
-		score:            0,
-		ticks:            0,
-		lives:            3,
-		invincibleTicks:  0,
-		shakeTimer:       0,
-		hitDelayTimer:    0,
+		onca:              entities.NewOnca(),
+		obstacle:          entities.NewObstacle(ScreenWidth, GroundY),
+		scenery:           scenery.NewBackground(),
+		audio:             audio.NewManager(),
+		score:             0,
+		ticks:             0,
+		lives:             3,
+		invincibleTicks:   0,
+		shakeTimer:        0,
+		hitDelayTimer:     0,
 		speechBubbleTimer: 0,
-		stage:            1,
-		stageBannerTimer: 120,
-		isTitleScreen:    true,
-		isShowingCredits: false,
-		isPaused:         false,
-		pauseMenuIndex:   0,
-		isGameOver:       false,
-		isStageComplete:  false,
+		stage:             1,
+		stageBannerTimer:  120,
+		isSplashScreen:    true,
+		splashTimer:       200,
+		isTitleScreen:     false,
+		isShowingCredits:  false,
+		isPaused:          false,
+		pauseMenuIndex:    0,
+		isGameOver:        false,
+		isStageComplete:   false,
 	}
 }
 
 func (e *Engine) Update() error {
+	if e.isSplashScreen {
+		e.ticks++
+		e.splashTimer--
+		anyKeyPressed := false
+		for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
+			if inpututil.IsKeyJustPressed(k) {
+				anyKeyPressed = true
+				break
+			}
+		}
+		if e.splashTimer <= 0 || anyKeyPressed {
+			e.isSplashScreen = false
+			e.isTitleScreen = true
+		}
+		return nil
+	}
+
 	if e.isShowingCredits {
 		exitCredits := inpututil.IsKeyJustPressed(ebiten.KeyEscape) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
@@ -101,6 +122,7 @@ func (e *Engine) Update() error {
 
 		e.ticks++
 		e.scenery.Update(0.6)
+		e.onca.Update()
 		return nil
 	}
 
@@ -280,11 +302,20 @@ func (e *Engine) Update() error {
 		return nil
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) && !e.onca.IsJumping {
+	// Movimentação horizontal da Onça (Adiantar com Seta Direita/D, Voltar com Seta Esquerda/A)
+	moveSpeed := 2.2
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) || ebiten.IsKeyPressed(ebiten.KeyD) {
+		e.onca.MoveForward(moveSpeed)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) || ebiten.IsKeyPressed(ebiten.KeyA) {
+		e.onca.MoveBackward(moveSpeed)
+	}
+
+	if (inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS)) && !e.onca.IsJumping {
 		e.audio.PlayDuck()
 	}
 
-	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
+	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
 		if e.onca.IsJumping {
 			e.onca.FastDrop()
 		} else {
@@ -294,7 +325,9 @@ func (e *Engine) Update() error {
 		e.onca.SetCrouch(false)
 	}
 
-	jumpPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeySpace)
+	jumpPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) ||
+		inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyW)
 	if jumpPressed {
 		jumped, isDouble := e.onca.Jump()
 		if jumped {
@@ -302,7 +335,9 @@ func (e *Engine) Update() error {
 		}
 	}
 
-	jumpReleased := inpututil.IsKeyJustReleased(ebiten.KeyArrowUp) || inpututil.IsKeyJustReleased(ebiten.KeySpace)
+	jumpReleased := inpututil.IsKeyJustReleased(ebiten.KeyArrowUp) ||
+		inpututil.IsKeyJustReleased(ebiten.KeySpace) ||
+		inpututil.IsKeyJustReleased(ebiten.KeyW)
 	if jumpReleased {
 		e.onca.ReleaseJump()
 	}
@@ -336,9 +371,15 @@ func (e *Engine) Update() error {
 }
 
 func (e *Engine) Draw(screen *ebiten.Image) {
+	if e.isSplashScreen {
+		ui.DrawSplashScreen(screen, ScreenWidth, ScreenHeight, e.ticks)
+		return
+	}
+
 	e.scenery.Draw(screen, ScreenWidth, GroundY, e.ticks, e.stage)
 
 	if e.isTitleScreen {
+		e.onca.Draw(screen, GroundY, e.ticks, 0)
 		if e.isShowingCredits {
 			ui.DrawCreditsScreen(screen, ScreenWidth, ScreenHeight)
 		} else {

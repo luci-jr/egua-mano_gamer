@@ -21,6 +21,7 @@ type Particle struct {
 }
 
 type Onca struct {
+	X           float64
 	Y           float64
 	VelocityY   float64
 	IsJumping   bool
@@ -33,6 +34,7 @@ type Onca struct {
 
 func NewOnca() *Onca {
 	return &Onca{
+		X:           45.0,
 		Y:           0,
 		VelocityY:   0,
 		IsJumping:   false,
@@ -44,6 +46,20 @@ func NewOnca() *Onca {
 	}
 }
 
+func (o *Onca) MoveForward(speed float64) {
+	o.X += speed
+	if o.X > 230.0 {
+		o.X = 230.0
+	}
+}
+
+func (o *Onca) MoveBackward(speed float64) {
+	o.X -= speed
+	if o.X < 15.0 {
+		o.X = 15.0
+	}
+}
+
 func (o *Onca) Jump() (jumped bool, isDouble bool) {
 	if !o.IsJumping || o.CoyoteTimer > 0 {
 		o.IsJumping = true
@@ -52,13 +68,13 @@ func (o *Onca) Jump() (jumped bool, isDouble bool) {
 		o.VelocityY = -6.8
 		o.JumpHolding = true
 		o.CoyoteTimer = 0
-		o.spawnDust(OncaPosX+10, 0, 6)
+		o.spawnDust(o.X+10, 0, 6)
 		return true, false
 	} else if o.JumpCount == 1 {
 		o.JumpCount = 2
 		o.VelocityY = -6.2
 		o.JumpHolding = true
-		o.spawnJumpBurst(OncaPosX+16, o.Y+18)
+		o.spawnJumpBurst(o.X+16, o.Y+18)
 		return true, true
 	}
 	return false, false
@@ -73,7 +89,7 @@ func (o *Onca) ReleaseJump() {
 
 func (o *Onca) SetCrouch(crouch bool) {
 	if !o.IsCrouching && crouch && !o.IsJumping {
-		o.spawnDust(OncaPosX+30, 0, 4)
+		o.spawnDust(o.X+30, 0, 4)
 	}
 	o.IsCrouching = crouch
 }
@@ -98,7 +114,7 @@ func (o *Onca) Update() {
 			o.IsJumping = false
 			o.JumpCount = 0
 			o.VelocityY = 0
-			o.spawnDust(OncaPosX+12, 0, 8)
+			o.spawnDust(o.X+12, 0, 8)
 		}
 	} else {
 		o.CoyoteTimer = 6
@@ -154,6 +170,7 @@ func (o *Onca) spawnJumpBurst(x, y float64) {
 }
 
 func (o *Onca) Reset() {
+	o.X = 45.0
 	o.Y = 0
 	o.VelocityY = 0
 	o.IsJumping = false
@@ -171,7 +188,7 @@ func (o *Onca) GetBounds(groundY float64) (x, y, w, h float64) {
 		w = 42.0
 		h = 12.0
 	}
-	x = OncaPosX
+	x = o.X
 	y = groundY - h + o.Y
 	return x, y, w, h
 }
@@ -186,6 +203,8 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 	if invincibleTicks > 0 && (invincibleTicks/4)%2 != 0 {
 		return
 	}
+
+	posX := o.X
 
 	cGold := color.RGBA{R: 235, G: 160, B: 35, A: 255}
 	cGoldLight := color.RGBA{R: 248, G: 185, B: 65, A: 255}
@@ -204,15 +223,15 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 	if o.IsCrouching {
 		oncaY := groundY - 12.0 + o.Y
 
-		ebitenutil.DrawRect(screen, OncaPosX, oncaY+2, 38, 9, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+4, oncaY+3, 30, 6, cGoldLight)
-		ebitenutil.DrawRect(screen, OncaPosX+6, oncaY+8, 26, 3, cCream)
+		ebitenutil.DrawRect(screen, posX, oncaY+2, 38, 9, cGold)
+		ebitenutil.DrawRect(screen, posX+4, oncaY+3, 30, 6, cGoldLight)
+		ebitenutil.DrawRect(screen, posX+6, oncaY+8, 26, 3, cCream)
 
-		drawRosette(OncaPosX+8, oncaY+3)
-		drawRosette(OncaPosX+18, oncaY+3)
-		drawRosette(OncaPosX+28, oncaY+4)
+		drawRosette(posX+8, oncaY+3)
+		drawRosette(posX+18, oncaY+3)
+		drawRosette(posX+28, oncaY+4)
 
-		headX := OncaPosX + 34
+		headX := posX + 34
 		headY := oncaY + 1
 		ebitenutil.DrawRect(screen, headX, headY, 9, 8, cGold)
 		ebitenutil.DrawRect(screen, headX+3, headY+5, 6, 4, cCream)
@@ -223,13 +242,13 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 		ebitenutil.DrawRect(screen, headX-1, headY, 2, 2, cEarPink)
 
 		step := float64((ticks / 4) % 2)
-		ebitenutil.DrawRect(screen, OncaPosX+4+step*2, oncaY+9, 7, 3, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+3+step*2, oncaY+11, 8, 2, cCream)
-		ebitenutil.DrawRect(screen, OncaPosX+30-step*2, oncaY+9, 7, 3, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+31-step*2, oncaY+11, 8, 2, cCream)
+		ebitenutil.DrawRect(screen, posX+4+step*2, oncaY+9, 7, 3, cGold)
+		ebitenutil.DrawRect(screen, posX+3+step*2, oncaY+11, 8, 2, cCream)
+		ebitenutil.DrawRect(screen, posX+30-step*2, oncaY+9, 7, 3, cGold)
+		ebitenutil.DrawRect(screen, posX+31-step*2, oncaY+11, 8, 2, cCream)
 
-		ebitenutil.DrawRect(screen, OncaPosX-12, oncaY+5, 13, 3, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX-15, oncaY+4, 4, 3, cSpotBlack)
+		ebitenutil.DrawRect(screen, posX-12, oncaY+5, 13, 3, cGold)
+		ebitenutil.DrawRect(screen, posX-15, oncaY+4, 4, 3, cSpotBlack)
 		return
 	}
 
@@ -244,17 +263,17 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 		bodyYOffset = 1.0
 	}
 
-	ebitenutil.DrawRect(screen, OncaPosX+3, oncaY+4+bodyYOffset, 27, 12, cGold)
-	ebitenutil.DrawRect(screen, OncaPosX+5, oncaY+5+bodyYOffset, 23, 8, cGoldLight)
-	ebitenutil.DrawRect(screen, OncaPosX+6, oncaY+13+bodyYOffset, 20, 4, cCream)
+	ebitenutil.DrawRect(screen, posX+3, oncaY+4+bodyYOffset, 27, 12, cGold)
+	ebitenutil.DrawRect(screen, posX+5, oncaY+5+bodyYOffset, 23, 8, cGoldLight)
+	ebitenutil.DrawRect(screen, posX+6, oncaY+13+bodyYOffset, 20, 4, cCream)
 
-	drawRosette(OncaPosX+6, oncaY+6+bodyYOffset)
-	drawRosette(OncaPosX+14, oncaY+7+bodyYOffset)
-	drawRosette(OncaPosX+21, oncaY+6+bodyYOffset)
-	ebitenutil.DrawRect(screen, OncaPosX+10, oncaY+12+bodyYOffset, 3, 2, cSpotBlack)
-	ebitenutil.DrawRect(screen, OncaPosX+18, oncaY+12+bodyYOffset, 3, 2, cSpotBlack)
+	drawRosette(posX+6, oncaY+6+bodyYOffset)
+	drawRosette(posX+14, oncaY+7+bodyYOffset)
+	drawRosette(posX+21, oncaY+6+bodyYOffset)
+	ebitenutil.DrawRect(screen, posX+10, oncaY+12+bodyYOffset, 3, 2, cSpotBlack)
+	ebitenutil.DrawRect(screen, posX+18, oncaY+12+bodyYOffset, 3, 2, cSpotBlack)
 
-	headX := OncaPosX + 26
+	headX := posX + 26
 	headY := oncaY + 2 + bodyYOffset
 	ebitenutil.DrawRect(screen, headX, headY, 10, 10, cGold)
 	ebitenutil.DrawRect(screen, headX+1, headY+1, 8, 7, cGoldLight)
@@ -272,47 +291,47 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 	if o.IsJumping {
 		tailWave = -2.5
 	}
-	ebitenutil.DrawRect(screen, OncaPosX-1, oncaY+9+bodyYOffset, 5, 4, cGold)
-	ebitenutil.DrawRect(screen, OncaPosX-5, oncaY+5+bodyYOffset, 5, 5, cGold)
-	ebitenutil.DrawRect(screen, OncaPosX-7, oncaY+tailWave+bodyYOffset, 4, 6, cGold)
-	ebitenutil.DrawRect(screen, OncaPosX-5, oncaY-3+tailWave+bodyYOffset, 4, 5, cSpotBlack)
-	ebitenutil.DrawRect(screen, OncaPosX-3, oncaY-4+tailWave+bodyYOffset, 3, 3, cSpotBlack)
+	ebitenutil.DrawRect(screen, posX-1, oncaY+9+bodyYOffset, 5, 4, cGold)
+	ebitenutil.DrawRect(screen, posX-5, oncaY+5+bodyYOffset, 5, 5, cGold)
+	ebitenutil.DrawRect(screen, posX-7, oncaY+tailWave+bodyYOffset, 4, 6, cGold)
+	ebitenutil.DrawRect(screen, posX-5, oncaY-3+tailWave+bodyYOffset, 4, 5, cSpotBlack)
+	ebitenutil.DrawRect(screen, posX-3, oncaY-4+tailWave+bodyYOffset, 3, 3, cSpotBlack)
 
 	switch gallopFrame {
 	case 0:
-		ebitenutil.DrawRect(screen, OncaPosX-2, oncaY+14, 6, 6, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX-5, oncaY+18, 5, 5, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX-7, oncaY+21, 5, 2, cCream)
+		ebitenutil.DrawRect(screen, posX-2, oncaY+14, 6, 6, cGold)
+		ebitenutil.DrawRect(screen, posX-5, oncaY+18, 5, 5, cGold)
+		ebitenutil.DrawRect(screen, posX-7, oncaY+21, 5, 2, cCream)
 
-		ebitenutil.DrawRect(screen, OncaPosX+24, oncaY+13, 6, 6, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+28, oncaY+17, 5, 5, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+30, oncaY+21, 5, 2, cCream)
+		ebitenutil.DrawRect(screen, posX+24, oncaY+13, 6, 6, cGold)
+		ebitenutil.DrawRect(screen, posX+28, oncaY+17, 5, 5, cGold)
+		ebitenutil.DrawRect(screen, posX+30, oncaY+21, 5, 2, cCream)
 
 	case 1:
-		ebitenutil.DrawRect(screen, OncaPosX+2, oncaY+15, 6, 5, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+1, oncaY+18, 5, 4, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX, oncaY+21, 5, 2, cCream)
+		ebitenutil.DrawRect(screen, posX+2, oncaY+15, 6, 5, cGold)
+		ebitenutil.DrawRect(screen, posX+1, oncaY+18, 5, 4, cGold)
+		ebitenutil.DrawRect(screen, posX, oncaY+21, 5, 2, cCream)
 
-		ebitenutil.DrawRect(screen, OncaPosX+22, oncaY+14, 6, 5, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+25, oncaY+17, 5, 5, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+26, oncaY+21, 5, 2, cCream)
+		ebitenutil.DrawRect(screen, posX+22, oncaY+14, 6, 5, cGold)
+		ebitenutil.DrawRect(screen, posX+25, oncaY+17, 5, 5, cGold)
+		ebitenutil.DrawRect(screen, posX+26, oncaY+21, 5, 2, cCream)
 
 	case 2:
-		ebitenutil.DrawRect(screen, OncaPosX+8, oncaY+14, 6, 5, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+10, oncaY+17, 5, 5, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+11, oncaY+21, 5, 2, cCream)
+		ebitenutil.DrawRect(screen, posX+8, oncaY+14, 6, 5, cGold)
+		ebitenutil.DrawRect(screen, posX+10, oncaY+17, 5, 5, cGold)
+		ebitenutil.DrawRect(screen, posX+11, oncaY+21, 5, 2, cCream)
 
-		ebitenutil.DrawRect(screen, OncaPosX+17, oncaY+14, 6, 5, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+18, oncaY+17, 5, 5, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+19, oncaY+21, 5, 2, cCream)
+		ebitenutil.DrawRect(screen, posX+17, oncaY+14, 6, 5, cGold)
+		ebitenutil.DrawRect(screen, posX+18, oncaY+17, 5, 5, cGold)
+		ebitenutil.DrawRect(screen, posX+19, oncaY+21, 5, 2, cCream)
 
 	case 3:
-		ebitenutil.DrawRect(screen, OncaPosX+5, oncaY+14, 6, 5, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+3, oncaY+18, 5, 4, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+2, oncaY+21, 5, 2, cCream)
+		ebitenutil.DrawRect(screen, posX+5, oncaY+14, 6, 5, cGold)
+		ebitenutil.DrawRect(screen, posX+3, oncaY+18, 5, 4, cGold)
+		ebitenutil.DrawRect(screen, posX+2, oncaY+21, 5, 2, cCream)
 
-		ebitenutil.DrawRect(screen, OncaPosX+20, oncaY+13, 6, 6, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+23, oncaY+17, 5, 5, cGold)
-		ebitenutil.DrawRect(screen, OncaPosX+24, oncaY+21, 5, 2, cCream)
+		ebitenutil.DrawRect(screen, posX+20, oncaY+13, 6, 6, cGold)
+		ebitenutil.DrawRect(screen, posX+23, oncaY+17, 5, 5, cGold)
+		ebitenutil.DrawRect(screen, posX+24, oncaY+21, 5, 2, cCream)
 	}
 }
