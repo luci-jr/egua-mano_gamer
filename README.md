@@ -173,10 +173,12 @@ paidegua-game/
 │       └── input_wasm.go        # Build tag para WebAssembly via syscall/js
 ├── assets/
 │   ├── capa_paidegua.jpg        # Capa oficial no estilo Pitfall: The Mayan Adventure
-│   ├── fase1_ver_o_peso.jpg     # Foto artística do Mercado do Ver-o-Peso
-│   ├── fase2_estacao_das_docas.jpg # Foto artística da Estação das Docas
-│   ├── fase3_theatro_da_paz.jpg # Foto artística do Theatro da Paz
-│   └── sao_bras.jpg             # Arte histórica do Mercado de São Brás
+│   ├── bg_fase1_8bit.png        # Arte 8-bit retrô do Mercado do Ver-o-Peso
+│   ├── bg_fase2_8bit.png        # Arte 8-bit retrô da Estação das Docas
+│   ├── bg_fase3_8bit.png        # Arte 8-bit retrô do Theatro da Paz
+│   ├── fase1_ver_o_peso.jpg     # Foto artística de referência do Ver-o-Peso
+│   ├── fase2_estacao_das_docas.jpg # Foto artística de referência das Docas
+│   └── fase3_theatro_da_paz.jpg # Foto artística de referência do Theatro da Paz
 ├── docs/                        # Build WebAssembly para GitHub Pages
 │   ├── index.html               # Página web com controles touch e barra de curiosidades
 │   ├── game.wasm                # Binário WebAssembly compilado
