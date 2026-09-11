@@ -59,28 +59,26 @@ O jogo conta com fluxo dinâmico de múltiplos obstáculos na tela simultaneamen
 ### 🐟 1. Mercado do Ver-o-Peso (0 a 1000 pontos)
 * **Cenário:** O crepúsculo alaranjado sobre a **Baía do Guajará**, barcos de madeira navegando, **Mercado de Ferro com cúpulas neogóticas** e calçadão de pedras.
 * **Obstáculos Temáticos:**
-  * 🧺 **Paneiro de Açaí:** Cesto de palha trançada transbordando açaí roxo *(Pular)*.
+  * 🧺 **Paneiro de Açaí:** Cesto tradicional de palha trançada com açaí roxo *(Pular)*.
   * 🦅 **Urubu do Ver-o-Peso:** Voando a meia altura *(Abaixar / Rastejar)*.
-  * 🐊 **Jacaré-Açu da Amazônia:** Réptil gigante com bocarra aberta e dentes brancos afiados *(Pular)*.
+  * 🐊 **Jacaré-Açu da Amazônia:** Réptil com bocarra aberta e dentes brancos afiados *(Pular)*.
   * 🐍 **Cobra-Coral da Floresta:** Serpente rápida ondulando no solo com língua bífida *(Pular)*.
-  * 🌧️ **Poça da Chuva das 4h:** Poça d'água paraense com reflexo azul e respingos *(Pulo Rápido)*.
 
 ### ⚓ 2. Estação das Docas (1001 a 2000 pontos)
 * **Cenário:** Os emblemáticos **galpões ingleses de ferro vermelho**, os imponentes **guindastes portuários amarelos** e o deck de madeira à beira da baía.
 * **Obstáculos Temáticos:**
-  * 🐊 **Jacaré no Cais das Docas:** O temível réptil que subiu da Baía do Guajará *(Pular - Substituiu os barris!)*.
+  * 🐊 **Jacaré no Cais das Docas:** O temível réptil que subiu da Baía do Guajará *(Pular)*.
   * 🐍 **Cobra-Coral Amazônica:** Serpente venenosa rastejante com anéis vibrantes *(Pular)*.
   * 🕊️ **Gaivota da Baía:** Pássaro rasante com asas animadas *(Abaixar / Rastejar)*.
-  * 🌊 **Poça Salina da Maré:** Água esmeralda do Guajará na beirada do deque *(Pulo Rápido)*.
+  * 🧺 **Paneiro de Açaí:** Cesto com frutos amazônicos *(Pular)*.
 
 ### 🎭 3. Theatro da Paz & Mangueiras (2001 a 3000 pontos - Vitória Final!)
 * **Cenário:** Fachada neoclássica do **Theatro da Paz**, **Mangueiras centenárias de Belém** com mangas douradas e calçada de pedras portuguesas.
 * **Obstáculos Temáticos:**
   * 🥭 **Cesto de Castanhas e Frutos:** Cesto artesanal com castanhas e cupuaçus *(Pular)*.
   * 🦜 **Arara / Maritaca Amazônica:** Ave verde e amarela sobrevoando veloz *(Abaixar / Rastejar)*.
-  * 🐊 **Jacaré Lendário Urbano:** Desafio reptiliano nos arredores da Praça da República *(Pular)*.
+  * 🐊 **Jacaré-Açu:** Desafio reptiliano nos arredores da Praça da República *(Pular)*.
   * 🐍 **Cobra da Amazônia:** Serpente rasteira em alta velocidade *(Pular)*.
-  * 🏛️ **Pilha de Cestas Nobres:** Obstáculo vertical ornamentado *(Pulo Duplo)*.
 
 ---
 
