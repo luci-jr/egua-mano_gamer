@@ -439,7 +439,8 @@ func (e *Engine) Update() error {
 	}
 
 	oncaX, oncaY, oncaW, oncaH := e.onca.GetBounds(GroundY)
-	if e.obstacles.CheckCollision(oncaX, oncaY, oncaW, oncaH) && e.invincibleTicks <= 0 {
+	hit, hitType := e.obstacles.CheckCollision(oncaX, oncaY, oncaW, oncaH)
+	if hit && e.invincibleTicks <= 0 {
 		e.hearts--
 		e.shakeTimer = 14
 		if e.hearts <= 0 {
@@ -461,7 +462,13 @@ func (e *Engine) Update() error {
 				e.audio.PlayHit()
 			}
 		} else {
-			e.speechBubbleText = "EGUA MANO!..."
+			if hitType == entities.TypeJacare {
+				e.speechBubbleText = "EGUA DO JACARE!..."
+			} else if hitType == entities.TypeSnake {
+				e.speechBubbleText = "VALHA-ME! UMA COBRA!"
+			} else {
+				e.speechBubbleText = "EGUA MANO!..."
+			}
 			e.speechBubbleTimer = 65
 			e.hitDelayTimer = 22
 			e.invincibleTicks = 75
