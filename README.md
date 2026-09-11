@@ -148,13 +148,14 @@ paidegua-game/
 
 Ao invés de carregar arquivos `.wav` ou `.mp3` pesados, todos os efeitos e músicas são **sintetizados matematicamente em tempo real** diretamente na memória:
 
-1. **Trilha de Carimbó (BGM):**
-   * Curimbó grave (82Hz) e repiques de aro sincopados.
-   * Melodia aveludada em ondas senoidais estilo marimba/flauta em loop contínuo via `audio.NewInfiniteLoop`.
-   * Sem ruídos estridentes, com mixagem suave de fundo.
-2. **Rugido Felino da Onça (*Feline Roar*):**
+1. **Trilha Suave de São Brás (Intro BGM):**
+   * Melodia nostálgica, serena e aveludada inspirada na brisa das tardes de Belém, tocando na tela de abertura do Mercado de São Brás.
+2. **Trilha de Carimbó da Corrida (Gameplay BGM):**
+   * Curimbó grave (82Hz), repiques sincopados e marimba procedural em loop contínuo via `audio.NewInfiniteLoop`.
+   * Mixagem alegre e festiva ao estilo dos ritmos paraenses durante toda a corrida.
+3. **Rugido Felino da Onça (*Feline Roar*):**
    * Sintetizado com frequência base grave (85Hz a 110Hz) modulada por tremolo de garganta (38Hz) e respiração felina.
-3. **Impacto e Danos:**
+4. **Impacto e Danos:**
    * Punch grave com decaimento exponencial suave.
 
 ---

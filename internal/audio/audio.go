@@ -19,7 +19,9 @@ type Manager struct {
 	sndGameOver   []byte
 	sndStageUp    []byte
 	bgmPlayer     *ebitenaudio.Player
+	introPlayer   *ebitenaudio.Player
 	isMuted       bool
+	isIntroActive bool
 }
 
 func createRoar(isDouble bool) []byte {
@@ -247,6 +249,76 @@ func createCarimboBGM() []byte {
 	return buf
 }
 
+func createSaoBrasIntroBGM() []byte {
+	// Melodia suave, nostálgica e aconchegante inspirada na brisa de Belém (Mercado de São Brás)
+	melodyNotes := []float64{
+		261.63, 329.63, 392.00, 523.25, // C - E - G - C
+		329.63, 392.00, 493.88, 659.25, // E - G - B - E
+		349.23, 440.00, 523.25, 698.46, // F - A - C - F
+		392.00, 493.88, 587.33, 783.99, // G - B - D - G
+		440.00, 523.25, 659.25, 523.25, // A - C - E - C
+		349.23, 440.00, 523.25, 440.00, // F - A - C - A
+		392.00, 329.63, 293.66, 246.94, // G - E - D - B
+		261.63, 329.63, 392.00, 261.63, // C - E - G - C
+	}
+
+	bassNotes := []float64{
+		130.81, 130.81, 130.81, 130.81, // C3
+		164.81, 164.81, 164.81, 164.81, // E3
+		174.61, 174.61, 174.61, 174.61, // F3
+		196.00, 196.00, 196.00, 196.00, // G3
+		220.00, 220.00, 220.00, 220.00, // A3
+		174.61, 174.61, 174.61, 174.61, // F3
+		196.00, 196.00, 196.00, 196.00, // G3
+		130.81, 130.81, 130.81, 130.81, // C3
+	}
+
+	noteMs := 240 // Andamento sereno e aveludado (~240ms por nota)
+	totalSamples := (sampleRate * noteMs / 1000) * len(melodyNotes)
+	buf := make([]byte, totalSamples*4)
+
+	sampleIdx := 0
+	melPhase := 0.0
+	bassPhase := 0.0
+
+	for step := 0; step < len(melodyNotes); step++ {
+		melFreq := melodyNotes[step]
+		bassFreq := bassNotes[step]
+		stepSamples := sampleRate * noteMs / 1000
+
+		for s := 0; s < stepSamples; s++ {
+			t := float64(s) / float64(stepSamples)
+
+			melPhase += 2.0 * math.Pi * melFreq / float64(sampleRate)
+			bassPhase += 2.0 * math.Pi * bassFreq / float64(sampleRate)
+
+			// Onda suave com harmônico aveludado estilo marimba / xilofone
+			melVal := math.Sin(melPhase) + 0.22*math.Sin(melPhase*2.0)
+			melAttack := math.Min(1.0, float64(s)/float64(sampleRate*0.035))
+			melDecay := math.Exp(-2.4 * t)
+			melEnvelope := melAttack * melDecay
+
+			// Baixo harmônico quente
+			bassVal := math.Sin(bassPhase)
+			bassAttack := math.Min(1.0, float64(s)/float64(sampleRate*0.04))
+			bassDecay := math.Exp(-1.9 * t)
+			bassEnvelope := bassAttack * bassDecay
+
+			mix := (melVal*melEnvelope*0.14 + bassVal*bassEnvelope*0.16)
+			sample := int16(mix * 32767.0)
+
+			idx := sampleIdx * 4
+			buf[idx] = byte(sample)
+			buf[idx+1] = byte(sample >> 8)
+			buf[idx+2] = byte(sample)
+			buf[idx+3] = byte(sample >> 8)
+
+			sampleIdx++
+		}
+	}
+	return buf
+}
+
 func NewManager() *Manager {
 	ctx := ebitenaudio.NewContext(sampleRate)
 
@@ -260,30 +332,51 @@ func NewManager() *Manager {
 		sndGameOver:   createSmoothTone(320, 95, 450, 0.3),
 		sndStageUp:    createStageUpJingle(),
 		isMuted:       false,
+		isIntroActive: false,
 	}
 
 	bgmBytes := createCarimboBGM()
-	loop := ebitenaudio.NewInfiniteLoop(bytes.NewReader(bgmBytes), int64(len(bgmBytes)))
-	player, err := ctx.NewPlayer(loop)
+	bgmLoop := ebitenaudio.NewInfiniteLoop(bytes.NewReader(bgmBytes), int64(len(bgmBytes)))
+	bgmPlayer, err := ctx.NewPlayer(bgmLoop)
 	if err == nil {
-		player.SetVolume(0.32)
-		m.bgmPlayer = player
-		m.bgmPlayer.Play()
+		bgmPlayer.SetVolume(0.32)
+		m.bgmPlayer = bgmPlayer
+	}
+
+	introBytes := createSaoBrasIntroBGM()
+	introLoop := ebitenaudio.NewInfiniteLoop(bytes.NewReader(introBytes), int64(len(introBytes)))
+	introPlayer, err := ctx.NewPlayer(introLoop)
+	if err == nil {
+		introPlayer.SetVolume(0.28)
+		m.introPlayer = introPlayer
 	}
 
 	return m
 }
 
+func (m *Manager) PlayIntroBGM() {
+	m.isIntroActive = true
+	if m.bgmPlayer != nil && m.bgmPlayer.IsPlaying() {
+		m.bgmPlayer.Pause()
+	}
+	if !m.isMuted && m.introPlayer != nil && !m.introPlayer.IsPlaying() {
+		m.introPlayer.Play()
+	}
+}
+
+func (m *Manager) StopIntroBGM() {
+	m.isIntroActive = false
+	if m.introPlayer != nil && m.introPlayer.IsPlaying() {
+		m.introPlayer.Pause()
+	}
+}
+
 func (m *Manager) ToggleMute() bool {
 	m.isMuted = !m.isMuted
 	if m.isMuted {
-		if m.bgmPlayer != nil && m.bgmPlayer.IsPlaying() {
-			m.bgmPlayer.Pause()
-		}
+		m.PauseBGM()
 	} else {
-		if m.bgmPlayer != nil && !m.bgmPlayer.IsPlaying() {
-			m.bgmPlayer.Play()
-		}
+		m.ResumeBGM()
 	}
 	return !m.isMuted
 }
@@ -340,15 +433,28 @@ func (m *Manager) PauseBGM() {
 	if m.bgmPlayer != nil && m.bgmPlayer.IsPlaying() {
 		m.bgmPlayer.Pause()
 	}
+	if m.introPlayer != nil && m.introPlayer.IsPlaying() {
+		m.introPlayer.Pause()
+	}
 }
 
 func (m *Manager) ResumeBGM() {
-	if !m.isMuted && m.bgmPlayer != nil && !m.bgmPlayer.IsPlaying() {
-		m.bgmPlayer.Play()
+	if m.isMuted {
+		return
+	}
+	if m.isIntroActive {
+		if m.introPlayer != nil && !m.introPlayer.IsPlaying() {
+			m.introPlayer.Play()
+		}
+	} else {
+		if m.bgmPlayer != nil && !m.bgmPlayer.IsPlaying() {
+			m.bgmPlayer.Play()
+		}
 	}
 }
 
 func (m *Manager) RestartBGM() {
+	m.StopIntroBGM()
 	if m.bgmPlayer != nil {
 		_ = m.bgmPlayer.Rewind()
 		if !m.isMuted {
