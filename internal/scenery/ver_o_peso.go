@@ -226,13 +226,18 @@ func (b *Background) drawAmazonRuins(screen *ebiten.Image, screenWidth, groundY 
 		ebitenutil.DrawRect(screen, leafX+3, 26, 8, 4, canopyLight)
 	}
 
-	// Cipós pendurados balançando suavemente no fundo (decorativos)
-	cVineBg := color.RGBA{R: 32, G: 60, B: 24, A: 210}
-	for v := 0; v < 4; v++ {
-		vx := float64(v*90) + 30.0 - math.Mod(b.scrollOffset*0.3, 90.0)
-		swing := math.Sin(float64(ticks+v*30)*0.04) * 4.0
-		ebitenutil.DrawLine(screen, vx, 14, vx+swing, groundY-40, cVineBg)
-		ebitenutil.DrawLine(screen, vx+1, 14, vx+swing+1, groundY-40, cVineBg)
+	// Postes coloniais de ferro fundido de Belém ao longo do cais (iluminação histórica)
+	lampIron := color.RGBA{R: 28, G: 32, B: 42, A: 255}
+	lampGlow := color.RGBA{R: 255, G: 215, B: 90, A: 220}
+	for p := 0; p < 3; p++ {
+		px := float64(p*120) + 40.0 - math.Mod(b.scrollOffset*0.35, 120.0)
+		// Haste do poste
+		ebitenutil.DrawRect(screen, px, groundY-48, 2, 48, lampIron)
+		// Suporte da luminária
+		ebitenutil.DrawRect(screen, px-2, groundY-50, 6, 2, lampIron)
+		ebitenutil.DrawRect(screen, px-1, groundY-52, 4, 3, lampIron)
+		// Brilho dourado da lâmpada
+		ebitenutil.DrawRect(screen, px-1, groundY-49, 4, 3, lampGlow)
 	}
 
 	// Sumaúmas gigantes no horizonte (Parallax distante)

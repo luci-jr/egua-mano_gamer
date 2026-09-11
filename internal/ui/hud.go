@@ -145,7 +145,7 @@ func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, 
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("RELIQUIAS: %d", relicsCount), 18, 22)
 
 	// Medidor de distância da corrida para a chegada da fase
-	targetDist := 1200
+	targetDist := 2800
 	currDist := int(stageDistance)
 	if currDist > targetDist {
 		currDist = targetDist
@@ -298,8 +298,8 @@ func DrawTitleCoverScreen(screen *ebiten.Image, screenWidth, screenHeight float6
 	ebitenutil.DrawRect(screen, logoX, logoY, 2, logoH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 	ebitenutil.DrawRect(screen, logoX+logoW, logoY, 2, logoH+2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 
-	ebitenutil.DebugPrintAt(screen, "★ P A I D E G U A   G A M E ★", int(logoX)+56, int(logoY)+5)
-	ebitenutil.DebugPrintAt(screen, "UMA AVENTURA PELA CIDADE DE BELEM DO PARA", int(logoX)+22, int(logoY)+17)
+	ebitenutil.DebugPrintAt(screen, "★ P A I D ' E G U A   R U N N E R ★", int(logoX)+46, int(logoY)+5)
+	ebitenutil.DebugPrintAt(screen, "UMA AVENTURA EM BELEM DO PARA", int(logoX)+54, int(logoY)+17)
 
 	// Badge com a versão no canto superior direito
 	verW := float64(len(version)*6 + 12)
@@ -426,9 +426,9 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 
 	if isAudioPlaying {
-		ebitenutil.DebugPrintAt(screen, "★ TRILHA SONORA: GUITARRADA & CARIMBO PROCEDURAL ★", 18, int(bannerY)+3)
+		ebitenutil.DebugPrintAt(screen, "★ TRILHA SONORA: PINDUCA - A DANCA DO CARIMBO ★", 24, int(bannerY)+3)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "★ PAIDEGUA GAME: AVENTURA EM BELEM DO PARA ★", 24, int(bannerY)+3)
+		ebitenutil.DebugPrintAt(screen, "★ PAID'EGUA RUNNER: UMA AVENTURA EM BELEM DO PARA ★", 10, int(bannerY)+3)
 	}
 
 	// Letreiro de ação e cultura paraense
@@ -534,7 +534,7 @@ func DrawCharacterSelectScreen(screen *ebiten.Image, screenWidth, screenHeight f
 	ebitenutil.DebugPrintAt(screen, "Arma: Baladeira", tx0, int(cardY)+25)
 	ebitenutil.DebugPrintAt(screen, "Tiro: Acai veloz", tx0, int(cardY)+37)
 	ebitenutil.DebugPrintAt(screen, "Pulo: Salto Duplo", tx0, int(cardY)+49)
-	ebitenutil.DebugPrintAt(screen, "Cipo: Agil no ar", tx0, int(cardY)+61)
+	ebitenutil.DebugPrintAt(screen, "Esquiva: Agil no ar", tx0, int(cardY)+61)
 	ebitenutil.DebugPrintAt(screen, "Modo: Aventureiro", tx0, int(cardY)+73)
 
 	// Divisória inferior do card
@@ -612,7 +612,7 @@ func DrawCharacterSelectScreen(screen *ebiten.Image, screenWidth, screenHeight f
 	ebitenutil.DebugPrintAt(screen, "Arma: Rugido", tx1, int(cardY)+25)
 	ebitenutil.DebugPrintAt(screen, "Tiro: Onda sonica", tx1, int(cardY)+37)
 	ebitenutil.DebugPrintAt(screen, "Pulo: Bote Feroz", tx1, int(cardY)+49)
-	ebitenutil.DebugPrintAt(screen, "Cipo: Garra firme", tx1, int(cardY)+61)
+	ebitenutil.DebugPrintAt(screen, "Passada: 2.4x rapida", tx1, int(cardY)+61)
 	ebitenutil.DebugPrintAt(screen, "Modo: Predadora", tx1, int(cardY)+73)
 
 	// Divisória inferior do card
@@ -694,7 +694,7 @@ func DrawCreditsScreen(screen *ebiten.Image, screenWidth, screenHeight float64) 
 	bx := int(boxX)
 	by := int(boxY)
 
-	ebitenutil.DebugPrintAt(screen, "★ CREDITOS - PAIDEGUA ★", bx+34, by+8)
+	ebitenutil.DebugPrintAt(screen, "★ CREDITOS - PAID'EGUA RUNNER ★", bx+12, by+8)
 	ebitenutil.DrawRect(screen, boxX+10, boxY+21, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
 
 	ebitenutil.DebugPrintAt(screen, "Desenvolvedor: Luci Junior", bx+14, by+26)
@@ -724,7 +724,7 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 	bx := int(boxX)
 	by := int(boxY)
 
-	ebitenutil.DebugPrintAt(screen, "PAUSA - PAIDEGUA", bx+56, by+8)
+	ebitenutil.DebugPrintAt(screen, "PAUSA - PAID'EGUA RUNNER", bx+34, by+8)
 	ebitenutil.DrawRect(screen, boxX+10, boxY+22, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
 
 	soundStatus := "Som: [ LIGADO ]"
@@ -1040,4 +1040,179 @@ func DrawSpeechBubble(screen *ebiten.Image, x, y float64, text string) {
 
 	// Texto da giria
 	ebitenutil.DebugPrintAt(screen, text, int(x)+7, int(y)+3)
+}
+
+// drawPopopoBoat renderiza o tradicional barco paraense de madeira (popopó) em pixel art
+func drawPopopoBoat(screen *ebiten.Image, x, y float64, ticks int) {
+	hullColor := color.RGBA{R: 28, G: 74, B: 140, A: 255}   // Azul amazônico
+	hullStripe := color.RGBA{R: 245, G: 195, B: 35, A: 255} // Listra amarela
+	cabinColor := color.RGBA{R: 240, G: 240, B: 245, A: 255} // Branco
+	roofColor := color.RGBA{R: 190, G: 35, B: 35, A: 255}    // Toldo vermelho
+	windowColor := color.RGBA{R: 20, G: 30, B: 50, A: 255}
+
+	// Casco de madeira
+	ebitenutil.DrawRect(screen, x+4, y+10, 28, 8, hullColor)
+	ebitenutil.DrawRect(screen, x+2, y+12, 32, 6, hullColor)
+	ebitenutil.DrawRect(screen, x+32, y+10, 4, 4, hullColor) // Proa elevada
+	ebitenutil.DrawRect(screen, x+3, y+13, 30, 2, hullStripe)
+
+	// Cabine com janelinhas
+	ebitenutil.DrawRect(screen, x+8, y+2, 18, 9, cabinColor)
+	ebitenutil.DrawRect(screen, x+6, y, 22, 3, roofColor)
+	ebitenutil.DrawRect(screen, x+10, y+4, 3, 4, windowColor)
+	ebitenutil.DrawRect(screen, x+15, y+4, 3, 4, windowColor)
+	ebitenutil.DrawRect(screen, x+20, y+4, 3, 4, windowColor)
+
+	// Chaminé na popa soltando fumaça "po-po-pó"
+	ebitenutil.DrawRect(screen, x+6, y-3, 2, 4, color.RGBA{R: 50, G: 50, B: 55, A: 255})
+	for f := 0; f < 3; f++ {
+		smokeTimer := (ticks*2 + f*22) % 60
+		sX := x + 6 - float64(smokeTimer)*0.45
+		sY := y - 4 - float64(smokeTimer)*0.35
+		alpha := uint8(220 - smokeTimer*3)
+		if alpha > 0 && smokeTimer < 52 {
+			sz := 2.0 + float64(smokeTimer/18)
+			ebitenutil.DrawRect(screen, sX, sY, sz, sz, color.RGBA{R: 230, G: 235, B: 245, A: alpha})
+		}
+	}
+
+	// Mastro e Bandeirinha do Pará balançando
+	ebitenutil.DrawRect(screen, x+26, y-6, 1, 8, color.RGBA{R: 200, G: 200, B: 200, A: 255})
+	flagWave := int(math.Sin(float64(ticks)*0.2) * 1.5)
+	ebitenutil.DrawRect(screen, x+27, y-6+float64(flagWave), 4, 3, color.RGBA{R: 220, G: 40, B: 40, A: 255})
+
+	// Espuma de água na proa cortando as ondas
+	foamW := 2.0 + math.Sin(float64(ticks)*0.3)*1.5
+	ebitenutil.DrawRect(screen, x+34, y+15, foamW+3, 2, color.RGBA{R: 240, G: 250, B: 255, A: 220})
+}
+
+// DrawStageTransitionLoadingScreen renderiza a tela de transição náutica e cultural de Belém entre as fases
+func DrawStageTransitionLoadingScreen(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int, nextStage int, progress float64) {
+	if progress < 0.0 {
+		progress = 0.0
+	}
+	if progress > 1.0 {
+		progress = 1.0
+	}
+
+	// 1. Céu crepuscular sobre a Baía do Guajará (degradê roxo-açaí para dourado-pôr-do-sol)
+	skyH := screenHeight * 0.58
+	for y := 0.0; y < skyH; y += 2.0 {
+		t := y / skyH
+		r := uint8(20*(1.0-t) + 215*t)
+		g := uint8(24*(1.0-t) + 115*t)
+		b := uint8(65*(1.0-t) + 40*t)
+		ebitenutil.DrawRect(screen, 0, y, screenWidth, 2.0, color.RGBA{R: r, G: g, B: b, A: 255})
+	}
+
+	// Sol poente no horizonte de Belém
+	sunY := skyH - 14.0
+	ebitenutil.DrawRect(screen, 155.0, sunY, 32, 16, color.RGBA{R: 255, G: 215, B: 90, A: 210})
+	ebitenutil.DrawRect(screen, 159.0, sunY-3, 24, 22, color.RGBA{R: 255, G: 235, B: 140, A: 230})
+
+	// Silhueta distante de Belém no horizonte (torres da Sé, casario histórico, mangueiras e guindastes)
+	horizonY := skyH - 10.0
+	cSil := color.RGBA{R: 22, G: 16, B: 28, A: 255}
+	ebitenutil.DrawRect(screen, 26, horizonY-14, 8, 14, cSil)   // Torre da Sé
+	ebitenutil.DrawRect(screen, 28, horizonY-18, 4, 4, cSil)    // Cúpula
+	ebitenutil.DrawRect(screen, 50, horizonY-8, 24, 8, cSil)    // Casario
+	ebitenutil.DrawRect(screen, 105, horizonY-13, 16, 13, cSil) // Copa de mangueira centenária
+	ebitenutil.DrawRect(screen, 250, horizonY-16, 3, 16, cSil)  // Guindaste inglês
+	ebitenutil.DrawRect(screen, 246, horizonY-16, 12, 3, cSil)
+
+	// Urubus e garças distantes voando no horizonte
+	drawFlyingUrubu(screen, 70.0+math.Mod(float64(ticks)*0.4, 280.0), 22.0, ticks)
+	drawFlyingGarca(screen, 280.0-math.Mod(float64(ticks)*0.6, 300.0), 32.0, ticks)
+
+	// 2. Águas da Baía do Guajará com reflexos dourados e ondulação
+	waterY := skyH
+	waterH := screenHeight - waterY
+	ebitenutil.DrawRect(screen, 0, waterY, screenWidth, waterH, color.RGBA{R: 16, G: 36, B: 68, A: 255})
+	for wy := waterY; wy < screenHeight; wy += 4.0 {
+		wt := (wy - waterY) / waterH
+		r := uint8(20*(1.0-wt) + 8*wt)
+		g := uint8(50*(1.0-wt) + 20*wt)
+		b := uint8(95*(1.0-wt) + 38*wt)
+		ebitenutil.DrawRect(screen, 0, wy, screenWidth, 4.0, color.RGBA{R: r, G: g, B: b, A: 255})
+
+		// Brilho cintilante da água
+		waveOffset := math.Sin(float64(ticks)*0.08 + wy*0.5) * 8.0
+		ebitenutil.DrawRect(screen, 150.0+waveOffset, wy, 42.0*(1.0-wt*0.5), 1.0, color.RGBA{R: 255, G: 215, B: 120, A: uint8(140 - wt*100)})
+	}
+
+	// 3. Barquinho Popopó tradicional navegando pela Baía
+	boatBaseX := 20.0 + progress*(screenWidth-85.0)
+	boatBob := math.Sin(float64(ticks)*0.12) * 2.5
+	boatY := waterY - 14.0 + boatBob
+	drawPopopoBoat(screen, boatBaseX, boatY, ticks)
+
+	// Som do motor "popopo~"
+	if (ticks/20)%3 == 0 {
+		ebitenutil.DebugPrintAt(screen, "popopo~", int(boatBaseX)+36, int(boatY)-8)
+	}
+
+	// 4. Placa Superior de Destino & Lore Cultural
+	cardW := 294.0
+	cardH := 52.0
+	cardX := (screenWidth - cardW) / 2.0
+	cardY := 10.0
+
+	ebitenutil.DrawRect(screen, cardX+2, cardY+2, cardW, cardH, color.RGBA{R: 0, G: 0, B: 0, A: 160})
+	ebitenutil.DrawRect(screen, cardX, cardY, cardW, cardH, color.RGBA{R: 14, G: 20, B: 34, A: 245})
+	ebitenutil.DrawRect(screen, cardX, cardY, cardW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, cardX, cardY+cardH, cardW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, cardX, cardY, 2, cardH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, cardX+cardW, cardY, 2, cardH+2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+
+	var stageTitle, stageRoute, stageLore string
+	switch nextStage {
+	case 2:
+		stageTitle = "★ PROXIMA PARADA: ESTACAO DAS DOCAS ★"
+		stageRoute = "Travessia fluvial: Mercado do Ver-o-Peso -> Docas"
+		stageLore = "Dica: Guindastes historicos europeus e jacares no cais!"
+	case 3:
+		stageTitle = "★ PROXIMA PARADA: THEATRO DA PAZ & MANGUEIRAS ★"
+		stageRoute = "Subindo a Av. Presidente Vargas sob as mangueiras"
+		stageLore = "Dica: Fundado em 1878, joia neoclassica da Amazonia!"
+	default:
+		stageTitle = "★ RETORNANDO AO MERCADO DO VER-O-PESO ★"
+		stageRoute = "A maior feira a ceu aberto da America Latina"
+		stageLore = "Dica: Acai fresquinho e peixe frito com farinha d'agua!"
+	}
+
+	ebitenutil.DebugPrintAt(screen, stageTitle, int(cardX)+18, int(cardY)+6)
+	ebitenutil.DrawRect(screen, cardX+10, cardY+18, cardW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 140})
+	ebitenutil.DebugPrintAt(screen, stageRoute, int(cardX)+12, int(cardY)+23)
+	ebitenutil.DebugPrintAt(screen, stageLore, int(cardX)+12, int(cardY)+36)
+
+	// 5. Barra de Carregamento Náutica Inferior
+	barBoxW := 270.0
+	barBoxH := 28.0
+	barBoxX := (screenWidth - barBoxW) / 2.0
+	barBoxY := screenHeight - barBoxH - 8.0
+
+	ebitenutil.DrawRect(screen, barBoxX+2, barBoxY+2, barBoxW, barBoxH, color.RGBA{R: 0, G: 0, B: 0, A: 160})
+	ebitenutil.DrawRect(screen, barBoxX, barBoxY, barBoxW, barBoxH, color.RGBA{R: 12, G: 18, B: 30, A: 245})
+	ebitenutil.DrawRect(screen, barBoxX, barBoxY, barBoxW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 220})
+	ebitenutil.DrawRect(screen, barBoxX, barBoxY+barBoxH, barBoxW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 220})
+
+	// Trilho da barra
+	fillTrackW := barBoxW - 20.0
+	fillTrackH := 8.0
+	fillX := barBoxX + 10.0
+	fillY := barBoxY + 6.0
+	ebitenutil.DrawRect(screen, fillX, fillY, fillTrackW, fillTrackH, color.RGBA{R: 25, G: 32, B: 48, A: 255})
+
+	// Preenchimento em verde floresta / dourado
+	fillW := fillTrackW * progress
+	ebitenutil.DrawRect(screen, fillX, fillY, fillW, fillTrackH, color.RGBA{R: 42, G: 165, B: 85, A: 255})
+	ebitenutil.DrawRect(screen, fillX, fillY, fillW, 2, color.RGBA{R: 110, G: 235, B: 140, A: 255})
+
+	// Texto de porcentagem e pontinhos animados
+	dots := strings.Repeat(".", (ticks/18)%4)
+	pctText := fmt.Sprintf("VIAJANDO POR BELEM: %3d%%%s", int(progress*100), dots)
+	ebitenutil.DebugPrintAt(screen, pctText, int(barBoxX)+14, int(barBoxY)+16)
+
+	// Atalho rápido
+	ebitenutil.DebugPrintAt(screen, "[ENTER] Pular >>", int(barBoxX)+176, int(barBoxY)+16)
 }
