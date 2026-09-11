@@ -1,0 +1,300 @@
+package entities
+
+import (
+	"fmt"
+	"image/color"
+	"math"
+
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+)
+
+const (
+	ProjKindAcai = 0
+	ProjKindRoar = 1
+)
+
+type Projectile struct {
+	X       float64
+	Y       float64
+	VX      float64
+	VY      float64
+	Kind    int
+	Active  bool
+	Life    int
+	MaxLife int
+}
+
+func NewProjectile(x, y, vx, vy float64, kind int) *Projectile {
+	return &Projectile{
+		X:       x,
+		Y:       y,
+		VX:      vx,
+		VY:      vy,
+		Kind:    kind,
+		Active:  true,
+		Life:    0,
+		MaxLife: 85,
+	}
+}
+
+func (p *Projectile) GetBounds() (x, y, w, h float64) {
+	if p.Kind == ProjKindRoar {
+		return p.X - 4.0, p.Y - 5.0, 10.0, 10.0
+	}
+	return p.X - 3.0, p.Y - 3.0, 7.0, 7.0
+}
+
+type ScorePopup struct {
+	X, Y    float64
+	Text    string
+	Life    int
+	MaxLife int
+	Color   color.RGBA
+}
+
+type ProjectileManager struct {
+	Projectiles []*Projectile
+	Popups      []*ScorePopup
+	Particles   []*Particle
+	screenWidth float64
+}
+
+func NewProjectileManager(screenWidth float64) *ProjectileManager {
+	return &ProjectileManager{
+		Projectiles: make([]*Projectile, 0, 16),
+		Popups:      make([]*ScorePopup, 0, 16),
+		Particles:   make([]*Particle, 0, 64),
+		screenWidth: screenWidth,
+	}
+}
+
+func (pm *ProjectileManager) ShootAcai(x, y, vx, vy float64) {
+	pm.Shoot(x, y, vx, vy, ProjKindAcai)
+}
+
+func (pm *ProjectileManager) ShootRoar(x, y, vx, vy float64) {
+	pm.Shoot(x, y, vx, vy, ProjKindRoar)
+}
+
+func (pm *ProjectileManager) Shoot(x, y, vx, vy float64, kind int) {
+	// Limite máximo de disparos simultâneos na tela
+	activeCount := 0
+	for _, p := range pm.Projectiles {
+		if p.Active {
+			activeCount++
+		}
+	}
+	if activeCount >= 5 {
+		return
+	}
+
+	pm.Projectiles = append(pm.Projectiles, NewProjectile(x, y, vx, vy, kind))
+
+	// Partículas de disparo
+	sparkColor := color.RGBA{R: 245, G: 215, B: 85, A: 240}
+	if kind == ProjKindRoar {
+		sparkColor = color.RGBA{R: 255, G: 165, B: 40, A: 255}
+	}
+
+	for i := 0; i < 5; i++ {
+		angle := float64(i)*0.5 - 1.0
+		if vx < 0 {
+			angle = math.Pi - angle
+		} else if vy < 0 {
+			angle = -math.Pi/2.0 + (float64(i)-2.0)*0.35
+		}
+		pm.Particles = append(pm.Particles, &Particle{
+			X:     x,
+			Y:     y,
+			VX:    math.Cos(angle) * (2.0 + float64(i)*0.4),
+			VY:    math.Sin(angle) * (2.0 + float64(i)*0.4),
+			Life:  0,
+			Max:   12,
+			Size:  2.5,
+			Color: sparkColor,
+		})
+	}
+}
+
+func (pm *ProjectileManager) SpawnHitBurst(x, y float64, col color.RGBA, count int) {
+	for i := 0; i < count; i++ {
+		angle := float64(i) * (2.0 * math.Pi / float64(count))
+		speed := 1.5 + float64(i%3)*0.8
+		pm.Particles = append(pm.Particles, &Particle{
+			X:     x,
+			Y:     y,
+			VX:    math.Cos(angle) * speed,
+			VY:    math.Sin(angle) * speed,
+			Life:  0,
+			Max:   14 + (i%3)*4,
+			Size:  2.5,
+			Color: col,
+		})
+	}
+}
+
+func (pm *ProjectileManager) AddScorePopup(x, y float64, score int) {
+	pm.Popups = append(pm.Popups, &ScorePopup{
+		X:       x,
+		Y:       y,
+		Text:    fmt.Sprintf("+%d", score),
+		Life:    0,
+		MaxLife: 32,
+		Color:   color.RGBA{R: 255, G: 225, B: 60, A: 255},
+	})
+}
+
+func (pm *ProjectileManager) Update(screenWidth float64) {
+	// 1. Atualizar Projéteis
+	active := pm.Projectiles[:0]
+	for _, p := range pm.Projectiles {
+		if !p.Active {
+			continue
+		}
+		p.X += p.VX
+		p.Y += p.VY
+		p.Life++
+
+		// Partícula de rastro
+		if p.Life%2 == 0 {
+			trailCol := color.RGBA{R: 160, G: 60, B: 180, A: 180} // Roxo açaí
+			if p.Kind == ProjKindRoar {
+				trailCol = color.RGBA{R: 255, G: 190, B: 50, A: 190} // Ouro rugido
+			}
+			pm.Particles = append(pm.Particles, &Particle{
+				X:     p.X - p.VX*0.35,
+				Y:     p.Y - p.VY*0.35,
+				VX:    -p.VX * 0.08,
+				VY:    -p.VY * 0.08,
+				Life:  0,
+				Max:   8,
+				Size:  2.0,
+				Color: trailCol,
+			})
+		}
+
+		// Checa limites de tela
+		if p.X < -15 || p.X > screenWidth+15 || p.Y < -20 || p.Y > 210 || p.Life >= p.MaxLife {
+			p.Active = false
+			continue
+		}
+		active = append(active, p)
+	}
+	pm.Projectiles = active
+
+	// 2. Atualizar Popups de Pontos Flutuantes
+	activePopups := pm.Popups[:0]
+	for _, pop := range pm.Popups {
+		pop.Y -= 0.6 // Flutua suavemente para cima
+		pop.Life++
+		if pop.Life < pop.MaxLife {
+			activePopups = append(activePopups, pop)
+		}
+	}
+	pm.Popups = activePopups
+
+	// 3. Atualizar Partículas de Impacto
+	aliveParticles := pm.Particles[:0]
+	for _, pt := range pm.Particles {
+		pt.X += pt.VX
+		pt.Y += pt.VY
+		pt.Life++
+		if pt.Life < pt.Max {
+			aliveParticles = append(aliveParticles, pt)
+		}
+	}
+	pm.Particles = aliveParticles
+}
+
+func (pm *ProjectileManager) Draw(screen *ebiten.Image, ticks int) {
+	// 1. Partículas
+	for _, pt := range pm.Particles {
+		alpha := uint8(float64(pt.Color.A) * (1.0 - float64(pt.Life)/float64(pt.Max)))
+		c := color.RGBA{R: pt.Color.R, G: pt.Color.G, B: pt.Color.B, A: alpha}
+		ebitenutil.DrawRect(screen, pt.X, pt.Y, pt.Size, pt.Size, c)
+	}
+
+	// 2. Projéteis
+	cAcaiOuter := color.RGBA{R: 50, G: 15, B: 55, A: 255}       // Casca do açaí roxo profundo
+	cAcaiInner := color.RGBA{R: 130, G: 45, B: 150, A: 255}     // Polpa de açaí vibrante
+	cAcaiCore := color.RGBA{R: 255, G: 230, B: 140, A: 255}     // Brilho do caroço em alta velocidade
+
+	cRoarOuter := color.RGBA{R: 220, G: 120, B: 25, A: 220}     // Onda de choque âmbar
+	cRoarInner := color.RGBA{R: 255, G: 215, B: 50, A: 250}     // Arco sonoro dourado
+	cRoarCore := color.RGBA{R: 255, G: 250, B: 210, A: 255}     // Núcleo branco energia
+
+	for _, p := range pm.Projectiles {
+		if !p.Active {
+			continue
+		}
+
+		if p.Kind == ProjKindRoar {
+			// Onda de Choque Sônica (Rugido da Onça) - Arcos concêntricos dourados
+			px := p.X
+			py := p.Y
+			isUp := p.VY < 0
+
+			if isUp {
+				// Arco virado para cima: ^
+				ebitenutil.DrawRect(screen, px-6, py+2, 12, 2, cRoarOuter)
+				ebitenutil.DrawRect(screen, px-5, py, 10, 2, cRoarInner)
+				ebitenutil.DrawRect(screen, px-3, py-2, 6, 2, cRoarCore)
+				ebitenutil.DrawRect(screen, px-1, py-3, 2, 2, cRoarCore)
+			} else {
+				// Arco virado para a direita: )
+				dir := 1.0
+				if p.VX < 0 {
+					dir = -1.0
+				}
+				// Onda 1 (principal)
+				ebitenutil.DrawRect(screen, px, py-5, 2, 10, cRoarOuter)
+				ebitenutil.DrawRect(screen, px+dir*2, py-4, 2, 8, cRoarInner)
+				ebitenutil.DrawRect(screen, px+dir*4, py-2, 2, 4, cRoarCore)
+				// Onda 2 (traseira menor)
+				ebitenutil.DrawRect(screen, px-dir*3, py-3, 2, 6, cRoarOuter)
+				ebitenutil.DrawRect(screen, px-dir*2, py-2, 2, 4, cRoarInner)
+			}
+			continue
+		}
+
+		// Sementes de Açaí Tradicionais do Garoto (com rotação visual)
+		rot := (ticks + int(p.X)) % 4
+		px := p.X - 3.0
+		py := p.Y - 3.0
+
+		// Esfera 6x6 pixel art com cantos recortados
+		ebitenutil.DrawRect(screen, px+1, py, 4, 6, cAcaiOuter)
+		ebitenutil.DrawRect(screen, px, py+1, 6, 4, cAcaiOuter)
+		ebitenutil.DrawRect(screen, px+1, py+1, 4, 4, cAcaiInner)
+
+		// Brilho pulsante
+		switch rot {
+		case 0:
+			ebitenutil.DrawRect(screen, px+2, py+1, 2, 2, cAcaiCore)
+		case 1:
+			ebitenutil.DrawRect(screen, px+3, py+2, 2, 2, cAcaiCore)
+		case 2:
+			ebitenutil.DrawRect(screen, px+2, py+3, 2, 2, cAcaiCore)
+		case 3:
+			ebitenutil.DrawRect(screen, px+1, py+2, 2, 2, cAcaiCore)
+		}
+	}
+
+	// 3. Popups de Pontos (+50, +100) flutuando no ar
+	for _, pop := range pm.Popups {
+		alphaRatio := 1.0 - float64(pop.Life)/float64(pop.MaxLife)
+		if alphaRatio < 0 {
+			alphaRatio = 0
+		}
+		// Sombra preta para legibilidade
+		ebitenutil.DebugPrintAt(screen, pop.Text, int(pop.X)+1, int(pop.Y)+1)
+		ebitenutil.DebugPrintAt(screen, pop.Text, int(pop.X), int(pop.Y))
+	}
+}
+
+func (pm *ProjectileManager) Reset() {
+	pm.Projectiles = pm.Projectiles[:0]
+	pm.Popups = pm.Popups[:0]
+	pm.Particles = pm.Particles[:0]
+}

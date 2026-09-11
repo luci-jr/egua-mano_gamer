@@ -250,7 +250,7 @@
 <body>
   <div id="loading">
     <div class="spinner"></div>
-    <h2 style="font-size: 1.3rem; margin-bottom: 6px;">🐆 Paidégua Game</h2>
+    <h2 style="font-size: 1.3rem; margin-bottom: 6px;">🏹 Paidégua Game</h2>
     <p style="color: #94a3b8; font-size: 0.9rem;">Carregando WebAssembly (Belém do Pará)...</p>
   </div>
 
@@ -269,10 +269,15 @@
       <button id="btn-touch-duck" class="touch-btn touch-btn-duck" aria-label="Abaixar">
         ▼<span class="btn-sub">BAIXO</span>
       </button>
+      <button id="btn-touch-attack" class="touch-btn touch-btn-duck" aria-label="Tiro" style="border-color: #f43f5e; color: #f43f5e;">
+        🎯<span class="btn-sub">TIRO</span>
+      </button>
       <button id="btn-touch-jump" class="touch-btn touch-btn-jump" aria-label="Pular">
         ▲<span class="btn-sub">PULO</span>
       </button>
     </div>
+  </div>
+
   <!-- Barra de Curiosidades Culturais de Belém do Pará -->
   <div id="trivia-bar">
     <span class="trivia-badge">🏛️ BELÉM</span>
@@ -280,7 +285,7 @@
   </div>
 
   <div id="controls-bar">
-    <kbd>CLIQUE / ENTER / ESPAÇO / ESC</kbd> Iniciar | <kbd>← / →</kbd> Mover | <kbd>ESPAÇO / ↑</kbd> Pular (2x) | <kbd>↓</kbd> Abaixar | <kbd>ESC</kbd> Pausa
+    <kbd>ENTER</kbd> Selecionar | <kbd>← / →</kbd> Mover | <kbd>W / ↑</kbd> Pular (2x) | <kbd>ESPAÇO / X</kbd> Atacar | <kbd>S / ↓</kbd> Abaixar | <kbd>ESC</kbd> Pausa
   </div>
 
   <script>
@@ -315,7 +320,8 @@
       JustDuck: false,
       Enter: false,
       Escape: false,
-      ArrowUp: false
+      ArrowUp: false,
+      Attack: false
     };
 
     function setVirtual(key, state) {
@@ -377,6 +383,7 @@
     bindTouchButton('btn-touch-right', 'ArrowRight', 'ArrowRight', 39, 'ArrowRight');
     bindTouchButton('btn-touch-jump', 'Space', ' ', 32, 'Jump');
     bindTouchButton('btn-touch-duck', 'ArrowDown', 'ArrowDown', 40, 'ArrowDown');
+    bindTouchButton('btn-touch-attack', 'KeyX', 'x', 88, 'Attack');
     bindTouchButton('btn-touch-pause', 'Escape', 'Escape', 27, 'Escape');
 
     // Toque em qualquer área vazia inicia ou confirma o jogo

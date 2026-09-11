@@ -26,58 +26,152 @@ type Onca struct {
 	VelocityY   float64
 	IsJumping   bool
 	IsCrouching bool
+	IsRunning   bool
+	FacingRight bool
+	AimUp       bool
+	IsAttacking bool
+	AttackTimer int
+
 	JumpCount   int
 	JumpHolding bool
 	CoyoteTimer int
-	Particles   []*Particle
+	RunTicks    int
+
+	IsSwinging   bool
+	SwingingVine *Vine
+
+	Particles []*Particle
 }
 
 func NewOnca() *Onca {
 	return &Onca{
-		X:           45.0,
-		Y:           0,
-		VelocityY:   0,
-		IsJumping:   false,
-		IsCrouching: false,
-		JumpCount:   0,
-		JumpHolding: false,
-		CoyoteTimer: 0,
-		Particles:   make([]*Particle, 0),
+		X:            45.0,
+		Y:            0,
+		VelocityY:    0,
+		IsJumping:    false,
+		IsCrouching:  false,
+		IsRunning:    false,
+		FacingRight:  true,
+		AimUp:        false,
+		IsAttacking:  false,
+		AttackTimer:  0,
+		JumpCount:    0,
+		JumpHolding:  false,
+		CoyoteTimer:  0,
+		RunTicks:     0,
+		IsSwinging:   false,
+		SwingingVine: nil,
+		Particles:    make([]*Particle, 0),
 	}
 }
 
 func (o *Onca) MoveForward(speed float64) {
 	o.X += speed
-	if o.X > 230.0 {
-		o.X = 230.0
+	o.FacingRight = true
+	o.IsRunning = true
+	if o.X > 260.0 {
+		o.X = 260.0
 	}
 }
 
 func (o *Onca) MoveBackward(speed float64) {
 	o.X -= speed
+	o.FacingRight = false
+	o.IsRunning = true
 	if o.X < 15.0 {
 		o.X = 15.0
 	}
 }
 
+func (o *Onca) StopRunning() {
+	o.IsRunning = false
+}
+
+func (o *Onca) SetAimUp(aim bool) {
+	o.AimUp = aim
+}
+
+func (o *Onca) TriggerAttack() {
+	o.IsAttacking = true
+	o.AttackTimer = 14
+}
+
+func (o *Onca) GetShootOrigin(groundY float64) (x, y, vx, vy float64) {
+	speed := 8.0
+	if o.AimUp {
+		x = o.X + 22.0
+		y = groundY - 24.0 + o.Y
+		vx = 0.0
+		vy = -speed
+		return x, y, vx, vy
+	}
+
+	dir := 1.0
+	x = o.X + 36.0
+	if !o.FacingRight {
+		dir = -1.0
+		x = o.X - 4.0
+	}
+
+	if o.IsCrouching {
+		y = groundY - 8.0 + o.Y
+	} else {
+		y = groundY - 14.0 + o.Y
+	}
+
+	vx = dir * speed
+	vy = 0.0
+	return x, y, vx, vy
+}
+
 func (o *Onca) Jump() (jumped bool, isDouble bool) {
+	if o.IsSwinging {
+		o.ReleaseVine()
+		return true, false
+	}
 	if !o.IsJumping || o.CoyoteTimer > 0 {
 		o.IsJumping = true
 		o.IsCrouching = false
 		o.JumpCount = 1
-		o.VelocityY = -6.8
+		o.VelocityY = -7.0 // Salto ágil felino
 		o.JumpHolding = true
 		o.CoyoteTimer = 0
 		o.spawnDust(o.X+10, 0, 6)
 		return true, false
 	} else if o.JumpCount == 1 {
 		o.JumpCount = 2
-		o.VelocityY = -6.2
+		o.VelocityY = -6.4
 		o.JumpHolding = true
 		o.spawnJumpBurst(o.X+16, o.Y+18)
 		return true, true
 	}
 	return false, false
+}
+
+func (o *Onca) GrabVine(v *Vine) {
+	o.IsSwinging = true
+	o.SwingingVine = v
+	o.IsJumping = false
+	o.IsCrouching = false
+	o.JumpCount = 0
+	o.VelocityY = 0
+	o.CoyoteTimer = 0
+}
+
+func (o *Onca) ReleaseVine() bool {
+	if !o.IsSwinging || o.SwingingVine == nil {
+		return false
+	}
+	o.VelocityY = -7.0 - math.Sin(o.SwingingVine.Angle)*2.5
+	o.X += 16.0
+	o.IsSwinging = false
+	o.IsJumping = true
+	o.JumpCount = 1
+	o.JumpHolding = true
+	o.SwingingVine.Grabbed = false
+	o.SwingingVine = nil
+	o.spawnJumpBurst(o.X+16, o.Y+12)
+	return true
 }
 
 func (o *Onca) ReleaseJump() {
@@ -88,20 +182,52 @@ func (o *Onca) ReleaseJump() {
 }
 
 func (o *Onca) SetCrouch(crouch bool) {
-	if !o.IsCrouching && crouch && !o.IsJumping {
+	if !o.IsCrouching && crouch && !o.IsJumping && !o.IsSwinging {
 		o.spawnDust(o.X+30, 0, 4)
 	}
 	o.IsCrouching = crouch
+	if crouch {
+		o.IsRunning = false
+	}
 }
 
 func (o *Onca) FastDrop() {
-	if o.IsJumping {
+	if o.IsJumping && !o.IsSwinging {
 		o.VelocityY += 0.9
 	}
 }
 
 func (o *Onca) Update() {
-	if o.IsJumping {
+	if o.IsRunning && !o.IsSwinging {
+		o.RunTicks++
+		if o.RunTicks%8 == 0 && !o.IsJumping {
+			o.spawnDust(o.X+4, 0, 2)
+		}
+	} else {
+		o.RunTicks = 0
+	}
+
+	if o.AttackTimer > 0 {
+		o.AttackTimer--
+		if o.AttackTimer == 0 {
+			o.IsAttacking = false
+		}
+	}
+
+	if o.IsSwinging {
+		if o.SwingingVine != nil && o.SwingingVine.Active {
+			tipX, tipY := o.SwingingVine.GetTipPosition()
+			o.X = tipX - 16.0
+			o.Y = tipY - 155.0 + 8.0
+			o.VelocityY = 0
+			o.IsJumping = false
+			o.FacingRight = o.SwingingVine.AngleVelocity >= 0
+		} else {
+			o.IsSwinging = false
+			o.IsJumping = true
+			o.VelocityY = 1.0
+		}
+	} else if o.IsJumping {
 		gravity := 0.36
 		if !o.JumpHolding && o.VelocityY < 0 {
 			gravity = 0.55
@@ -175,13 +301,28 @@ func (o *Onca) Reset() {
 	o.VelocityY = 0
 	o.IsJumping = false
 	o.IsCrouching = false
+	o.IsRunning = false
+	o.FacingRight = true
+	o.AimUp = false
+	o.IsAttacking = false
+	o.AttackTimer = 0
 	o.JumpCount = 0
 	o.JumpHolding = false
 	o.CoyoteTimer = 0
+	o.RunTicks = 0
+	o.IsSwinging = false
+	o.SwingingVine = nil
 	o.Particles = o.Particles[:0]
 }
 
 func (o *Onca) GetBounds(groundY float64) (x, y, w, h float64) {
+	if o.IsSwinging {
+		w = 26.0
+		h = 28.0
+		x = o.X
+		y = groundY - h + o.Y
+		return x, y, w, h
+	}
 	w = 34.0
 	h = 22.0
 	if o.IsCrouching {
@@ -192,6 +333,14 @@ func (o *Onca) GetBounds(groundY float64) (x, y, w, h float64) {
 	y = groundY - h + o.Y
 	return x, y, w, h
 }
+
+func (o *Onca) IsPlayerJumping() bool   { return o.IsJumping }
+func (o *Onca) IsPlayerCrouching() bool { return o.IsCrouching }
+func (o *Onca) IsPlayerSwinging() bool  { return o.IsSwinging }
+func (o *Onca) GetJumpHolding() bool    { return o.JumpHolding }
+func (o *Onca) GetJumpCount() int       { return o.JumpCount }
+func (o *Onca) GetHeroKind() int        { return HeroOnca }
+func (o *Onca) GetName() string         { return "ONÇA-PINTADA" }
 
 func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincibleTicks int) {
 	for _, p := range o.Particles {
@@ -218,6 +367,46 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 	drawRosette := func(rx, ry float64) {
 		ebitenutil.DrawRect(screen, rx, ry, 5, 4, cSpotBlack)
 		ebitenutil.DrawRect(screen, rx+1, ry+1, 3, 2, cSpotCenter)
+	}
+
+	// 0. ESTADO: BALANÇANDO NO CIPÓ (Onça pendurada estilo Pitfall)
+	if o.IsSwinging {
+		oncaY := groundY - 26.0 + o.Y
+		// Cipó descendo
+		cVine := color.RGBA{R: 85, G: 130, B: 45, A: 255}
+		ebitenutil.DrawRect(screen, posX+14, oncaY-8, 3, 14, cVine)
+
+		// Patas dianteiras agarradas ao cipó
+		ebitenutil.DrawRect(screen, posX+11, oncaY-2, 4, 6, cGold)
+		ebitenutil.DrawRect(screen, posX+15, oncaY-2, 4, 6, cGold)
+		ebitenutil.DrawRect(screen, posX+11, oncaY-4, 8, 3, cCream)
+
+		// Cabeça erguida
+		headX := posX + 16
+		headY := oncaY + 2
+		ebitenutil.DrawRect(screen, headX, headY, 10, 9, cGold)
+		ebitenutil.DrawRect(screen, headX+1, headY+1, 8, 6, cGoldLight)
+		ebitenutil.DrawRect(screen, headX+5, headY+5, 5, 4, cCream)
+		ebitenutil.DrawRect(screen, headX+8, headY+4, 2, 2, cNose)
+		ebitenutil.DrawRect(screen, headX+5, headY+2, 2, 2, cEye)
+		ebitenutil.DrawRect(screen, headX+2, headY-2, 3, 3, cEarPink)
+
+		// Corpo inclinado pendurado verticalmente
+		ebitenutil.DrawRect(screen, posX+8, oncaY+6, 14, 16, cGold)
+		ebitenutil.DrawRect(screen, posX+9, oncaY+7, 12, 14, cGoldLight)
+		ebitenutil.DrawRect(screen, posX+10, oncaY+10, 8, 10, cCream)
+		drawRosette(posX+10, oncaY+8)
+		drawRosette(posX+12, oncaY+14)
+
+		// Patas traseiras abraçando o cipó
+		ebitenutil.DrawRect(screen, posX+10, oncaY+20, 5, 5, cGold)
+		ebitenutil.DrawRect(screen, posX+15, oncaY+20, 5, 5, cGold)
+
+		// Rabo curvado no ar
+		tailWave := math.Sin(float64(ticks)*0.2) * 2.0
+		ebitenutil.DrawRect(screen, posX+4+tailWave, oncaY+18, 5, 3, cGold)
+		ebitenutil.DrawRect(screen, posX+2+tailWave, oncaY+20, 4, 4, cSpotBlack)
+		return
 	}
 
 	if o.IsCrouching {
@@ -249,6 +438,11 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 
 		ebitenutil.DrawRect(screen, posX-12, oncaY+5, 13, 3, cGold)
 		ebitenutil.DrawRect(screen, posX-15, oncaY+4, 4, 3, cSpotBlack)
+
+		if o.IsAttacking {
+			ebitenutil.DrawRect(screen, headX+10, headY+4, 2, 4, color.RGBA{R: 200, G: 50, B: 50, A: 255})
+			ebitenutil.DrawRect(screen, headX+12, headY+3, 2, 6, color.RGBA{R: 255, G: 200, B: 50, A: 200})
+		}
 		return
 	}
 
@@ -286,6 +480,14 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 
 	ebitenutil.DrawRect(screen, headX+1, headY-3, 4, 4, cSpotBlack)
 	ebitenutil.DrawRect(screen, headX+2, headY-2, 2, 3, cEarPink)
+
+	if o.IsAttacking {
+		// Boca rugindo e onda sônica
+		ebitenutil.DrawRect(screen, headX+10, headY+5, 3, 5, color.RGBA{R: 180, G: 30, B: 30, A: 255})
+		ebitenutil.DrawRect(screen, headX+11, headY+6, 1, 3, color.RGBA{R: 250, G: 240, B: 240, A: 255}) // Caninos
+		ebitenutil.DrawRect(screen, headX+13, headY+4, 2, 7, color.RGBA{R: 255, G: 215, B: 50, A: 220})
+		ebitenutil.DrawRect(screen, headX+16, headY+2, 2, 11, color.RGBA{R: 255, G: 160, B: 30, A: 170})
+	}
 
 	tailWave := math.Sin(float64(ticks)*0.25) * 1.8
 	if o.IsJumping {
