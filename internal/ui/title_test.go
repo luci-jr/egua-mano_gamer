@@ -10,7 +10,10 @@ func TestRenderTitleCoverNoPanic(t *testing.T) {
 	img := ebiten.NewImage(320, 224)
 	DrawTitleCoverScreen(img, 320, 224, 60, "VER. 2.4.0")
 	DrawTitleIntro(img, 320, 224, 60, true, 0, false, "NORMAL", "Curumim", "VER. 2.4.0")
-	DrawPauseMenu(img, 320, 224, 0, false, "NORMAL")
+	DrawPauseMenu(img, 320, 224, 0, false, "NORMAL", 0)
+	DrawPauseMenu(img, 320, 224, 1, false, "NORMAL", 1)
+	DrawGameOverScreen(img, 320, 224, 1200, 1, 0)
+	DrawGameOverScreen(img, 320, 224, 3500, 2, 1)
 	DrawCharacterSelectScreen(img, 320, 224, 60, 0)
 	DrawCharacterSelectScreen(img, 320, 224, 60, 1)
 }

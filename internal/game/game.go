@@ -140,6 +140,74 @@ func NewEngine() *Engine {
 	}
 }
 
+func (e *Engine) applySelectedHero() {
+	if e.selectedHero == entities.HeroGaroto {
+		e.player = e.garoto
+	} else {
+		e.player = e.onca
+	}
+}
+
+func (e *Engine) toggleSelectedHero() {
+	if e.selectedHero == entities.HeroGaroto {
+		e.selectedHero = entities.HeroOnca
+	} else {
+		e.selectedHero = entities.HeroGaroto
+	}
+	e.applySelectedHero()
+}
+
+func (e *Engine) restartStage() {
+	e.applySelectedHero()
+	e.player.Reset()
+	e.currentPlatform = nil
+	e.attackCooldown = 0
+	e.chargeTimer = 0
+	e.isCharged = false
+	e.projectiles.Reset()
+	e.obstacles.Reset()
+	e.vines.Reset()
+	e.relics.Reset()
+	e.stageDistance = 0
+	e.mudSinkTimer = 0
+	e.lives = 3
+	e.hearts = 3
+	e.stageBannerTimer = 120
+	e.stageFadeTimer = 20
+	e.invincibleTicks = 60
+	e.shakeTimer = 0
+	e.speechBubbleTimer = 0
+	e.speechBubbleText = ""
+	e.waterFallActive = false
+	e.isPaused = false
+	e.isGameOver = false
+	e.isStageComplete = false
+	e.audio.RestartBGM()
+}
+
+func (e *Engine) resetGame() {
+	e.stage = 1
+	e.score = 0
+	e.relicsCount = 0
+	e.restartStage()
+}
+
+func (e *Engine) returnToTitle() {
+	e.isPaused = false
+	e.isGameOver = false
+	e.isStageComplete = false
+	e.isTitleScreen = false
+	e.isCharSelect = false
+	e.isSaoBrasIntro = false
+	e.isTitleCover = true
+	e.introMenuIndex = 0
+	e.pauseMenuIndex = 0
+	e.audio.PauseBGM()
+	if !e.audio.IsMuted() {
+		e.audio.PlayIntroBGM()
+	}
+}
+
 func isPointerJustPressed() bool {
 	if getVirtualKey("Enter") {
 		resetVirtualKey("Enter")
@@ -566,30 +634,37 @@ func (e *Engine) Update() error {
 	if e.isPaused {
 		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) || getVirtualKey("ArrowUp") {
 			resetVirtualKey("ArrowUp")
-			e.pauseMenuIndex = (e.pauseMenuIndex - 1 + 6) % 6
+			e.pauseMenuIndex = (e.pauseMenuIndex - 1 + 7) % 7
 		}
 		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) || getVirtualKey("ArrowDown") {
 			resetVirtualKey("ArrowDown")
-			e.pauseMenuIndex = (e.pauseMenuIndex + 1) % 6
+			e.pauseMenuIndex = (e.pauseMenuIndex + 1) % 7
 		}
 
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft") {
+			resetVirtualKey("ArrowLeft")
 			if e.pauseMenuIndex == 1 {
+				e.toggleSelectedHero()
+			} else if e.pauseMenuIndex == 4 {
 				e.audio.ToggleMute()
-			} else if e.pauseMenuIndex == 2 {
+			} else if e.pauseMenuIndex == 5 {
 				e.speedIndex = (e.speedIndex - 1 + len(SpeedMultipliers)) % len(SpeedMultipliers)
 			}
 		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) || getVirtualKey("ArrowRight") {
+			resetVirtualKey("ArrowRight")
 			if e.pauseMenuIndex == 1 {
+				e.toggleSelectedHero()
+			} else if e.pauseMenuIndex == 4 {
 				e.audio.ToggleMute()
-			} else if e.pauseMenuIndex == 2 {
+			} else if e.pauseMenuIndex == 5 {
 				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
 			}
 		}
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") {
 			resetVirtualKey("Escape")
+			e.applySelectedHero()
 			e.isPaused = false
 			if !e.audio.IsMuted() {
 				e.audio.ResumeBGM()
@@ -600,82 +675,68 @@ func (e *Engine) Update() error {
 		selectPressed := isPointerJustPressed() ||
 			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeySpace)
+			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
+			getVirtualKey("Enter") ||
+			getVirtualKey("Space")
+
+		if getVirtualKey("Enter") {
+			resetVirtualKey("Enter")
+		}
+		if getVirtualKey("Space") {
+			resetVirtualKey("Space")
+		}
 
 		if selectPressed {
 			switch e.pauseMenuIndex {
-			case 0:
+			case 0: // CONTINUAR
+				e.applySelectedHero()
 				e.isPaused = false
 				if !e.audio.IsMuted() {
 					e.audio.ResumeBGM()
 				}
-			case 1:
+			case 1: // ALTERNAR HEROI (GAROTO / ONCA)
+				e.toggleSelectedHero()
+			case 2: // REINICIAR FASE ATUAL
+				e.restartStage()
+			case 3: // RESETAR JOGO (DO ZERO)
+				e.resetGame()
+			case 4: // SOM
 				e.audio.ToggleMute()
-			case 2:
+			case 5: // VELOCIDADE
 				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
-			case 3:
-				e.player.Reset()
-				e.currentPlatform = nil
-				e.attackCooldown = 0
-				e.chargeTimer = 0
-				e.isCharged = false
-				e.projectiles.Reset()
-				e.obstacles.Reset()
-				e.vines.Reset()
-				e.relics.Reset()
-				e.score = 0
-				e.relicsCount = 0
-				e.mudSinkTimer = 0
-				e.lives = 3
-				e.hearts = 3
-				e.stage = 1
-				e.stageBannerTimer = 120
-				e.speechBubbleTimer = 0
-				e.speechBubbleText = ""
-				e.isPaused = false
-				e.audio.RestartBGM()
-			case 4:
-				e.isShowingCredits = true
-			case 5:
-				return ebiten.Termination
+			case 6: // MENU INICIAL
+				e.returnToTitle()
 			}
 		}
 		return nil
 	}
 
 	if e.isStageComplete {
-		exitPressed := inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyQ)
+		exitPressed := inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyQ) || getVirtualKey("Escape")
 		if exitPressed {
-			return ebiten.Termination
+			resetVirtualKey("Escape")
+			e.returnToTitle()
+			return nil
 		}
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyR) {
-			e.player.Reset()
-			e.currentPlatform = nil
-			e.attackCooldown = 0
-			e.chargeTimer = 0
-			e.isCharged = false
-			e.projectiles.Reset()
-			e.obstacles.Reset()
-			e.vines.Reset()
-			e.relics.Reset()
-			e.score = 0
-			e.relicsCount = 0
-			e.stageDistance = 0
-			e.mudSinkTimer = 0
-			e.lives = 3
-			e.hearts = 3
-			e.stage = 1
-			e.stageBannerTimer = 120
-			e.isStageComplete = false
-			e.audio.RestartBGM()
+			e.resetGame()
 			return nil
 		}
 
 		continuePressed := isPointerJustPressed() ||
 			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeySpace)
+			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
+			getVirtualKey("Enter") ||
+			getVirtualKey("Space")
+
+		if getVirtualKey("Enter") {
+			resetVirtualKey("Enter")
+		}
+		if getVirtualKey("Space") {
+			resetVirtualKey("Space")
+		}
 
 		if continuePressed {
 			if e.stage < 3 {
@@ -685,25 +746,7 @@ func (e *Engine) Update() error {
 				e.loadingTimer = 180 // ~3 segundos navegando no barco Popopó pela Baía do Guajará
 				return nil
 			} else {
-				e.player.Reset()
-				e.currentPlatform = nil
-				e.attackCooldown = 0
-				e.chargeTimer = 0
-				e.isCharged = false
-				e.projectiles.Reset()
-				e.obstacles.Reset()
-				e.vines.Reset()
-				e.relics.Reset()
-				e.score = 0
-				e.relicsCount = 0
-				e.stageDistance = 0
-				e.mudSinkTimer = 0
-				e.lives = 3
-				e.hearts = 3
-				e.stage = 1
-				e.stageBannerTimer = 120
-				e.isStageComplete = false
-				e.audio.RestartBGM()
+				e.resetGame()
 			}
 			return nil
 		}
@@ -711,42 +754,44 @@ func (e *Engine) Update() error {
 	}
 
 	if e.isGameOver {
-		exitPressed := inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyQ)
+		exitPressed := inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyQ) || getVirtualKey("Escape")
 		if exitPressed {
-			return ebiten.Termination
+			resetVirtualKey("Escape")
+			e.returnToTitle()
+			return nil
+		}
+
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft") ||
+			inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) || getVirtualKey("ArrowRight") {
+			resetVirtualKey("ArrowLeft")
+			resetVirtualKey("ArrowRight")
+			e.toggleSelectedHero()
+		}
+
+		if inpututil.IsKeyJustPressed(ebiten.KeyN) || getVirtualKey("KeyN") {
+			resetVirtualKey("KeyN")
+			e.resetGame()
+			return nil
 		}
 
 		restartPressed := isPointerJustPressed() ||
 			inpututil.IsKeyJustPressed(ebiten.KeyR) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeySpace)
+			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
+			getVirtualKey("Enter") ||
+			getVirtualKey("Space")
+
+		if getVirtualKey("Enter") {
+			resetVirtualKey("Enter")
+		}
+		if getVirtualKey("Space") {
+			resetVirtualKey("Space")
+		}
 
 		if restartPressed {
-			e.player.Reset()
-			e.currentPlatform = nil
-			e.attackCooldown = 0
-			e.chargeTimer = 0
-			e.isCharged = false
-			e.projectiles.Reset()
-			e.obstacles.Reset()
-			e.vines.Reset()
-			e.relics.Reset()
-			e.score = 0
-			e.relicsCount = 0
-			e.stageDistance = 0
-			e.mudSinkTimer = 0
-			e.lives = 3
-			e.hearts = 3
-			e.stage = 1
-			e.stageBannerTimer = 120
-			e.invincibleTicks = 0
-			e.shakeTimer = 0
-			e.speechBubbleTimer = 0
-			e.speechBubbleText = ""
-			e.isPaused = false
-			e.isGameOver = false
-			e.audio.RestartBGM()
+			e.restartStage()
+			return nil
 		}
 		return nil
 	}
@@ -1367,7 +1412,7 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 	}
 
 	if e.isPaused {
-		ui.DrawPauseMenu(screen, ScreenWidth, ScreenHeight, e.pauseMenuIndex, e.audio.IsMuted(), SpeedLabels[e.speedIndex])
+		ui.DrawPauseMenu(screen, ScreenWidth, ScreenHeight, e.pauseMenuIndex, e.audio.IsMuted(), SpeedLabels[e.speedIndex], e.selectedHero)
 	}
 
 	if e.isStageComplete {
@@ -1375,7 +1420,7 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 	}
 
 	if e.isGameOver {
-		ui.DrawGameOverScreen(screen, ScreenWidth, ScreenHeight, e.score, e.stage)
+		ui.DrawGameOverScreen(screen, ScreenWidth, ScreenHeight, e.score, e.stage, e.selectedHero)
 	}
 }
 
