@@ -520,36 +520,16 @@ func (e *Engine) Update() error {
 			e.introMenuIndex = (e.introMenuIndex + 1) % 5
 		}
 
-		// Ajuste com Esquerda / Direita
+		// Ajuste com Esquerda / Direita (apenas para SOM e VELOCIDADE)
 		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
-			if e.introMenuIndex == 1 {
-				if e.selectedHero == entities.HeroGaroto {
-					e.selectedHero = entities.HeroOnca
-					e.player = e.onca
-					e.audio.PlayRoar(false)
-				} else {
-					e.selectedHero = entities.HeroGaroto
-					e.player = e.garoto
-					e.audio.PlayShot()
-				}
-			} else if e.introMenuIndex == 2 {
+			if e.introMenuIndex == 2 {
 				e.audio.ToggleMute()
 			} else if e.introMenuIndex == 3 {
 				e.speedIndex = (e.speedIndex - 1 + len(SpeedMultipliers)) % len(SpeedMultipliers)
 			}
 		}
 		if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
-			if e.introMenuIndex == 1 {
-				if e.selectedHero == entities.HeroGaroto {
-					e.selectedHero = entities.HeroOnca
-					e.player = e.onca
-					e.audio.PlayRoar(false)
-				} else {
-					e.selectedHero = entities.HeroGaroto
-					e.player = e.garoto
-					e.audio.PlayShot()
-				}
-			} else if e.introMenuIndex == 2 {
+			if e.introMenuIndex == 2 {
 				e.audio.ToggleMute()
 			} else if e.introMenuIndex == 3 {
 				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
@@ -671,9 +651,7 @@ func (e *Engine) Update() error {
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft") {
 			resetVirtualKey("ArrowLeft")
-			if e.pauseMenuIndex == 1 {
-				e.toggleSelectedHero()
-			} else if e.pauseMenuIndex == 4 {
+			if e.pauseMenuIndex == 4 {
 				e.audio.ToggleMute()
 			} else if e.pauseMenuIndex == 5 {
 				e.speedIndex = (e.speedIndex - 1 + len(SpeedMultipliers)) % len(SpeedMultipliers)
@@ -681,9 +659,7 @@ func (e *Engine) Update() error {
 		}
 		if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) || getVirtualKey("ArrowRight") {
 			resetVirtualKey("ArrowRight")
-			if e.pauseMenuIndex == 1 {
-				e.toggleSelectedHero()
-			} else if e.pauseMenuIndex == 4 {
+			if e.pauseMenuIndex == 4 {
 				e.audio.ToggleMute()
 			} else if e.pauseMenuIndex == 5 {
 				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
@@ -792,19 +768,31 @@ func (e *Engine) Update() error {
 			return nil
 		}
 
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft") ||
-			inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) || getVirtualKey("ArrowRight") {
-			resetVirtualKey("ArrowLeft")
-			resetVirtualKey("ArrowRight")
-			e.toggleSelectedHero()
-		}
-
 		if inpututil.IsKeyJustPressed(ebiten.KeyJ) || getVirtualKey("KeyJ") {
 			resetVirtualKey("KeyJ")
 			e.charSelectSource = CharSelectSourceGameOver
 			e.isCharSelect = true
 			e.isGameOver = false
 			return nil
+		}
+
+		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+			_, my := ebiten.CursorPosition()
+			if float64(my) >= 46.0 && float64(my) <= 66.0 {
+				e.charSelectSource = CharSelectSourceGameOver
+				e.isCharSelect = true
+				e.isGameOver = false
+				return nil
+			}
+		}
+		for _, id := range inpututil.AppendJustPressedTouchIDs(nil) {
+			_, ty := ebiten.TouchPosition(id)
+			if ty >= 46 && ty <= 66 {
+				e.charSelectSource = CharSelectSourceGameOver
+				e.isCharSelect = true
+				e.isGameOver = false
+				return nil
+			}
 		}
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyN) || getVirtualKey("KeyN") {
