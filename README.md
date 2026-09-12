@@ -1,6 +1,8 @@
 # 🏹 PaiD'Egua Runner: Uma Aventura em Belém do Pará
 
-![PaiD'Egua Runner - Uma Aventura em Belém do Pará](assets/title_screen.jpg)
+<p align="center">
+  <img src="assets/title_screen.jpg" alt="PaiD'Egua Runner: Uma Aventura em Belém do Pará" width="680" style="max-width: 100%; image-rendering: pixelated; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);" />
+</p>
 
 > Um jogo de ação e aventura arcade retrô 16-bit construído 100% em **Go** com a engine **Ebitengine (v2)**, ambientado nos cartões-postais históricos, na rica culinária e na cultura vibrante de **Belém do Pará**.
 >
