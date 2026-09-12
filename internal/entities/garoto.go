@@ -713,9 +713,6 @@ func (g *Garoto) Draw(screen *ebiten.Image, groundY float64, ticks int, invincib
 		drawBox(4, 7+bobY, 3, 2, cLeatherPouch)
 		drawBox(4, 7+bobY, 2, 2, cAcaiBerry)
 		drawBox(4, 7+bobY, 1, 1, cAcaiGleam)
-
-		// Flash estalo de disparo na ponta da forquilha
-		drawBox(20, 5+bobY, 2, 2, color.RGBA{R: 255, G: 245, B: 180, A: 230})
 	} else {
 		// Empunhadura de repouso / corrida: forquilha em Y sempre à mostra
 		drawBox(10, 11+bobY, 5, 3, cSkin)

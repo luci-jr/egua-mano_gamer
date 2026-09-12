@@ -119,39 +119,37 @@ func (pm *ProjectileManager) Shoot(x, y, vx, vy float64, kind int, isSpecial boo
 
 	pm.Projectiles = append(pm.Projectiles, NewProjectile(x, y, vx, vy, kind, isSpecial))
 
-	// Partículas de disparo
-	sparkColor := color.RGBA{R: 245, G: 215, B: 85, A: 240}
-	if isSpecial {
-		sparkColor = color.RGBA{R: 255, G: 240, B: 120, A: 255}
-	} else if kind == ProjKindRoar {
-		sparkColor = color.RGBA{R: 255, G: 165, B: 40, A: 255}
-	}
-
-	count := 5
-	if isSpecial {
-		count = 10
-	}
-	for i := 0; i < count; i++ {
-		angle := float64(i)*0.5 - 1.0
-		if vx < 0 {
-			angle = math.Pi - angle
-		} else if vy < 0 {
-			angle = -math.Pi/2.0 + (float64(i)-2.0)*0.35
-		}
-		speed := 2.0 + float64(i)*0.4
+	// Partículas de disparo: apenas para o Rugido Sônico da Onça.
+	// O tiro da Baladeira do Garoto dispara exclusivamente o caroço de açaí limpo, sem estalos ou fagulhas amarelas.
+	if kind == ProjKindRoar {
+		sparkColor := color.RGBA{R: 255, G: 165, B: 40, A: 255}
+		count := 5
 		if isSpecial {
-			speed *= 1.4
+			sparkColor = color.RGBA{R: 255, G: 215, B: 50, A: 255}
+			count = 10
 		}
-		pm.Particles = append(pm.Particles, &Particle{
-			X:     x,
-			Y:     y,
-			VX:    math.Cos(angle) * speed,
-			VY:    math.Sin(angle) * speed,
-			Life:  0,
-			Max:   14,
-			Size:  2.8,
-			Color: sparkColor,
-		})
+		for i := 0; i < count; i++ {
+			angle := float64(i)*0.5 - 1.0
+			if vx < 0 {
+				angle = math.Pi - angle
+			} else if vy < 0 {
+				angle = -math.Pi/2.0 + (float64(i)-2.0)*0.35
+			}
+			speed := 2.0 + float64(i)*0.4
+			if isSpecial {
+				speed *= 1.4
+			}
+			pm.Particles = append(pm.Particles, &Particle{
+				X:     x,
+				Y:     y,
+				VX:    math.Cos(angle) * speed,
+				VY:    math.Sin(angle) * speed,
+				Life:  0,
+				Max:   14,
+				Size:  2.8,
+				Color: sparkColor,
+			})
+		}
 	}
 }
 
@@ -205,12 +203,9 @@ func (pm *ProjectileManager) Update(screenWidth float64) {
 		p.Y += p.VY
 		p.Life++
 
-		// Partícula de rastro
-		if p.Life%2 == 0 {
-			trailCol := color.RGBA{R: 160, G: 60, B: 180, A: 180} // Roxo açaí
-			if p.Kind == ProjKindRoar {
-				trailCol = color.RGBA{R: 255, G: 190, B: 50, A: 190} // Ouro rugido
-			}
+		// Partícula de rastro (apenas para o rugido da Onça; o caroço de açaí viaja limpo e nítido)
+		if p.Life%2 == 0 && p.Kind == ProjKindRoar {
+			trailCol := color.RGBA{R: 255, G: 190, B: 50, A: 190} // Ouro rugido
 			pm.Particles = append(pm.Particles, &Particle{
 				X:     p.X - p.VX*0.35,
 				Y:     p.Y - p.VY*0.35,
@@ -265,9 +260,9 @@ func (pm *ProjectileManager) Draw(screen *ebiten.Image, ticks int) {
 	}
 
 	// 2. Projéteis
-	cAcaiOuter := color.RGBA{R: 50, G: 15, B: 55, A: 255}       // Casca do açaí roxo profundo
-	cAcaiInner := color.RGBA{R: 130, G: 45, B: 150, A: 255}     // Polpa de açaí vibrante
-	cAcaiCore := color.RGBA{R: 255, G: 230, B: 140, A: 255}     // Brilho do caroço em alta velocidade
+	cAcaiOuter := color.RGBA{R: 28, G: 10, B: 34, A: 255}       // Casca do açaí roxo escuro (quase preto)
+	cAcaiInner := color.RGBA{R: 72, G: 20, B: 82, A: 255}       // Polpa de açaí encorpado
+	cAcaiCore := color.RGBA{R: 135, G: 48, B: 150, A: 255}      // Brilho natural aveludado do açaí (zero amarelo)
 
 	cRoarOuter := color.RGBA{R: 220, G: 120, B: 25, A: 220}     // Onda de choque âmbar
 	cRoarInner := color.RGBA{R: 255, G: 215, B: 50, A: 250}     // Arco sonoro dourado
@@ -330,20 +325,21 @@ func (pm *ProjectileManager) Draw(screen *ebiten.Image, ticks int) {
 		}
 
 		if p.IsSpecial {
-			// Super Semente de Açaí Dourada Energizada (10x10 brilhante)
+			// Super Semente de Açaí Gigante Energizada (10x10 roxo profundo puro)
 			px := p.X - 5.0
 			py := p.Y - 5.0
-			cAura := color.RGBA{R: 255, G: 200, B: 40, A: 160}
-			cGoldAcai := color.RGBA{R: 245, G: 165, B: 25, A: 255}
+			cAura := color.RGBA{R: 155, G: 35, B: 185, A: 160}
+			cAcaiSpecialBody := color.RGBA{R: 95, G: 25, B: 115, A: 255}
+			cAcaiSpecialGleam := color.RGBA{R: 180, G: 70, B: 205, A: 255}
 			ebitenutil.DrawRect(screen, px-1, py-1, 12, 12, cAura)
 			ebitenutil.DrawRect(screen, px+1, py, 8, 10, cAcaiOuter)
 			ebitenutil.DrawRect(screen, px, py+1, 10, 8, cAcaiOuter)
-			ebitenutil.DrawRect(screen, px+2, py+2, 6, 6, cGoldAcai)
-			ebitenutil.DrawRect(screen, px+3, py+3, 4, 4, cAcaiCore)
+			ebitenutil.DrawRect(screen, px+2, py+2, 6, 6, cAcaiSpecialBody)
+			ebitenutil.DrawRect(screen, px+3, py+3, 4, 4, cAcaiSpecialGleam)
 			continue
 		}
 
-		// Sementes de Açaí Tradicionais do Garoto (com rotação visual)
+		// Sementes de Açaí Tradicionais do Garoto (com rotação visual de açaí puro)
 		rot := (ticks + int(p.X)) % 4
 		px := p.X - 3.0
 		py := p.Y - 3.0
@@ -353,7 +349,7 @@ func (pm *ProjectileManager) Draw(screen *ebiten.Image, ticks int) {
 		ebitenutil.DrawRect(screen, px, py+1, 6, 4, cAcaiOuter)
 		ebitenutil.DrawRect(screen, px+1, py+1, 4, 4, cAcaiInner)
 
-		// Brilho pulsante
+		// Brilho sutil do açaí
 		switch rot {
 		case 0:
 			ebitenutil.DrawRect(screen, px+2, py+1, 2, 2, cAcaiCore)

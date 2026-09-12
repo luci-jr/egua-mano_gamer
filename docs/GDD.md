@@ -4,8 +4,8 @@
 > **Status:** Vivo / Produção (VER. 2.4.0)  
 > **Última Atualização:** 12 de Setembro de 2026  
 > **Autor & Engenheiro Responsável:** Lucivaldo Junior ([@luci-jr](https://github.com/luci-jr))  
-> **Repositório Oficial:** [github.com/luci-jr/paidegua-runner](https://github.com/luci-jr/paidegua-runner)  
-> **Deploy de Produção (WebAssembly):** [luci-jr.github.io/paidegua-runner](https://luci-jr.github.io/paidegua-runner/)  
+> **Repositório Oficial:** [github.com/luci-jr/egua-mano_gamer](https://github.com/luci-jr/egua-mano_gamer)  
+> **Deploy de Produção (WebAssembly):** [luci-jr.github.io/egua-mano_gamer](https://luci-jr.github.io/egua-mano_gamer/)  
 
 ---
 
@@ -252,7 +252,7 @@ O jogo utiliza um motor sonoro sintetizado em tempo real via código Go (sem con
 
 ### 11.1. Arquitetura de Pastas (Standard Go Project Layout)
 ```text
-paidegua-runner/
+egua-mano_gamer/
 ├── cmd/runner/main.go       # Ponto de entrada enxuto (< 20 linhas)
 ├── internal/
 │   ├── audio/audio.go       # Sintetizador procedural chiptune e mixer PCM

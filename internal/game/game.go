@@ -7,10 +7,10 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/luci-jr/paidegua-runner/internal/audio"
-	"github.com/luci-jr/paidegua-runner/internal/entities"
-	"github.com/luci-jr/paidegua-runner/internal/scenery"
-	"github.com/luci-jr/paidegua-runner/internal/ui"
+	"github.com/luci-jr/egua-mano_gamer/internal/audio"
+	"github.com/luci-jr/egua-mano_gamer/internal/entities"
+	"github.com/luci-jr/egua-mano_gamer/internal/scenery"
+	"github.com/luci-jr/egua-mano_gamer/internal/ui"
 )
 
 const (

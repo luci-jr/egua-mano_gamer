@@ -4,10 +4,10 @@
   <a href="https://github.com/luci-jr">
     <img src="https://img.shields.io/badge/Desenvolvedor-Lucivaldo%20Junior-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Lucivaldo Junior" />
   </a>
-  <a href="https://github.com/luci-jr/paidegua-runner">
-    <img src="https://img.shields.io/badge/Repositório-paidegua--runner-blue?style=for-the-badge&logo=git&logoColor=white" alt="Repositório GitHub" />
+  <a href="https://github.com/luci-jr/egua-mano_gamer">
+    <img src="https://img.shields.io/badge/Repositório-egua--mano_gamer-blue?style=for-the-badge&logo=git&logoColor=white" alt="Repositório GitHub" />
   </a>
-  <a href="https://luci-jr.github.io/paidegua-runner/">
+  <a href="https://luci-jr.github.io/egua-mano_gamer/">
     <img src="https://img.shields.io/badge/Jogar%20Online-WebAssembly-green?style=for-the-badge&logo=webassembly&logoColor=white" alt="Jogar Online" />
   </a>
 </p>
@@ -19,7 +19,7 @@
 > Um jogo de ação e aventura arcade retrô 16-bit construído 100% em **Go** com a engine **Ebitengine (v2)**, ambientado nos cartões-postais históricos, na rica culinária e na cultura vibrante de **Belém do Pará**.
 >
 > 🕹️ **Jogue agora online no navegador (WebAssembly):**  
-> 👉 **[https://luci-jr.github.io/paidegua-runner/](https://luci-jr.github.io/paidegua-runner/)** *(Zero instalação, compatível com PC e Celular / Smartphone Android & iOS!)*  
+> 👉 **[https://luci-jr.github.io/egua-mano_gamer/](https://luci-jr.github.io/egua-mano_gamer/)** *(Zero instalação, compatível com PC e Celular / Smartphone Android & iOS!)*  
 >  
 > 📜 **Documentação de Design & Engenharia:**  
 > 👉 **[Consulte o Game Design Document (GDD) Oficial](docs/GDD.md)**
@@ -128,7 +128,7 @@ Entre cada fase, o jogador navega pelas águas da Baía do Guajará a bordo do t
 ## 🏗️ Arquitetura do Software (Standard Go Layout)
 
 ```text
-paidegua-runner/
+egua-mano_gamer/
 ├── cmd/
 │   └── runner/
 │       └── main.go              # Ponto de entrada oficial da aplicação
@@ -163,7 +163,7 @@ paidegua-runner/
 │   ├── game.wasm                # Binário executável Go compilado para WebAssembly
 │   └── wasm_exec.js             # Runtime oficial de ponte Go-JS
 ├── main.go                      # Wrapper raiz para execução rápida
-├── go.mod                       # Módulo Go: github.com/luci-jr/paidegua-runner
+├── go.mod                       # Módulo Go: github.com/luci-jr/egua-mano_gamer
 └── go.sum                       # Checksums de dependências
 ```
 
@@ -176,7 +176,7 @@ paidegua-runner/
 
 ### 🌐 1. Jogar Online via Navegador (WebAssembly)
 Acesse diretamente o GitHub Pages oficial do projeto:  
-👉 **[https://luci-jr.github.io/paidegua-runner/](https://luci-jr.github.io/paidegua-runner/)**
+👉 **[https://luci-jr.github.io/egua-mano_gamer/](https://luci-jr.github.io/egua-mano_gamer/)**
 
 Para testar a compilação WebAssembly localmente:
 ```bash
@@ -191,8 +191,8 @@ python3 -m http.server 8080 --directory docs
 go run main.go
 
 # Ou gerar o binário compilado de alta performance
-go build -o paidegua-runner main.go
-./paidegua-runner
+go build -o egua-mano_gamer main.go
+./egua-mano_gamer
 ```
 
 ---
@@ -201,7 +201,7 @@ go build -o paidegua-runner main.go
 
 * **Desenvolvedor:** [**Lucivaldo Junior**](https://github.com/luci-jr)
   * 🐙 **GitHub:** [https://github.com/luci-jr](https://github.com/luci-jr) (`@luci-jr`)
-  * 💻 **Repositório:** [https://github.com/luci-jr/paidegua-runner](https://github.com/luci-jr/paidegua-runner)
+  * 💻 **Repositório:** [https://github.com/luci-jr/egua-mano_gamer](https://github.com/luci-jr/egua-mano_gamer)
 * **Linguagem:** Go (Golang 1.22+)
 * **Engine Gráfica:** [Ebitengine (v2)](https://ebitengine.org/)
 * **Trilha Sonora:** Carimbó Chiptune 8-Bit autoral sintetizado proceduralmente (livre de direitos autorais)
