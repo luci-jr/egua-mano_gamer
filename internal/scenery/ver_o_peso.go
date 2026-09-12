@@ -50,8 +50,9 @@ func NewBackground() *Background {
 
 func (b *Background) Update(speed float64) {
 	b.scrollOffset += speed * 0.7
-	if b.scrollOffset >= 340.0 {
-		b.scrollOffset -= 340.0
+	// Reseta apenas em múltiplos gigantescos para evitar qualquer salto visível nos diferentes períodos de parallax
+	if b.scrollOffset >= 1000000.0 {
+		b.scrollOffset -= 1000000.0
 	}
 }
 
@@ -93,6 +94,9 @@ func (b *Background) drawLoopingImage(screen *ebiten.Image, bg *ebiten.Image, sc
 	op2.GeoM.Scale(scaleX, scaleY)
 	op2.GeoM.Translate(screenWidth-offset, 0)
 	screen.DrawImage(bg, op2)
+
+	// Sombra sutil de transição e ambient occlusion entre a paisagem e o calçadão/piso
+	ebitenutil.DrawRect(screen, 0, groundY-1, screenWidth, 1, color.RGBA{R: 15, G: 20, B: 28, A: 70})
 }
 
 // ==========================================
@@ -125,6 +129,28 @@ func (b *Background) drawVerOPeso(screen *ebiten.Image, screenWidth, groundY flo
 			ebitenutil.DrawRect(screen, px-1, groundY-47, 4, 3, lampGlow)
 			ebitenutil.DrawRect(screen, px-5, groundY-44, 12, 44, lampLightBeam)
 		}
+
+		// 4. Chão: Cais de pedra de cantaria histórica do Ver-o-Peso
+		cStoneDark := color.RGBA{R: 52, G: 54, B: 58, A: 255}
+		cStoneMid := color.RGBA{R: 72, G: 76, B: 82, A: 255}
+		cStoneLight := color.RGBA{R: 98, G: 104, B: 112, A: 255}
+		cWaterEdge := color.RGBA{R: 35, G: 70, B: 85, A: 255}
+
+		ebitenutil.DrawRect(screen, 0, groundY, screenWidth, 55, cStoneDark)
+		ebitenutil.DrawRect(screen, 0, groundY, screenWidth, 3, cStoneLight)
+
+		// Lajes de pedra do cais em scroll
+		for x := -math.Mod(b.scrollOffset, 24.0); x < screenWidth; x += 24.0 {
+			ebitenutil.DrawRect(screen, x, groundY+4, 22, 10, cStoneMid)
+			ebitenutil.DrawRect(screen, x+2, groundY+5, 18, 2, cStoneLight)
+			ebitenutil.DrawRect(screen, x+12, groundY+18, 22, 11, cStoneMid)
+			ebitenutil.DrawRect(screen, x+14, groundY+19, 18, 2, cStoneLight)
+			ebitenutil.DrawRect(screen, x, groundY+33, 22, 11, cStoneMid)
+		}
+
+		// Borda da Baía com água no limite inferior
+		ebitenutil.DrawRect(screen, 0, groundY+49, screenWidth, 6, cWaterEdge)
+		ebitenutil.DrawRect(screen, 0, groundY+48, screenWidth, 1, color.RGBA{R: 90, G: 145, B: 170, A: 200})
 		return
 	}
 
@@ -152,6 +178,36 @@ func (b *Background) drawDocas(screen *ebiten.Image, screenWidth, groundY float6
 			ebitenutil.DrawRect(screen, px-1, groundY-34, 4, 3, cAmberGlow)
 			ebitenutil.DrawRect(screen, px-4, groundY-31, 10, 31, cAmberBeam)
 		}
+
+		// 3. Chão: Famoso Deck de Madeira de Lei (Ipê/Itaúba) das Docas e Trilhos dos Guindastes
+		cWoodDark := color.RGBA{R: 78, G: 46, B: 30, A: 255}
+		cWoodMid := color.RGBA{R: 110, G: 68, B: 44, A: 255}
+		cWoodLight := color.RGBA{R: 138, G: 86, B: 56, A: 255}
+		cRailMetal := color.RGBA{R: 45, G: 50, B: 55, A: 255}
+		cRailShine := color.RGBA{R: 165, G: 175, B: 185, A: 255}
+
+		ebitenutil.DrawRect(screen, 0, groundY, screenWidth, 55, cWoodDark)
+
+		// Réguas do deck de madeira com juntas
+		for y := groundY; y < groundY+55; y += 6.0 {
+			ebitenutil.DrawRect(screen, 0, y, screenWidth, 5, cWoodMid)
+			ebitenutil.DrawRect(screen, 0, y, screenWidth, 1, cWoodLight)
+			ebitenutil.DrawRect(screen, 0, y+5, screenWidth, 1, cWoodDark)
+		}
+
+		// Parafusos e nós da madeira em movimento
+		for x := -math.Mod(b.scrollOffset, 30.0); x < screenWidth; x += 30.0 {
+			ebitenutil.DrawRect(screen, x, groundY+2, 2, 2, cWoodDark)
+			ebitenutil.DrawRect(screen, x+14, groundY+14, 2, 2, cWoodDark)
+			ebitenutil.DrawRect(screen, x+4, groundY+26, 2, 2, cWoodDark)
+			ebitenutil.DrawRect(screen, x+18, groundY+38, 2, 2, cWoodDark)
+		}
+
+		// Trilho de ferro fundido do guindaste inglês
+		ebitenutil.DrawRect(screen, 0, groundY+8, screenWidth, 4, cRailMetal)
+		ebitenutil.DrawRect(screen, 0, groundY+8, screenWidth, 1, cRailShine)
+		ebitenutil.DrawRect(screen, 0, groundY+20, screenWidth, 4, cRailMetal)
+		ebitenutil.DrawRect(screen, 0, groundY+20, screenWidth, 1, cRailShine)
 		return
 	}
 
@@ -181,6 +237,32 @@ func (b *Background) drawTheatroDaPaz(screen *ebiten.Image, screenWidth, groundY
 			ebitenutil.DrawRect(screen, px-2, groundY-54, 6, 6, cGlobeWhite)
 			ebitenutil.DrawRect(screen, px-6, groundY-46, 14, 46, cGlobeBeam)
 		}
+
+		// 3. Chão: Calçadão clássico de pedras portuguesas preto e branco (Mosaico da Praça da República)
+		cStoneWhite := color.RGBA{R: 228, G: 228, B: 222, A: 255}
+		cStoneBlack := color.RGBA{R: 42, G: 44, B: 48, A: 255}
+		cBaseGrey := color.RGBA{R: 90, G: 92, B: 96, A: 255}
+		cGrassGreen := color.RGBA{R: 35, G: 95, B: 45, A: 255}
+
+		ebitenutil.DrawRect(screen, 0, groundY, screenWidth, 55, cBaseGrey)
+
+		// Mosaico geométrico ondulado em pixel art
+		step := 16.0
+		for x := -math.Mod(b.scrollOffset, step*2); x < screenWidth; x += step {
+			ebitenutil.DrawRect(screen, x, groundY+2, 7, 7, cStoneWhite)
+			ebitenutil.DrawRect(screen, x+8, groundY+2, 7, 7, cStoneBlack)
+			ebitenutil.DrawRect(screen, x, groundY+10, 7, 7, cStoneBlack)
+			ebitenutil.DrawRect(screen, x+8, groundY+10, 7, 7, cStoneWhite)
+			ebitenutil.DrawRect(screen, x, groundY+18, 7, 7, cStoneWhite)
+			ebitenutil.DrawRect(screen, x+8, groundY+18, 7, 7, cStoneBlack)
+			ebitenutil.DrawRect(screen, x, groundY+26, 7, 7, cStoneBlack)
+			ebitenutil.DrawRect(screen, x+8, groundY+26, 7, 7, cStoneWhite)
+		}
+
+		// Meio-fio e gramado da praça no rodapé
+		ebitenutil.DrawRect(screen, 0, groundY+36, screenWidth, 4, color.RGBA{R: 160, G: 160, B: 165, A: 255})
+		ebitenutil.DrawRect(screen, 0, groundY+40, screenWidth, 15, cGrassGreen)
+		ebitenutil.DrawRect(screen, 0, groundY+40, screenWidth, 2, color.RGBA{R: 55, G: 135, B: 65, A: 255})
 		return
 	}
 
