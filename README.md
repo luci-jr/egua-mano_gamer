@@ -13,7 +13,7 @@
 
 **PaiD'egua Runner** foi concebido e desenvolvido por **Lucivaldo Junior** em co-criação com o **Nexus AI Ecosystem** (seu time de agentes autônomos de IA, sob liderança técnica de **Lucy - Tech Lead Sênior**). O projeto alia rigor de engenharia de software em Go às melhores práticas do **Standard Go Project Layout** (`cmd/` e `internal/`), integrando síntese de áudio procedural, decodificação MP3 nativa e física refinada de corrida de plataforma 16-bit.
 
-O protagonista é um corajoso **Garoto Aventureiro Paraense**, equipado com sua clássica **baladeira de madeira (estilingue que dispara sementes de açaí)** e faixa vermelha retrô, desbravando a cidade e os cartões-postais históricos de Belém do Pará ao som de um autêntico e vibrante **Carimbó Paraense** (*Pinduca - A Dança do Carimbó*).
+O protagonista é um corajoso **Garoto Aventureiro Paraense**, equipado com sua clássica **baladeira de madeira (estilingue que dispara sementes de açaí)** e faixa vermelha retrô, desbravando a cidade e os cartões-postais históricos de Belém do Pará ao som de um autêntico e vibrante **Carimbó Paraense 8-Bit Chiptune** autoral (NES/Arcade style, 100% livre de direitos autorais).
 
 ---
 

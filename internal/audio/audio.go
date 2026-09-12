@@ -2,15 +2,10 @@ package audio
 
 import (
 	"bytes"
-	_ "embed"
 	"math"
 
 	ebitenaudio "github.com/hajimehoshi/ebiten/v2/audio"
-	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
 )
-
-//go:embed carimbo_bgm.mp3
-var carimboBGMData []byte
 
 const sampleRate = 44100
 
@@ -318,61 +313,267 @@ func createTreasureJingle() []byte {
 	return buf
 }
 
+// nesSquareWave gera onda retangular com duty cycle (estilo Canais Pulse 1 e Pulse 2 do NES)
+func nesSquareWave(phase float64, duty float64) float64 {
+	p := math.Mod(phase, 2.0*math.Pi)
+	if p < 0 {
+		p += 2.0 * math.Pi
+	}
+	if p/(2.0*math.Pi) < duty {
+		return 1.0
+	}
+	return -1.0
+}
+
+// nesTriangleWave gera onda triangular pura (estilo Canal Triangle do NES)
+func nesTriangleWave(phase float64) float64 {
+	p := math.Mod(phase, 2.0*math.Pi)
+	if p < 0 {
+		p += 2.0 * math.Pi
+	}
+	norm := p / (2.0 * math.Pi)
+	if norm < 0.5 {
+		return 4.0*norm - 1.0
+	}
+	return 3.0 - 4.0*norm
+}
+
+// createCarimboBGM sintetiza um autêntico Carimbó Paraense em puro estilo 8-Bit Chiptune (NES/Arcade).
+// 100% autoral e procedural, eliminando qualquer risco de direitos autorais de gravações comerciais.
 func createCarimboBGM() []byte {
+	const (
+		r = 0.0 // Silêncio
+
+		// Baixo (Oitava 2)
+		c2 = 65.41
+		d2 = 73.42
+		e2 = 82.41
+		f2 = 87.31
+		g2 = 98.00
+		a2 = 110.00
+		b2 = 123.47
+
+		// Baixo / Harmonia (Oitava 3)
+		c3 = 130.81
+		d3 = 146.83
+		e3 = 164.81
+		f3 = 174.61
+		g3 = 196.00
+		a3 = 220.00
+		b3 = 246.94
+
+		// Harmonia / Guitarrada (Oitava 4)
+		c4 = 261.63
+		d4 = 293.66
+		e4 = 329.63
+		f4 = 349.23
+		g4 = 392.00
+		a4 = 440.00
+		b4 = 493.88
+
+		// Melodia Principal (Oitava 5)
+		c5 = 523.25
+		d5 = 587.33
+		e5 = 659.25
+		f5 = 698.46
+		g5 = 783.99
+		a5 = 880.00
+		b5 = 987.77
+
+		// Agudos de Guitarrada (Oitava 6)
+		c6 = 1046.50
+		d6 = 1174.66
+		e6 = 1318.51
+		f6 = 1396.91
+		g6 = 1567.98
+	)
+
+	// 1. Canal Pulse 1 (Square 50%): Melodia contagiante do Carimbó Paraense
 	melodyNotes := []float64{
-		261.63, 261.63, 329.63, 392.00,
-		392.00, 329.63, 293.66, 261.63,
-		293.66, 293.66, 329.63, 392.00,
-		329.63, 293.66, 261.63, 220.00,
-		261.63, 329.63, 392.00, 329.63,
-		293.66, 261.63, 220.00, 196.00,
-		220.00, 261.63, 293.66, 329.63,
-		293.66, 261.63, 220.00, 261.63,
+		// Seção A: Tema Principal Alegre (C -> G7)
+		c5, r, e5, g5, g5, e5, d5, c5,
+		d5, e5, d5, c5, a4, c5, d5, e5,
+		d5, r, f5, a5, a5, f5, e5, d5,
+		b4, c5, d5, b4, g4, b4, d5, f5,
+
+		// Seção B: Balanço do Rio e Ver-o-Peso (F -> C -> G7 -> C)
+		a5, r, c6, a5, g5, f5, e5, f5,
+		g5, f5, e5, d5, c5, e5, g5, a5,
+		g5, e5, c5, e5, d5, c5, b4, c5,
+		d5, e5, f5, g5, a5, b5, c6, r,
+
+		// Seção C: Solo Virtuoso de Guitarrada Paraense 8-Bit (Am -> Em -> F -> G7)
+		a5, c6, b5, a5, e5, a5, b5, c6,
+		b5, a5, g5, e5, g5, b5, d6, b5,
+		c6, b5, a5, f5, a5, c6, e6, d6,
+		d6, c6, b5, g5, b5, d6, f6, g6,
+
+		// Seção D: Dança das Saias Rodadas e Cadência Triunfal (C -> F -> G7 -> C)
+		e6, r, d6, c6, g5, c6, d6, e6,
+		f6, e6, d6, c6, a5, c6, d6, f6,
+		g6, f6, e6, d6, c6, b5, a5, g5,
+		c5, e5, g5, c6, b5, g5, c6, r,
 	}
 
+	// 2. Canal Pulse 2 (Square 25%): Guitarrada Sincopada e Arpejos de Contraponto
+	harmonyNotes := []float64{
+		// Seção A (C / G)
+		e4, g4, c5, g4, e4, g4, c5, g4,
+		f4, a4, d5, a4, f4, a4, d5, a4,
+		d4, g4, b4, g4, d4, g4, b4, g4,
+		d4, g4, b4, g4, f4, g4, b4, g4,
+
+		// Seção B (F / C / G / C)
+		c4, f4, a4, f4, c4, f4, a4, f4,
+		e4, g4, c5, g4, e4, g4, c5, g4,
+		d4, g4, b4, g4, d4, g4, b4, g4,
+		e4, g4, c5, g4, f4, a4, c5, r,
+
+		// Seção C (Am / Em / F / G)
+		c5, e5, a5, e5, c5, e5, a5, e5,
+		b4, e5, g5, e5, b4, e5, g5, e5,
+		a4, c5, f5, c5, a4, c5, f5, c5,
+		b4, d5, g5, d5, b4, d5, g5, d5,
+
+		// Seção D (C / F / G / C)
+		c5, e5, g5, e5, c5, e5, g5, e5,
+		d5, f5, a5, f5, d5, f5, a5, f5,
+		b4, d5, f5, d5, b4, d5, f5, d5,
+		c5, e5, g5, e5, d5, g5, c5, r,
+	}
+
+	// 3. Canal Triangle: Baixo Curimbó Tumbao Sincopado Tradicional
 	bassNotes := []float64{
-		130.81, 130.81, 98.00, 130.81,
-		130.81, 130.81, 98.00, 130.81,
-		110.00, 110.00, 82.41, 110.00,
-		110.00, 110.00, 82.41, 110.00,
-		130.81, 130.81, 98.00, 130.81,
-		130.81, 130.81, 98.00, 130.81,
-		98.00, 98.00, 73.42, 98.00,
-		130.81, 130.81, 98.00, 130.81,
+		// Seção A (C / G)
+		c3, r, g2, c3, r, g2, c3, g2,
+		c3, r, g2, c3, r, g2, c3, g2,
+		g2, r, d2, g2, r, d2, g2, d2,
+		g2, r, d2, g2, r, d2, g2, d2,
+
+		// Seção B (F / C / G / C)
+		f2, r, c2, f2, r, c2, f2, c2,
+		c3, r, g2, c3, r, g2, c3, g2,
+		g2, r, d2, g2, r, d2, g2, d2,
+		c3, r, g2, c3, r, c3, g2, c3,
+
+		// Seção C (Am / Em / F / G)
+		a2, r, e2, a2, r, e2, a2, e2,
+		e2, r, b2, e2, r, b2, e2, b2,
+		f2, r, c2, f2, r, c2, f2, c2,
+		g2, r, d2, g2, r, d2, g2, d2,
+
+		// Seção D (C / F / G / C)
+		c3, r, g2, c3, r, g2, c3, g2,
+		f2, r, c2, f2, r, c2, f2, c2,
+		g2, r, d2, g2, r, d2, g2, d2,
+		c3, g2, c3, g2, c3, r, c3, r,
 	}
 
-	noteMs := 150
-	totalSamples := (sampleRate * noteMs / 1000) * len(melodyNotes)
+	noteMs := 112 // ~135 BPM (semicolcheia rápida de Carimbó)
+	stepSamples := sampleRate * noteMs / 1000
+	totalSamples := stepSamples * len(melodyNotes)
 	buf := make([]byte, totalSamples*4)
 
 	sampleIdx := 0
 	melPhase := 0.0
+	harmPhase := 0.0
 	bassPhase := 0.0
+	kickPhase := 0.0
+	noiseSeed := uint32(2147483647)
+
+	nextNoise := func() float64 {
+		noiseSeed = noiseSeed*1664525 + 1013904223
+		val := int((noiseSeed >> 16) & 0x0F)
+		return float64(val-8) / 8.0
+	}
 
 	for step := 0; step < len(melodyNotes); step++ {
 		melFreq := melodyNotes[step]
+		harmFreq := harmonyNotes[step]
 		bassFreq := bassNotes[step]
-		stepSamples := sampleRate * noteMs / 1000
+
+		beatInBar := step % 8
+		isTurnaround := (step == 63 || step == 127)
 
 		for s := 0; s < stepSamples; s++ {
 			t := float64(s) / float64(stepSamples)
 
-			melPhase += 2.0 * math.Pi * melFreq / float64(sampleRate)
-			bassPhase += 2.0 * math.Pi * bassFreq / float64(sampleRate)
+			// 1. Canal 1 - Melodia Square 50% com vibrato sutil
+			var melVal float64
+			if melFreq > 0 {
+				vibrato := 1.0
+				if t > 0.45 {
+					vibrato += 0.007 * math.Sin(2.0*math.Pi*5.5*(t-0.45)/0.55)
+				}
+				melPhase += 2.0 * math.Pi * (melFreq * vibrato) / float64(sampleRate)
+				square := nesSquareWave(melPhase, 0.50)
+				attack := math.Min(1.0, float64(s)/float64(sampleRate*0.006))
+				decay := math.Exp(-1.7 * t)
+				envelope := attack * decay
+				if t > 0.86 {
+					envelope *= math.Exp(-18.0 * (t - 0.86))
+				}
+				melVal = square * envelope
+			}
 
-			melVal := math.Sin(melPhase)
-			melAttack := math.Min(1.0, float64(s)/float64(sampleRate*0.012))
-			melDecay := math.Exp(-2.8 * t)
-			melEnvelope := melAttack * melDecay
+			// 2. Canal 2 - Harmonia / Guitarrada Square 25% (staccato sincopado)
+			var harmVal float64
+			if harmFreq > 0 {
+				harmPhase += 2.0 * math.Pi * harmFreq / float64(sampleRate)
+				square := nesSquareWave(harmPhase, 0.25)
+				attack := math.Min(1.0, float64(s)/float64(sampleRate*0.005))
+				decay := math.Exp(-4.2 * t)
+				harmVal = square * attack * decay
+			}
 
-			bassVal := math.Sin(bassPhase)
-			bassAttack := math.Min(1.0, float64(s)/float64(sampleRate*0.015))
-			bassDecay := math.Exp(-2.2 * t)
-			bassEnvelope := bassAttack * bassDecay
+			// 3. Canal 3 - Baixo Triangle (Tumbao sincopado de Curimbó)
+			var bassVal float64
+			if bassFreq > 0 {
+				bassPhase += 2.0 * math.Pi * bassFreq / float64(sampleRate)
+				tri := nesTriangleWave(bassPhase)
+				attack := math.Min(1.0, float64(s)/float64(sampleRate*0.008))
+				decay := math.Exp(-2.2 * t)
+				bassVal = tri * attack * decay
+			}
 
-			mix := (melVal*melEnvelope*0.11 + bassVal*bassEnvelope*0.18)
+			// 4. Canal 4 - Percussão Curimbó (Kick de pitch sweep + Snare + Maraca)
+			var percVal float64
 
+			// Curimbó Kick grave (TUM)
+			if beatInBar == 0 || beatInBar == 3 || beatInBar == 6 || isTurnaround {
+				kickFreq := 155.0*math.Exp(-26.0*t) + 45.0
+				kickPhase += 2.0 * math.Pi * kickFreq / float64(sampleRate)
+				kickTone := nesTriangleWave(kickPhase)
+				kickNoise := nextNoise() * math.Exp(-55.0*t) * 0.35
+				kickEnv := math.Exp(-11.0 * t)
+				percVal += (kickTone*0.85 + kickNoise) * kickEnv * 0.42
+			}
+
+			// Curimbó Snare estalado (TÁ)
+			if beatInBar == 2 || beatInBar == 5 || beatInBar == 7 || isTurnaround {
+				snareNoise := nextNoise()
+				snareEnv := math.Exp(-26.0 * t)
+				percVal += snareNoise * snareEnv * 0.32
+			}
+
+			// Maraca / Ganzá nos contratempos
+			maracaNoise := nextNoise()
+			maracaEnv := math.Exp(-65.0 * t)
+			percVal += maracaNoise * maracaEnv * 0.08
+
+			// Mixagem equilibrada estilo console 8-bit
+			mix := melVal*0.19 + harmVal*0.12 + bassVal*0.22 + percVal*0.20
+
+			// Soft limiter
+			if mix > 0.95 {
+				mix = 0.95
+			} else if mix < -0.95 {
+				mix = -0.95
+			}
+
+			// Quantização DAC estilo chiptune clássico
 			sample := int16(mix * 32767.0)
+			sample = (sample / 64) * 64
 
 			idx := sampleIdx * 4
 			buf[idx] = byte(sample)
@@ -500,31 +701,14 @@ func NewManager() *Manager {
 		isIntroActive: false,
 	}
 
-	// 1. Música Principal de Aventura: Autêntico Carimbó Paraense (Pinduca - A Dança do Carimbó)
-	var bgmPlayer *ebitenaudio.Player
-	if len(carimboBGMData) > 0 {
-		stream, err := mp3.DecodeWithSampleRate(sampleRate, bytes.NewReader(carimboBGMData))
-		if err == nil {
-			bgmLoop := ebitenaudio.NewInfiniteLoop(stream, stream.Length())
-			p, err := ctx.NewPlayer(bgmLoop)
-			if err == nil {
-				p.SetVolume(0.18) // Volume suave e equilibrado para a trilha de fundo
-				bgmPlayer = p
-			}
-		}
+	// 1. Trilha Sonora Principal: Autêntico Carimbó 8-Bit Chiptune Paraense (100% Autoral & Livre de Direitos Autorais)
+	bgmBytes := createCarimboBGM()
+	bgmLoop := ebitenaudio.NewInfiniteLoop(bytes.NewReader(bgmBytes), int64(len(bgmBytes)))
+	bgmPlayer, err := ctx.NewPlayer(bgmLoop)
+	if err == nil {
+		bgmPlayer.SetVolume(0.20) // Volume agradável, suave e perfeitamente calibrado
+		m.bgmPlayer = bgmPlayer
 	}
-
-	// Fallback procedural sintetizado se o MP3 não estiver disponível
-	if bgmPlayer == nil {
-		bgmBytes := createCarimboBGM()
-		bgmLoop := ebitenaudio.NewInfiniteLoop(bytes.NewReader(bgmBytes), int64(len(bgmBytes)))
-		p, err := ctx.NewPlayer(bgmLoop)
-		if err == nil {
-			p.SetVolume(0.15) // Volume calibrado suave para o fallback procedural
-			bgmPlayer = p
-		}
-	}
-	m.bgmPlayer = bgmPlayer
 
 	introBytes := createSaoBrasIntroBGM()
 	introLoop := ebitenaudio.NewInfiniteLoop(bytes.NewReader(introBytes), int64(len(introBytes)))

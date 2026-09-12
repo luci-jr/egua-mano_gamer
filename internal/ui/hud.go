@@ -348,14 +348,13 @@ func DrawTitleCoverScreen(screen *ebiten.Image, screenWidth, screenHeight float6
 		ebitenutil.DebugPrintAt(screen, "   APERTE ENTER OU TOQUE NA TELA   ", int(startX)+18, int(startY)+2)
 	}
 
-	// 8. Rodapé clássico de abertura arcade
-	botH := 24.0
+	// 8. Rodapé clássico de abertura arcade - Dev e Ano
+	botH := 18.0
 	botY := screenHeight - botH
 	ebitenutil.DrawRect(screen, 0, botY, screenWidth, botH, color.RGBA{R: 8, G: 12, B: 22, A: 245})
 	ebitenutil.DrawRect(screen, 0, botY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("(C) 2026 LUCIVALDO JUNIOR & NEXUS AI  |  %s", version), 16, int(botY)+3)
-	ebitenutil.DebugPrintAt(screen, "BELEM DO PARA - BRASIL  |  [C] CREDITOS DO JOGO", 20, int(botY)+13)
+	ebitenutil.DebugPrintAt(screen, "DEV: LUCIVALDO JUNIOR - 2026", 76, int(botY)+4)
 
 	// 9. Scanlines sutis estilo monitor CRT de Arcade
 	for y := 0; y < int(screenHeight); y += 3 {
@@ -459,7 +458,7 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 
 	if isAudioPlaying {
-		ebitenutil.DebugPrintAt(screen, "★ TRILHA SONORA: PINDUCA - A DANCA DO CARIMBO ★", 24, int(bannerY)+3)
+		ebitenutil.DebugPrintAt(screen, "★ TRILHA SONORA: CARIMBO 8-BIT AUTORAL (CHIPTUNE) ★", 10, int(bannerY)+3)
 	} else {
 		ebitenutil.DebugPrintAt(screen, "★ PAID'EGUA RUNNER: UMA AVENTURA EM BELEM DO PARA ★", 10, int(bannerY)+3)
 	}
@@ -735,11 +734,11 @@ func DrawCreditsScreen(screen *ebiten.Image, screenWidth, screenHeight float64) 
 	ebitenutil.DebugPrintAt(screen, "★ CREDITOS - PAID'EGUA RUNNER ★", bx+12, by+8)
 	ebitenutil.DrawRect(screen, boxX+10, boxY+21, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
 
-	ebitenutil.DebugPrintAt(screen, "Desenvolvedor: Luci Junior", bx+14, by+26)
+	ebitenutil.DebugPrintAt(screen, "Desenvolvedor: Lucivaldo Junior", bx+14, by+26)
 	ebitenutil.DebugPrintAt(screen, "Co-criacao IA: Nexus AI (Lucy)", bx+14, by+38)
 	ebitenutil.DebugPrintAt(screen, "Linguagem:     Go (Golang)", bx+14, by+50)
 	ebitenutil.DebugPrintAt(screen, "Game Engine:   Ebitengine v2", bx+14, by+62)
-	ebitenutil.DebugPrintAt(screen, "Trilha Sonora: Pinduca (Carimbo)", bx+14, by+74)
+	ebitenutil.DebugPrintAt(screen, "Trilha Sonora: Carimbo 8-Bit Chiptune", bx+14, by+74)
 	ebitenutil.DebugPrintAt(screen, "Cenarios:      Belem do Para", bx+14, by+86)
 
 	ebitenutil.DebugPrintAt(screen, "[ENTER / ESC / C] Voltar", bx+30, by+112)
