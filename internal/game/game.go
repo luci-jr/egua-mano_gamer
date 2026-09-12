@@ -283,13 +283,17 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
 			getVirtualKey("Enter") ||
-			getVirtualKey("Space")
+			getVirtualKey("Space") ||
+			getVirtualKey("Start")
 
 		if getVirtualKey("Enter") {
 			resetVirtualKey("Enter")
 		}
 		if getVirtualKey("Space") {
 			resetVirtualKey("Space")
+		}
+		if getVirtualKey("Start") {
+			resetVirtualKey("Start")
 		}
 
 		if startTriggered {
@@ -426,13 +430,17 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
 			getVirtualKey("Enter") ||
-			getVirtualKey("Space")
+			getVirtualKey("Space") ||
+			getVirtualKey("Start")
 
 		if getVirtualKey("Enter") {
 			resetVirtualKey("Enter")
 		}
 		if getVirtualKey("Space") {
 			resetVirtualKey("Space")
+		}
+		if getVirtualKey("Start") {
+			resetVirtualKey("Start")
 		}
 
 		if confirmPressed {
@@ -576,13 +584,17 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
 			getVirtualKey("Enter") ||
-			getVirtualKey("Space")
+			getVirtualKey("Space") ||
+			getVirtualKey("Start")
 
 		if getVirtualKey("Enter") {
 			resetVirtualKey("Enter")
 		}
 		if getVirtualKey("Space") {
 			resetVirtualKey("Space")
+		}
+		if getVirtualKey("Start") {
+			resetVirtualKey("Start")
 		}
 
 		if selectTriggered {
@@ -679,13 +691,17 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
 			getVirtualKey("Enter") ||
-			getVirtualKey("Space")
+			getVirtualKey("Space") ||
+			getVirtualKey("Start")
 
 		if getVirtualKey("Enter") {
 			resetVirtualKey("Enter")
 		}
 		if getVirtualKey("Space") {
 			resetVirtualKey("Space")
+		}
+		if getVirtualKey("Start") {
+			resetVirtualKey("Start")
 		}
 
 		if selectPressed {
@@ -820,8 +836,10 @@ func (e *Engine) Update() error {
 		return nil
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") {
+	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyP) || getVirtualKey("Escape") || getVirtualKey("Start") || getVirtualKey("Pause") {
 		resetVirtualKey("Escape")
+		resetVirtualKey("Start")
+		resetVirtualKey("Pause")
 		e.isPaused = true
 		e.pauseMenuIndex = 0
 		e.audio.PauseBGM()

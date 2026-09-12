@@ -501,8 +501,20 @@
       ArrowUp: false,
       Attack: false,
       PageHidden: false,
-      JustUnfocused: false
+      JustUnfocused: false,
+      Start: false
     };
+
+    function lockLandscape() {
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch(() => {});
+        }
+      } catch (e) {}
+    }
+    window.addEventListener('load', lockLandscape);
+    document.addEventListener('touchstart', lockLandscape, { passive: true });
+    document.addEventListener('click', lockLandscape, { passive: true });
 
     function setVirtual(key, state) {
       if (window._virtualKeys) {
@@ -788,8 +800,8 @@
     // Botão A: Pulo com Física Parabólica / Salto Duplo (ArrowUp / Jump)
     bindTouchButton('btn-touch-a', 'ArrowUp', 'ArrowUp', 38, 'Jump');
 
-    // START: Enter (Iniciar Jogo / Confirmar Seleção / Pular Travessia)
-    bindTouchButton('btn-touch-start', 'Enter', 'Enter', 13, 'Enter');
+    // START: Pausar Jogo e Abrir Menu (no jogo) / Confirmar Seleção (nos menus)
+    bindTouchButton('btn-touch-start', 'Enter', 'Enter', 13, 'Start');
 
     // SELECT: Alterna Opções / Herói / Créditos (ArrowDown / KeyC)
     bindTouchButton('btn-touch-select', 'ArrowDown', 'ArrowDown', 40, 'ArrowDown');
