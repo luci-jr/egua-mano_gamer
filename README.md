@@ -1,8 +1,8 @@
-# 🏹 PaiD'egua Runner - Uma Aventura em Belém do Pará
+# 🏹 PaiD'Egua Runner: Uma Aventura em Belém do Pará
 
-![PaiD'egua Runner - Uma Aventura em Belém do Pará](assets/capa_paidegua.jpg)
+![PaiD'Egua Runner - Uma Aventura em Belém do Pará](assets/title_screen.jpg)
 
-> Um jogo de ação e aventura arcade retrô construído 100% em **Go** com **Ebitengine (v2)**, ambientado nas paisagens, cartões-postais e na cultura vibrante de **Belém do Pará**.
+> Um jogo de ação e aventura arcade retrô 16-bit construído 100% em **Go** com a engine **Ebitengine (v2)**, ambientado nos cartões-postais históricos, na rica culinária e na cultura vibrante de **Belém do Pará**.
 >
 > 🕹️ **Jogue agora online no navegador (WebAssembly):**  
 > 👉 **[https://luci-jr.github.io/paidegua-runner/](https://luci-jr.github.io/paidegua-runner/)** *(Zero instalação, compatível com PC e Celular / Smartphone Android & iOS!)*
@@ -11,141 +11,100 @@
 
 ## 🌟 Sobre o Projeto
 
-**PaiD'egua Runner** foi concebido e desenvolvido por **Lucivaldo Junior** em co-criação com o **Nexus AI Ecosystem** (seu time de agentes autônomos de IA, sob liderança técnica de **Lucy - Tech Lead Sênior**). O projeto alia rigor de engenharia de software em Go às melhores práticas do **Standard Go Project Layout** (`cmd/` e `internal/`), integrando síntese de áudio procedural, decodificação MP3 nativa e física refinada de corrida de plataforma 16-bit.
+**PaiD'Egua Runner: Uma Aventura em Belém do Pará** foi concebido e desenvolvido pelo engenheiro de software **Lucivaldo Junior** em co-criação com o **Nexus AI Ecosystem** (sob a liderança técnica de **Lucy — Agente-Mor, Tech Lead & Arquiteto Sênior**).
 
-O protagonista é um corajoso **Garoto Aventureiro Paraense**, equipado com sua clássica **baladeira de madeira (estilingue que dispara sementes de açaí)** e faixa vermelha retrô, desbravando a cidade e os cartões-postais históricos de Belém do Pará ao som de um autêntico e vibrante **Carimbó Paraense 8-Bit Chiptune** autoral (NES/Arcade style, 100% livre de direitos autorais).
+O projeto une rigor de engenharia de software em Go às melhores práticas arquiteturais do **Standard Go Project Layout** (`cmd/` e `internal/`), integrando:
+* **Física de Plataforma Customizada:** Colisão AABB, salto com altura variável, pulo duplo (*double jump*), queda rápida (*fast drop*), aterrissagem no dorso de animais (*Pitfall ledge landing*) e refúgio em bancos de praça coloniais.
+* **Pixel Art Retrô 8-Bit / 16-Bit:** Cenários panorâmicos fiéis aos pontos turísticos de Belém com scroll parallax contínuo e piso temático histórico.
+* **Trilha Sonora Chiptune 8-Bit Autoral:** Autêntico **Carimbó Paraense 8-Bit** sintetizado matematicamente em tempo real (estilo Ricoh 2A03 / NES Arcade), 100% livre de direitos autorais.
+* **Animações Culturais Únicas:** Cinemática dramática e cômica de perda de vida caindo na Baía do Guajará com splash aquático (*"Tchibum!"*), balões com gírias e expressões regionais paraenses, e tela náutica de transição a bordo do clássico barco regional "Popopó".
 
 ---
 
-## 🐾 Escolha de Protagonista: Garoto Curumim ou Onça-Pintada!
+## 🐾 Dois Heróis da Amazônia: Garoto Curumim & Onça-Pintada
 
-Na nova versão inspirada em clássicos arcade dos anos 90, o jogador pode **escolher livremente seu herói da Amazônia** tanto no menu inicial quanto na **Tela Dedicada de Seleção de Personagem**:
+O jogador pode escolher seu herói a qualquer momento no menu de abertura ou na **Tela de Seleção de Personagem**:
 
-| Herói | Classe / Perfil | Ataque Especial | Habilidade & Estilo | Grito / Frase Marcante |
+| Herói | Perfil / Arquétipo | Ataque Padrão | Tiro Especial Carregado (*Charge Shot*) | Frase / Grito Marcante |
 | :--- | :--- | :--- | :--- | :--- |
-| 🏹 **Garoto Curumim** | **Aventureiro da Selva** | **Baladeira de Açaí:** Disparo balístico de sementes velozes (anti-aéreo para cima ou frontal). | Pulo Duplo ágil no ar, escalada acrobática no cipó pendular e rastejo. | *"Bora lá maninho!"* / Grito de selva estilo Tarzan ao soltar o cipó. |
-| 🐆 **Onça-Pintada** | **Predadora Guardiã** | **Rugido Sônico:** Emite ondas de choque acústicas douradas concêntricas que varrem inimigos. | Salto felino feroz, passadas mais rápidas (`2.4x`), bote ágil e garras no cipó. | *"RRRAUW! Rainha da Selva!"* / Rugido trovejante ao soltar o cipó. |
+| 🏹 **Garoto Curumim** | **Aventureiro Destemido** | **Baladeira de Açaí:** Disparo veloz de caroços de açaí (frontal ou anti-aéreo para cima). | **Super Caroço Dourado:** Segure o ataque para canalizar energia e disparar um caroço gigante perfurante (+30 pts). | *"Bora lá maninho!"* / *"Tchibum na Baía do Guajará!"* |
+| 🐆 **Onça-Pintada** | **Guardiã da Floresta** | **Rugido Sônico:** Emite ondas de choque acústicas que destroem predadores e abrem caminho. | **Mega Rugido Alfa:** Segure o ataque para soltar uma onda sônica massiva que perfura múltiplos alvos em fila. | *"RRRAUW! Rainha da Selva!"* / *"Tchibum! Onça no Guajará!"* |
 
 ---
 
-## 🕹️ Tela de Abertura Cinematográfica & Menu Interativo (VER. 2.4.0)
+## 🕹️ Tela de Abertura Oficial Arcade & Menus Compactos
 
-O jogo inicia com uma **apresentação de abertura arcade clássica** (estilo *Pitfall / Super Metroid / Contra*):
-* **Fundo Panorâmico de Belém:** Mercado do Ver-o-Peso e a Baía do Guajará ao entardecer com reflexos dourados na água.
-* **Revoada em Tempo Real:** Urubus negros e garças brancas amazônicas voando continuamente pelo céu em pixel art animado.
-* **Abertura Limpa:** O menu de opções e configurações surge apenas após o jogador pressionar **Enter** ou tocar na tela (podendo retornar à capa limpa a qualquer momento com `ESC`).
+A apresentação do jogo traz a autêntica nostalgia dos clássicos fliperamas dos anos 90:
 
-Tanto no **Menu de Aventura** quanto no **Menu de Pausa (`Esc`)**, o jogador conta com um painel completo de controle:
-
-* **▶ INICIAR AVENTURA:** Abre a **Tela de Seleção de Personagem** para escolher entre Garoto Curumim ou Onça-Pintada.
-* **🐾 HERÓI: [ GAROTO CURUMIM / ONÇA-PINTADA ]:** Alterna o herói ativo diretamente com `Esquerda/Direita` ou clicando no menu.
-* **🔊 SOM: [ LIGADO / MUDO ]:** Alterna instantaneamente a trilha de carimbó e todos os efeitos sonoros procedurais.
-* **⚡ VELOCIDADE DO JOGO:** Calibre o ritmo da ação em tempo real com 4 perfis distintos:
-  * `0.6x CALMO`: Ritmo cadenciado para treino e exploração cuidadosa.
-  * `0.8x NORMAL`: **Velocidade oficial padrão**, perfeitamente equilibrada para a travessia e esquivas.
-  * `1.0x RAPIDO`: Ação dinâmica e reflexos apurados.
-  * `1.3x TURBO`: Desafio extremo estilo arcade frenético!
-* **★ VER CRÉDITOS:** Apresenta a autoria, stack técnica (Go + Ebitengine v2) e co-criação com IA.
+1. **Vista Aérea 8-Bit do Ver-o-Peso:** A tela inicial exibe uma panorâmica em pixel art do emblemático **Mercado do Ver-o-Peso**, destacando as 4 torres de ferro inglesas, o cais de cantaria histórica, as barracas azuis dos feirantes e os barcos atracados na **Baía do Guajará**.
+2. **Revoada em Tempo Real:** Urubus negros e garças brancas amazônicas sobrevoam continuamente o céu de Belém com animação de asas.
+3. **Logotipo Arcade 3D em Ouro Maciço:** Letras garrafais em relevo de ouro imperial com extrusão 3D, bisel specular, feixe de luz dinâmico (*shimmer*), fita vermelha "RUNNER" chanfrada e grafismos geométricos da cerâmica marajoara.
+4. **Menu de Opções Compacto:** Sem poluição visual e com proporções harmoniosas:
+   * **JOGAR:** Inicia a jornada por Belém.
+   * **HERÓI: [ GAROTO / ONÇA ]:** Alterna o personagem jogável.
+   * **SOM: [ LIGADO / MUDO ]:** Alterna a trilha sonora de carimbó chiptune e os efeitos sonoros procedurais.
+   * **VELOCIDADE: [ LENTO / NORMAL / RAPIDO ]:** Ajuste simples e direto, sem números decimais confusos (`NORMAL` é o padrão oficial balanceado).
+   * **CRÉDITOS:** Informações de autoria e tecnologia.
 
 ---
 
-## 🎮 Mecânicas & Jogabilidade (PC & Celular)
+## 🎮 Controles do Jogo (Teclado & Celular)
 
-| Comando (Teclado) | Controle Touch (Celular) | Ação | Descrição |
+| Teclado (PC) | Toque / Virtual Pad (Mobile) | Ação | Efeito no Jogo |
 | :--- | :--- | :--- | :--- |
-| `Enter` | Toque na tela / botão | **Confirmar / Escolher** | Confirma seleções no menu e na Tela de Escolha de Personagem. |
-| `Seta Direita` ou `D` | Botão virtual **`►`** | **Avançar** | O aventureiro se desloca para a direita na tela. |
-| `Seta Esquerda` ou `A` | Botão virtual **`◄`** | **Recuar** | Recua na tela horizontalmente para ganhar espaço de mira. |
-| `W` ou `↑` | Botão virtual **`▲ PULO`** | **Salto com Altura Variável** | Salta com impulso físico parabólico e poeira nos pés. |
-| `W` ou `↑` (2x) | Tocar **`▲ PULO`** (2x) | **Pulo Duplo (*Double Jump*)** | Segundo impulso acrobático no ar (Curumim) ou bote feroz no ar (Onça). |
-| `Espaço`, `X` ou `J` | Botão virtual **`🎯 ATAQUE`** | **Ataque do Herói** | Baladeira de sementes de açaí (Curumim) ou Rugido Sônico concêntrico (Onça). |
-| `W` ou `↑` (em pé) | Mirar para cima | **Mira Anti-Aérea** | Aponta o disparo verticalmente para abater aves no céu. |
-| `Seta Baixo` ou `S` | Botão virtual **`▼ BAIXO`** | **Abaixar / Rastejar** | Reduz a hitbox pela metade para esquivar de aves rasantes. |
-| `Seta Baixo` (no ar) | Botão **`▼ BAIXO`** (no ar) | **Queda Rápida (*Fast Drop*)** | Corta o arco do pulo e cai velozmente no chão. |
-| `Esc` | Botão virtual **`⏸ PAUSA`** | **Menu de Pausa Interativo** | Pausa o jogo e permite ajustar som, velocidade e opções. |
-| `C` | Opção do Menu | **Ver Créditos** | Detalhes sobre o desenvolvedor, Nexus AI, Go e áudio. |
-| `R` | Toque na tela | **Recomeçar Rápido** | Reinicia imediatamente na tela de conclusão ou Game Over. |
-| **Ao sofrer dano** | Automático | **Hitstop & Regionalismo** | Congelamento suave de tela (*hitstop*), som regional e balão de fala. |
+| `Seta Direita` ou `D` | Botão virtual **`►`** | **Avançar** | Caminha para a frente e avança o scroll da fase. |
+| `Seta Esquerda` ou `A` | Botão virtual **`◄`** | **Recuar** | Retrocede suavemente para ganhar espaço de esquiva. |
+| `W` ou `Seta Cima` | Botão **`▲ PULO`** | **Salto Variável** | Salto dinâmico com altura proporcional ao tempo pressionado. |
+| `W` ou `↑` (2x no ar) | Tocar **`▲ PULO`** (2x) | **Pulo Duplo (*Double Jump*)** | Salto acrobático extra no ar (Curumim) ou bote felino (Onça). |
+| `Espaço`, `X` ou `J` | Botão **`🎯 ATAQUE`** | **Ataque / Disparo** | Dispara baladeira de açaí (Curumim) ou rugido sônico (Onça). |
+| Segurar `Espaço` (~0.7s) | Segurar **`🎯 ATAQUE`** | **Tiro Carregado (*Charge Shot*)** | Canaliza energia e dispara Super Caroço Dourado / Mega Rugido Alfa! |
+| `W` ou `↑` (em pé) | Mirar para cima | **Mira Anti-Aérea** | Aponta o tiro na vertical para abater urubus e aves rasantes. |
+| `Seta Baixo` ou `S` | Botão **`▼ BAIXO`** | **Abaixar / Rastejar** | Reduz a hitbox pela metade para desviar de ataques aéreos. |
+| `Seta Baixo` (no ar) | Botão **`▼ BAIXO`** (no ar) | **Queda Rápida (*Fast Drop*)** | Interrompe o pulo e desce rapidamente ao solo seguro. |
+| `Enter` / `Espaço` | Toque na tela | **Confirmar / Avançar** | Confirma opções de menu e salta telas de transição. |
+| `Esc` | Botão **`⏸ PAUSA`** | **Pausar Aventura** | Abre o menu de pausa para ajuste de som, velocidade ou reinício. |
 
 ---
 
-## 💖 Sistema de Sobrevivência (3 Vidas x 3 Erros)
+## 💖 Sistema de Vida, Cura do Açaí e Queda no Rio
 
-O jogo possui um sistema balanceado de sobrevivência arcade retrô:
-* **3 Vidas Totais (`x3 VIDAS` no HUD):** O herói começa com 3 vidas completas.
-* **3 Corações por Vida:** 3 corações vermelhos em pixel art medem a resistência da vida atual.
-* **Mecânica de Dano e Invencibilidade:**
-  * Cada colisão com inimigo desconta **1 coração** (o aventureiro solta balão regional com congelamento suave de tela e *i-frames* piscantes).
-  * Ao esgotar os **3 corações**, perde **1 vida**, e os **3 corações são recarregados** para a nova vida (`x2 VIDAS`, depois `x1 VIDAS`).
-  * Ao perder as 3 vidas (`x0 VIDAS`), ocorre o Game Over com a expressão paraense: `"Levei o farelo mano, mancada!"`.
-* **Calor Amazônico em Pista:**
-  * Periodicamente na corrida, o personagem sente o mormaço de Belém e solta o balão: `"Égua da lua, um sol pra cada um!"` com gotículas de suor em pixel art.
-* **Saudação do Tuxaua Indígena:**
-  * Ao concluir cada fase, o **Guerreiro Indígena Tuxaua** surge em destaque em pixel art com cocar majestoso de penas de arara e saúda o herói com bênçãos da floresta!
+* **3 Vidas & 3 Corações:** O aventureiro possui 3 vidas (`x3 VIDAS`). Cada vida suporta até 3 corações de dano.
+* **Açaí não Machuca (Fonte de Energia Vital!):** Alinhado à tradição paraense, encostar nos Paneiros de Açaí no chão ou coletar a Tigela de Açaí (`RelicAcaiBowl`) **recupera 1 Coração** (`+1 CORACAO!`). Se os corações já estiverem cheios, concede o bônus **AÇAÍ POWER! (+100/+150 pts)**.
+* **Subir em Obstáculos (*Ledge Landing*):** O herói pode aterrissar com segurança sobre o dorso do **Jacaré-Açu** e sobre os **Paneiros de Açaí**, usando-os como plataforma elevada para atacar ou desviar de outros perigos.
+* **Banco de Praça Colonial (Refúgio Seguro):** Plataforma de madeira de lei e ferro trabalhado verde colonial. O banco NUNCA causa dano e serve de abrigo contra predadores terrestres.
+* **Animação Dramática de Queda d'Água (*"Tchibum na Baía do Guajará!"*):**
+  * Ao esgotar os corações, o herói é lançado em arco para trás caindo nas águas da baía.
+  * Ao atingir a linha d'água, dispara som de splash aquático procedural, borrifos de água e ondas na superfície, com o popup `"-1 VIDA!"` e balões hilários:
+    * Curumim: *"TCHIBUM NA BAIA DO GUAJARA!"*
+    * Onça: *"TCHIBUM! ONCA NO GUAJARA!"*
+  * Se restar vidas, ressurge caindo em segurança no cais com 3 corações cheios e invencibilidade temporária. Se zerar as 3 vidas, ocorre o Game Over: *"Levei o farelo mano, mancada!"*.
 
 ---
 
-## 🏛️ As 3 Fases de Belém do Pará
+## 🏛️ Os Três Cartões-Postais de Belém em 8-Bit
+
+A corrida se desenvolve ao longo de **2.800 metros por fase**, totalizando uma travessia completa pela capital paraense:
 
 ```text
-[ FASE 1: Ver-o-Peso (2800 m) ] ──> [ Popopó pela Baía ] ──> [ FASE 2: Estação das Docas (2800 m) ] ──> [ Popopó pela Baía ] ──> [ FASE 3: Theatro da Paz (2800 m - Vitória!) ]
+[ FASE 1: Ver-o-Peso (2800m) ] ──> [ Barco Popopó ] ──> [ FASE 2: Estação das Docas (2800m) ] ──> [ Barco Popopó ] ──> [ FASE 3: Theatro da Paz (2800m) ]
 ```
 
-### ⛵ Tela Náutica de Transição Cultural (O Barco Popopó)
-Entre cada fase, o jogador navega pelas águas da Baía do Guajará a bordo do tradicional **Barco de Madeira Regional ("Popopó")**, com fumaça pixel art animada, horizonte de Belém ao entardecer e barra de carregamento com curiosidades e rotas culturais da cidade!
-
-### 🐟 1. Mercado do Ver-o-Peso (0 a 2800 metros)
-![Fase 1: Mercado do Ver-o-Peso](assets/fase1_ver_o_peso.jpg)
-* **Cenário:** O crepúsculo sobre a **Baía do Guajará**, barcos tradicionais, **Mercado de Ferro com cúpulas neogóticas**, postes coloniais de iluminação e calçadão histórico.
-* **Inimigos & Desafios:**
-  * 🧺 **Paneiro de Açaí:** Cesto de palha com açaí fresco *(Pular ou Destruir com a Baladeira)*.
-  * 🦅 **Urubu do Ver-o-Peso:** Voando a meia altura *(Abaixar ou Disparar para Cima)*.
-  * 🐊 **Jacaré-Açu da Amazônia:** Bocarra aberta e dentes afiados *(Pular ou Abater com Baladeira)*.
-  * 🐍 **Cobra-Coral da Floresta:** Serpente rápida rastejando no solo *(Pular ou Abater)*.
+### ⛵ Tela Náutica de Transição (O Barco Popopó)
+Entre cada fase, o jogador navega pelas águas da Baía do Guajará a bordo do tradicional **Barco de Madeira Regional ("Popopó")** animado em pixel art, soltando fumacinha de escape (`"po-po-pó!"`) com barra de progresso náutica e curiosidades históricas de Belém.
 
 ---
 
-### ⚓ 2. Estação das Docas (0 a 2800 metros)
-![Fase 2: Estação das Docas](assets/fase2_estacao_das_docas.jpg)
-* **Cenário:** Os emblemáticos **galpões ingleses de ferro vermelho**, os imponentes **guindastes portuários amarelos** e o deck de madeira à beira da baía.
-* **Inimigos & Desafios:**
-  * 🐊 **Jacaré no Cais das Docas:** O temível predador que subiu da Baía do Guajará *(Pular ou Destruir)*.
-  * 🐍 **Cobra-Coral Amazônica:** Serpente venenosa rastejante com anéis vibrantes *(Pular ou Abater)*.
-  * 🕊️ **Gaivota da Baía:** Pássaro rasante com asas animadas *(Abaixar ou Disparar)*.
-  * 🧺 **Paneiro de Açaí:** Cesto com frutos amazônicos *(Pular ou Destruir)*.
+## 📸 Galeria de Cenários Oficiais do Jogo
 
----
-
-### 🎭 3. Theatro da Paz & Mangueiras (0 a 2800 metros - Vitória Final!)
-![Fase 3: Theatro da Paz](assets/fase3_theatro_da_paz.jpg)
-* **Cenário:** Fachada neoclássica do **Theatro da Paz**, **Mangueiras centenárias de Belém** com mangas douradas e calçada de pedras portuguesas.
-* **Inimigos & Desafios:**
-  * 🥭 **Cesto de Castanhas e Frutos:** Cesto artesanal com castanhas e cupuaçus *(Pular ou Destruir)*.
-  * 🦜 **Arara / Maritaca Amazônica:** Ave verde e amarela sobrevoando veloz *(Abaixar ou Disparar)*.
-  * 🐊 **Jacaré-Açu:** Desafio reptiliano nos arredores da Praça da República *(Pular ou Destruir)*.
-  * 🐍 **Cobra da Amazônia:** Serpente rasteira em alta velocidade *(Pular ou Destruir)*.
-
----
-
-## 🏛️ Rodapé com Curiosidades Culturais de Belém do Pará
-
-Durante o jogo e na tela de abertura, o rodapé exibe um letreiro digital contínuo com fatos históricos, culturais e ambientais sobre Belém:
-* **Fase 1 (Ver-o-Peso):** Fatos sobre a fundação da feira livre em 1627, a tradição do açaí puro com peixe frito e o tacacá com jambu adormecedor.
-* **Fase 2 (Estação das Docas):** Fatos sobre a restauração dos armazéns de ferro ingleses de 1897, os guindastes históricos e o ecoturismo no Rio Guamá.
-* **Fase 3 (Theatro da Paz):** Fatos sobre a Belle Époque amazônica, o Theatro da Paz (1878), o Círio de Nazaré e a gíria "Paidégua".
-* **Tela de Abertura (Belém do Pará):** Visão panorâmica do Mercado do Ver-o-Peso, Baía do Guajará, barcos amazônicos e o crepúsculo dourado paraense.
-
----
-
-## 📸 Galeria Visual do Jogo
-
-| Capa Oficial (Belém do Pará) | Mercado do Ver-o-Peso (Fase 1) |
+| Tela Inicial Oficial (Ver-o-Peso Aéreo) | Fase 1: Mercado do Ver-o-Peso |
 | :---: | :---: |
-| ![Capa Oficial](assets/capa_paidegua.jpg) | ![Fase 1](assets/fase1_ver_o_peso.jpg) |
+| ![Tela Inicial](assets/title_screen.jpg) | ![Fase 1: Ver-o-Peso](assets/bg_fase1_8bit.png) |
+| *Vista aérea em 8-bit com torres de ferro inglesas e baía* | *Cais de cantaria histórica, barcos e Mercado de Ferro* |
 
-| Estação das Docas (Fase 2) | Theatro da Paz (Fase 3) |
+| Fase 2: Estação das Docas | Fase 3: Theatro da Paz |
 | :---: | :---: |
-| ![Fase 2](assets/fase2_estacao_das_docas.jpg) | ![Fase 3](assets/fase3_theatro_da_paz.jpg) |
+| ![Fase 2: Estação das Docas](assets/bg_fase2_8bit.png) | ![Fase 3: Theatro da Paz](assets/bg_fase3_8bit.png) |
+| *Galpões ingleses vermelhos, deck e guindaste amarelo* | *Fachada neoclássica, mangueiras e pedras portuguesas* |
 
 ---
 
@@ -155,80 +114,66 @@ Durante o jogo e na tela de abertura, o rodapé exibe um letreiro digital contí
 paidegua-runner/
 ├── cmd/
 │   └── runner/
-│       └── main.go              # Entrypoint oficial da aplicação (< 15 linhas)
-├── internal/                    # Módulos privados protegidos pelo compilador Go
+│       └── main.go              # Ponto de entrada oficial da aplicação
+├── internal/                    # Módulos encapsulados da engine
 │   ├── audio/
-│   │   └── audio.go             # Síntese procedural de Carimbó BGM, São Brás, baladeira e derrota
+│   │   └── audio.go             # Síntese procedural chiptune de Carimbó 8-bit e splash d'água
 │   ├── entities/
-│   │   ├── garoto.go            # O protagonista aventureiro, física, partículas, baladeira e poses
-│   │   ├── projectile.go        # Sistema de projéteis (sementes de açaí), partículas e popups
-│   │   └── obstacle.go          # Gerador procedural de obstáculos, vida e detecção de tiros
+│   │   ├── player.go            # Interface unificada PlayerCharacter (Garoto Curumim & Onça)
+│   │   ├── garoto.go            # Física, sprites, poses, passadas e baladeira do Garoto
+│   │   ├── onca.go              # Física, sprites, bote felino e rugido sônico da Onça
+│   │   ├── projectile.go        # Projéteis (sementes de açaí e super tiros energizados)
+│   │   ├── obstacle.go          # Animais autônomos (Jacaré, Cobra, Urubu) e plataformas sólidas
+│   │   └── relic.go             # Relíquias (Muiraquitã, Urna, Ouro e Cuia de Tacacá/Açaí)
 │   ├── scenery/
-│   │   └── ver_o_peso.go        # Renderização em camadas e paralaxe dos cartões postais
+│   │   └── ver_o_peso.go        # Scroll contínuo parallax e pisos históricos em pixel art
 │   ├── ui/
-│   │   └── hud.go               # HUD, menus interativos, corações, letreiro cultural e Tuxaua
+│   │   ├── hud.go               # HUD, logotipo arcade 3D, menus compactos, splash e Tuxaua
+│   │   ├── title_screen.jpg     # Embed oficial da imagem da tela inicial em 8-bit
+│   │   └── title_test.go        # Testes automatizados de renderização sem pânico
 │   └── game/
-│       ├── game.go              # Game Loop principal, inputs, menus, velocidade e colisões
-│       ├── input_desktop.go     # Build tag para Desktop Nativo
-│       └── input_wasm.go        # Build tag para WebAssembly via syscall/js
-├── assets/
-│   ├── capa_paidegua.jpg        # Capa oficial no estilo Pitfall: The Mayan Adventure
-│   ├── bg_fase1_8bit.png        # Arte 8-bit retrô do Mercado do Ver-o-Peso
-│   ├── bg_fase2_8bit.png        # Arte 8-bit retrô da Estação das Docas
-│   ├── bg_fase3_8bit.png        # Arte 8-bit retrô do Theatro da Paz
-│   ├── fase1_ver_o_peso.jpg     # Foto artística de referência do Ver-o-Peso
-│   ├── fase2_estacao_das_docas.jpg # Foto artística de referência das Docas
-│   └── fase3_theatro_da_paz.jpg # Foto artística de referência do Theatro da Paz
-├── docs/                        # Build WebAssembly para GitHub Pages
-│   ├── index.html               # Página web com controles touch e barra de curiosidades
-│   ├── game.wasm                # Binário WebAssembly compilado
-│   └── wasm_exec.js             # Ponte de execução Go-WASM oficial
-├── GUIA_APRENDIZADO.md          # Guia técnico passo a passo de aprendizado
-├── main.go                      # Wrapper na raiz para execução rápida
-├── go.mod                       # Módulo Go (github.com/luci-jr/paidegua-runner)
-└── go.sum                       # Checksums das bibliotecas
+│       ├── game.go              # Loop principal, máquina de estados, velocidade e colisões
+│       ├── input_desktop.go     # Captura de teclado/mouse para desktop
+│       └── input_wasm.go        # Ponte de controles touch para WebAssembly no navegador
+├── assets/                      # Recursos visuais oficiais do jogo
+│   ├── title_screen.jpg         # Imagem 8-bit oficial da tela de abertura
+│   ├── bg_fase1_8bit.png        # Cenário 8-bit da Fase 1 (Ver-o-Peso)
+│   ├── bg_fase2_8bit.png        # Cenário 8-bit da Fase 2 (Estação das Docas)
+│   └── bg_fase3_8bit.png        # Cenário 8-bit da Fase 3 (Theatro da Paz)
+├── docs/                        # Deploy WebAssembly para GitHub Pages
+│   ├── index.html               # Frontend responsivo para PC e Mobile
+│   ├── game.wasm                # Binário executável Go compilado para WebAssembly
+│   └── wasm_exec.js             # Runtime oficial de ponte Go-JS
+├── main.go                      # Wrapper raiz para execução rápida
+├── go.mod                       # Módulo Go: github.com/luci-jr/paidegua-runner
+└── go.sum                       # Checksums de dependências
 ```
 
 ---
 
-## 🎵 Síntese de Áudio Procedural (Zero Arquivos Externos)
-
-Ao invés de carregar arquivos `.wav` ou `.mp3` pesados, todos os efeitos e músicas são **sintetizados matematicamente em tempo real** diretamente na memória:
-
-1. **Trilha de Apresentação de São Brás (Intro BGM):**
-   * Melodia aconchegante de 64 passos inspirada na Guitarrada Paraense e na brisa de Belém.
-2. **Trilha de Carimbó da Corrida (Gameplay BGM):**
-   * Curimbó grave sincopado (82Hz), repiques e marimba procedural em loop contínuo.
-3. **Disparo da Baladeira (Slingshot SFX):**
-   * Efeito acústico rápido de elástico estalando com ressonância de projétil em alta velocidade.
-4. **Impacto e Derrota de Inimigos:**
-   * Som de desintegração de inimigos com explosão de partículas e popups de pontos.
-
----
-
-## 💻 Como Rodar o Projeto
+## 💻 Como Compilar e Jogar
 
 ### Pré-requisitos
-* **Go** versão 1.22 ou superior instalada.
+* **Go 1.22+** instalado.
 
-### 🌐 1. Jogar Online no Navegador (WebAssembly)
-Acesse diretamente o link oficial no GitHub Pages:
+### 🌐 1. Jogar Online via Navegador (WebAssembly)
+Acesse diretamente o GitHub Pages oficial do projeto:  
 👉 **[https://luci-jr.github.io/paidegua-runner/](https://luci-jr.github.io/paidegua-runner/)**
 
-Para testar localmente:
+Para testar a compilação WebAssembly localmente:
 ```bash
-GOOS=js GOARCH=wasm go build -o docs/game.wasm ./cmd/runner
+env GOOS=js GOARCH=wasm go build -o docs/game.wasm main.go
 python3 -m http.server 8080 --directory docs
 # Abra http://localhost:8080 no seu navegador
 ```
 
-### 💻 2. Execução Nativa Desktop (Linux / Mac / Windows)
+### 💻 2. Execução Nativa Desktop (Linux / macOS / Windows)
 ```bash
-# Execução direta
-go run ./cmd/runner
+# Execução direta com go run
+go run main.go
 
-# Ou compilar o binário local
-go build -o paidegua-runner ./cmd/runner
+# Ou gerar o binário compilado de alta performance
+go build -o paidegua-runner main.go
 ./paidegua-runner
 ```
 
@@ -236,10 +181,11 @@ go build -o paidegua-runner ./cmd/runner
 
 ## 👥 Autoria & Créditos
 
-* **Desenvolvedor:** **Lucivaldo Junior** (Luci Junior)
-* **Co-criação & Squad de IA:** **Nexus AI Ecosystem** — Sistema autônomo de múltiplos agentes de IA idealizado por **Lucivaldo Junior**, atuando sob a liderança de **Lucy (Tech Lead & Arquiteta Sênior)**.
+* **Desenvolvedor:** **Lucivaldo Junior** ([@luci-jr](https://github.com/luci-jr))
+* **Co-criação & Squad de Inteligência:** **Nexus AI Ecosystem** (sob a liderança técnica do **Lucy — Tech Lead & Arquiteto Sênior**)
 * **Linguagem:** Go (Golang 1.22+)
-* **Game Engine:** [Ebitengine (v2)](https://ebitengine.org/)
-* **Gênero:** Plataforma / Arcade de Aventura 16-bit
+* **Engine Gráfica:** [Ebitengine (v2)](https://ebitengine.org/)
+* **Trilha Sonora:** Carimbó Chiptune 8-Bit autoral sintetizado proceduralmente (livre de direitos autorais)
+* **Gênero:** Corrida de Aventura & Plataforma Arcade Retrô
 * **Inspiração:** *Pitfall: The Mayan Adventure* (1994)
-* **Temática Cultural:** Belém do Pará, Amazônia, Brasil.
+* **Cenários & Temática:** Belém do Pará, Amazônia, Brasil 🇧🇷
