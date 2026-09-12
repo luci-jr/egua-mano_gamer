@@ -823,12 +823,12 @@ func DrawTitleCoverScreen(screen *ebiten.Image, screenWidth, screenHeight float6
 		ebitenutil.DebugPrintAt(screen, "   APERTE ENTER OU TOQUE NA TELA   ", int(startX)+18, int(startY)+2)
 	}
 
-	// 6. Rodapé clássico de abertura arcade - Dev e Ano
+	// 6. Rodapé clássico de abertura arcade - Desenvolvido por e Ano
 	botH := 18.0
 	botY := screenHeight - botH
 	ebitenutil.DrawRect(screen, 0, botY, screenWidth, botH, color.RGBA{R: 8, G: 12, B: 22, A: 245})
 	ebitenutil.DrawRect(screen, 0, botY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DebugPrintAt(screen, "DEV: LUCIVALDO JUNIOR - 2026", 76, int(botY)+4)
+	ebitenutil.DebugPrintAt(screen, "DESENVOLVIDO POR LUCIVALDO JUNIOR - 2026", 43, int(botY)+4)
 
 	// 7. Scanlines sutis estilo monitor CRT de Arcade
 	for y := 0; y < int(screenHeight); y += 3 {
@@ -1127,7 +1127,7 @@ func DrawTitleScreen(screen *ebiten.Image, screenWidth, screenHeight float64, ti
 	// Fundo com escurecimento suave para destacar a onça correndo e o cenário ao redor
 	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 10, G: 12, B: 20, A: 110})
 
-	boxW := 195.0
+	boxW := 216.0
 	boxH := 108.0
 	boxX := (screenWidth - boxW) / 2.0
 	boxY := (screenHeight - boxH) / 2.0
@@ -1141,20 +1141,20 @@ func DrawTitleScreen(screen *ebiten.Image, screenWidth, screenHeight float64, ti
 	bx := int(boxX)
 	by := int(boxY)
 
-	ebitenutil.DebugPrintAt(screen, "★ EGUA MANO! GAMER ★", bx+34, by+8)
+	ebitenutil.DebugPrintAt(screen, "★ EGUA MANO! GAMER ★", bx+48, by+8)
 	ebitenutil.DrawRect(screen, boxX+10, boxY+22, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
 
-	ebitenutil.DebugPrintAt(screen, "Dev: Lucivaldo Junior", bx+24, by+26)
-	ebitenutil.DebugPrintAt(screen, "Mover: A/D ou Setas | Pulo: W/Cima", bx+8, by+41)
-	ebitenutil.DebugPrintAt(screen, "Ataque: Espaco/X | Baixo: S", bx+10, by+54)
+	ebitenutil.DebugPrintAt(screen, "Desenvolvido por Lucivaldo Junior", bx+9, by+26)
+	ebitenutil.DebugPrintAt(screen, "Mover: A/D ou Setas | Pulo: W/Cima", bx+6, by+41)
+	ebitenutil.DebugPrintAt(screen, "Ataque: Espaco/X | Baixo: S", bx+27, by+54)
 
 	if (ticks/30)%2 == 0 {
-		ebitenutil.DebugPrintAt(screen, ">> TOQUE OU APERTE ENTER <<", bx+20, by+72)
+		ebitenutil.DebugPrintAt(screen, ">> TOQUE OU APERTE ENTER <<", bx+27, by+72)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "   TOQUE OU APERTE ENTER   ", bx+20, by+72)
+		ebitenutil.DebugPrintAt(screen, "   TOQUE OU APERTE ENTER   ", bx+27, by+72)
 	}
 
-	ebitenutil.DebugPrintAt(screen, "[C] Creditos  |  [ESC] Sair", bx+18, by+91)
+	ebitenutil.DebugPrintAt(screen, "[C] Creditos  |  [ESC] Sair", bx+27, by+91)
 }
 
 func DrawCreditsScreen(screen *ebiten.Image, screenWidth, screenHeight float64) {
@@ -1177,7 +1177,7 @@ func DrawCreditsScreen(screen *ebiten.Image, screenWidth, screenHeight float64) 
 	ebitenutil.DebugPrintAt(screen, "★ CREDITOS - EGUA MANO! GAMER ★", bx+10, by+8)
 	ebitenutil.DrawRect(screen, boxX+10, boxY+21, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
 
-	ebitenutil.DebugPrintAt(screen, "Autor / Dev:   Lucivaldo Junior", bx+14, by+26)
+	ebitenutil.DebugPrintAt(screen, "Desenvolvido por: Lucivaldo Junior", bx+7, by+26)
 	ebitenutil.DebugPrintAt(screen, "GitHub:        github.com/luci-jr", bx+14, by+38)
 	ebitenutil.DebugPrintAt(screen, "Linguagem:     Go (Golang)", bx+14, by+50)
 	ebitenutil.DebugPrintAt(screen, "Game Engine:   Ebitengine v2", bx+14, by+62)
