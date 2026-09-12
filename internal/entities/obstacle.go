@@ -157,29 +157,11 @@ func (obs *Obstacle) drawGround(screen *ebiten.Image, ticks int, stage int) {
 	ebitenutil.DrawRect(screen, obs.X-3, obsRealY+21, 3, 3, acaiPurple)
 	ebitenutil.DrawRect(screen, obs.X-1, obsRealY+22, 2, 2, acaiLight)
 
-	// 3. Indicador de Energia Vital (quando ainda não foi colhido pelo herói)
+	// 3. Brilho sutil de energia vital no açaí (sem poluição de corações flutuantes)
 	if !obs.Collided {
-		flicker := (ticks / 8) % 2
-		iconY := obsRealY - 10.0
-		if flicker == 0 {
-			iconY -= 1.0
-		}
-		// Coração flutuante de energia vital sobre o açaí
-		cHeart := color.RGBA{R: 255, G: 55, B: 85, A: 255}
-		cHeartLight := color.RGBA{R: 255, G: 190, B: 205, A: 255}
-		ebitenutil.DrawRect(screen, obs.X+6, iconY, 3, 2, cHeart)
-		ebitenutil.DrawRect(screen, obs.X+11, iconY, 3, 2, cHeart)
-		ebitenutil.DrawRect(screen, obs.X+5, iconY+2, 10, 2, cHeart)
-		ebitenutil.DrawRect(screen, obs.X+6, iconY+4, 8, 2, cHeart)
-		ebitenutil.DrawRect(screen, obs.X+8, iconY+6, 4, 1, cHeart)
-		ebitenutil.DrawRect(screen, obs.X+9, iconY+7, 2, 1, cHeart)
-		ebitenutil.DrawRect(screen, obs.X+7, iconY+1, 1, 1, cHeartLight)
-
-		// Partículas de brilho dourado
-		ebitenutil.DrawRect(screen, obs.X+2, iconY+2, 2, 2, energyGold)
-		ebitenutil.DrawRect(screen, obs.X+17, iconY+1, 2, 2, energyGold)
-		if (ticks/6)%2 == 0 {
-			ebitenutil.DrawRect(screen, obs.X+10, iconY-4, 1, 2, energyGold)
+		if (ticks/10)%2 == 0 {
+			ebitenutil.DrawRect(screen, obs.X+4, obsRealY-2, 2, 2, energyGold)
+			ebitenutil.DrawRect(screen, obs.X+16, obsRealY-1, 2, 2, palmGreen)
 		}
 	}
 }

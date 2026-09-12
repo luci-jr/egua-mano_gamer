@@ -640,26 +640,26 @@ func (e *Engine) Update() error {
 	if e.isPaused {
 		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) || getVirtualKey("ArrowUp") {
 			resetVirtualKey("ArrowUp")
-			e.pauseMenuIndex = (e.pauseMenuIndex - 1 + 7) % 7
+			e.pauseMenuIndex = (e.pauseMenuIndex - 1 + 5) % 5
 		}
 		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) || getVirtualKey("ArrowDown") {
 			resetVirtualKey("ArrowDown")
-			e.pauseMenuIndex = (e.pauseMenuIndex + 1) % 7
+			e.pauseMenuIndex = (e.pauseMenuIndex + 1) % 5
 		}
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft") {
 			resetVirtualKey("ArrowLeft")
-			if e.pauseMenuIndex == 4 {
+			if e.pauseMenuIndex == 2 {
 				e.audio.ToggleMute()
-			} else if e.pauseMenuIndex == 5 {
+			} else if e.pauseMenuIndex == 3 {
 				e.speedIndex = (e.speedIndex - 1 + len(SpeedMultipliers)) % len(SpeedMultipliers)
 			}
 		}
 		if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) || getVirtualKey("ArrowRight") {
 			resetVirtualKey("ArrowRight")
-			if e.pauseMenuIndex == 4 {
+			if e.pauseMenuIndex == 2 {
 				e.audio.ToggleMute()
-			} else if e.pauseMenuIndex == 5 {
+			} else if e.pauseMenuIndex == 3 {
 				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
 			}
 		}
@@ -696,20 +696,13 @@ func (e *Engine) Update() error {
 				if !e.audio.IsMuted() {
 					e.audio.ResumeBGM()
 				}
-			case 1: // SELECIONAR JOGADOR
-				e.charSelectSource = CharSelectSourcePause
-				e.isCharSelect = true
-				e.isPaused = false
-				return nil
-			case 2: // REINICIAR FASE ATUAL
+			case 1: // REINICIAR FASE ATUAL
 				e.restartStage()
-			case 3: // RESETAR JOGO (DO ZERO)
-				e.resetGame()
-			case 4: // SOM
+			case 2: // SOM
 				e.audio.ToggleMute()
-			case 5: // VELOCIDADE
+			case 3: // VELOCIDADE
 				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
-			case 6: // MENU INICIAL
+			case 4: // MENU INICIAL
 				e.returnToTitle()
 			}
 		}
@@ -856,14 +849,14 @@ func (e *Engine) Update() error {
 		if !e.waterFallSplashTriggered {
 			e.waterFallHeroX += e.waterFallHeroVX
 			e.waterFallHeroY += e.waterFallHeroVY
-			e.waterFallHeroVY += 0.32 // Gravidade acelerando a queda
+			e.waterFallHeroVY += 0.16 // Gravidade desacelerada para arco dramático e leitura do balão
 			if e.waterFallHeroY >= GroundY+6.0 {
 				e.waterFallSplashTriggered = true
-				e.waterFallSplashTimer = 45
+				e.waterFallSplashTimer = 110
 				e.audio.PlaySplash()
 				e.shakeTimer = 10
-				e.speechBubbleText = "Egua do pitiu. Essa agua ta podre!"
-				e.speechBubbleTimer = 85
+				e.speechBubbleText = "Egua do pitiu! Essa agua ta podre!"
+				e.speechBubbleTimer = 190
 			}
 		} else {
 			if e.waterFallSplashTimer > 0 {
@@ -1346,19 +1339,19 @@ func (e *Engine) Update() error {
 			e.hearts = 0
 			e.audio.PlayHit()
 
-			// Dispara a animação dramática de queda no rio / splash na baía do Guajará
+			// Dispara a animação dramática de queda no rio / splash na baía do Guajará (tempo estendido)
 			e.waterFallActive = true
-			e.waterFallTimer = 75
+			e.waterFallTimer = 190
 			e.waterFallHeroX = playerX
 			e.waterFallHeroY = playerY
-			e.waterFallHeroVX = -1.2
-			e.waterFallHeroVY = -3.8
+			e.waterFallHeroVX = -0.8
+			e.waterFallHeroVY = -2.5
 			e.waterFallSplashTriggered = false
 			e.waterFallSplashTimer = 0
 			e.hitDelayTimer = 0
 			e.invincibleTicks = 0
-			e.speechBubbleText = "Egua do pitiu. Essa agua ta podre!"
-			e.speechBubbleTimer = 90
+			e.speechBubbleText = "Egua do pitiu! Essa agua ta podre!"
+			e.speechBubbleTimer = 220
 		} else {
 			e.hitDelayTimer = 22
 			e.invincibleTicks = 75

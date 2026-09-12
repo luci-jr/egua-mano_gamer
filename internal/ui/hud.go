@@ -1243,9 +1243,7 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 
 	options := []string{
 		"CONTINUAR",
-		"SELECIONAR JOGADOR",
 		"REINICIAR FASE",
-		"RESETAR JOGO (DO ZERO)",
 		soundStatus,
 		fmt.Sprintf("VELOCIDADE: [ %s ]", speedLabel),
 		"MENU INICIAL",
