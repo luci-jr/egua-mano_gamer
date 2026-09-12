@@ -951,12 +951,20 @@ func (e *Engine) Update() error {
 
 	if attackHeld {
 		e.chargeTimer++
-		// Efeito visual de carregamento de energia (partículas douradas e de açaí)
+		// Efeito visual de carregamento de energia (partículas de açaí roxo escuro para o Garoto, ondas translúcidas para a Onça; zero bolinhas amarelas)
 		if e.chargeTimer >= 18 {
 			pX, pY, pW, pH := e.player.GetBounds(GroundY)
-			sparkColor := color.RGBA{R: 245, G: 200, B: 50, A: 220}
-			if e.chargeTimer >= 42 {
-				sparkColor = color.RGBA{R: 255, G: 240, B: 120, A: 255}
+			var sparkColor color.RGBA
+			if e.selectedHero == entities.HeroOnca {
+				sparkColor = color.RGBA{R: 240, G: 110, B: 40, A: 160} // Onda sônica âmbar/ar translúcida
+				if e.chargeTimer >= 42 {
+					sparkColor = color.RGBA{R: 255, G: 255, B: 255, A: 200} // Halo branco de ar
+				}
+			} else {
+				sparkColor = color.RGBA{R: 25, G: 6, B: 32, A: 200} // Açaí roxo bem escuro
+				if e.chargeTimer >= 42 {
+					sparkColor = color.RGBA{R: 42, G: 10, B: 52, A: 220} // Açaí encorpado
+				}
 			}
 			if e.chargeTimer%2 == 0 {
 				e.projectiles.Particles = append(e.projectiles.Particles, &entities.Particle{
@@ -971,8 +979,12 @@ func (e *Engine) Update() error {
 				})
 			}
 			if e.chargeTimer == 42 {
-				// Halo luminoso anunciando carga máxima pronta!
-				e.projectiles.SpawnHitBurst(pX+pW/2.0, pY+pH/2.0, color.RGBA{R: 255, G: 240, B: 100, A: 255}, 12)
+				// Halo anunciando carga máxima pronta (sem amarelo)
+				burstCol := color.RGBA{R: 255, G: 255, B: 255, A: 200}
+				if e.selectedHero == entities.HeroGaroto {
+					burstCol = color.RGBA{R: 35, G: 8, B: 44, A: 220}
+				}
+				e.projectiles.SpawnHitBurst(pX+pW/2.0, pY+pH/2.0, burstCol, 10)
 			}
 		}
 		e.isCharged = (e.chargeTimer >= 42)
@@ -1175,8 +1187,8 @@ func (e *Engine) Update() error {
 			} else {
 				e.score += r.Value
 				e.projectiles.AddScorePopup(r.X, r.Y-8, r.Value)
-				e.projectiles.AddTextPopup(r.X-20, r.Y-24, "ACAI POWER!", color.RGBA{R: 255, G: 220, B: 50, A: 255})
-				e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 255, G: 220, B: 50, A: 255}, 14)
+				e.projectiles.AddTextPopup(r.X-20, r.Y-24, "ACAI POWER!", color.RGBA{R: 215, G: 65, B: 245, A: 255})
+				e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 45, G: 10, B: 58, A: 255}, 14)
 			}
 			e.audio.PlayTreasure()
 		} else {
@@ -1209,8 +1221,8 @@ func (e *Engine) Update() error {
 			bonus := 100
 			e.score += bonus
 			e.projectiles.AddScorePopup(centerX-12, centerY-14, bonus)
-			e.projectiles.AddTextPopup(centerX-20, centerY-26, "ACAI POWER!", color.RGBA{R: 255, G: 220, B: 50, A: 255})
-			e.projectiles.SpawnHitBurst(centerX, centerY, color.RGBA{R: 255, G: 220, B: 50, A: 255}, 14)
+			e.projectiles.AddTextPopup(centerX-20, centerY-26, "ACAI POWER!", color.RGBA{R: 215, G: 65, B: 245, A: 255})
+			e.projectiles.SpawnHitBurst(centerX, centerY, color.RGBA{R: 45, G: 10, B: 58, A: 255}, 14)
 		}
 		e.audio.PlayTreasure()
 	}

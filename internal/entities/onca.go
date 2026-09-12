@@ -412,9 +412,9 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 	cMouthDark := color.RGBA{R: 140, G: 25, B: 25, A: 255}
 	cTongue := color.RGBA{R: 220, G: 50, B: 60, A: 255}
 	cTooth := color.RGBA{R: 255, G: 255, B: 250, A: 255}
-	cRoarWave1 := color.RGBA{R: 255, G: 215, B: 50, A: 220}
-	cRoarWave2 := color.RGBA{R: 255, G: 160, B: 30, A: 180}
-	cRoarWave3 := color.RGBA{R: 255, G: 90, B: 25, A: 140}
+	cRoarWave1 := color.RGBA{R: 255, G: 255, B: 255, A: 220} // Onda de pressão de ar sônica
+	cRoarWave2 := color.RGBA{R: 235, G: 110, B: 40, A: 180}  // Laranja terracota
+	cRoarWave3 := color.RGBA{R: 200, G: 60, B: 30, A: 140}   // Carmesim rugido
 
 	// Helper com espelhamento horizontal relativo ao centro da onça
 	centerX := posX + 19.0
