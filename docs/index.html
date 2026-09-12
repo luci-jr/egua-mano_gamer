@@ -633,10 +633,10 @@
     const go = new Go();
     const loadingElem = document.getElementById('loading');
 
-    // Carrega o WASM compactado (.gz) para contornar o limite de 10MB/arquivo do GitHub Pages
+    // Carrega o WASM compactado (game.dat = gzip) para contornar o limite de 10MB/arquivo do GitHub Pages
     async function loadCompressedWasm() {
-      const response = await fetch("game.wasm.gz");
-      if (!response.ok) throw new Error("HTTP " + response.status + " ao baixar game.wasm.gz");
+      const response = await fetch("game.dat");
+      if (!response.ok) throw new Error("HTTP " + response.status + " ao baixar game.dat");
 
       let wasmBytes;
       if (typeof DecompressionStream !== 'undefined') {
