@@ -792,9 +792,9 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 	}
 }
 
-// DrawTitleCoverScreen renderiza a tela de abertura oficial limpa (sem menu) estilo Pitfall / Super Metroid / Contra
+// DrawTitleCoverScreen renderiza a tela de abertura oficial limpa estilo Arcade Retrô com a vista aérea do Ver-o-Peso
 func DrawTitleCoverScreen(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int, version string) {
-	// 1. Imagem de fundo 16-bit estilo Pitfall / Arcade (Templo Perdido e Floresta Amazônica ao Luar)
+	// 1. Imagem de fundo 8-bit aérea do Mercado do Ver-o-Peso e Baía do Guajará
 	tImg := getTitleScreenImage()
 	if tImg != nil {
 		op := &ebiten.DrawImageOptions{}
@@ -807,32 +807,21 @@ func DrawTitleCoverScreen(screen *ebiten.Image, screenWidth, screenHeight float6
 		ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 8, G: 14, B: 24, A: 255})
 	}
 
-	// 2. Fogueiras animadas nas tochas do templo de pedra (efeito visual dinâmico arcade)
-	drawTempleTorches(screen, ticks)
-
-	// 3. Reflexos cintilantes na água do rio amazônico sob o luar
-	for i := 0; i < 7; i++ {
-		glX := 115.0 + float64(i*12) + math.Sin(float64(ticks+i*17)*0.08)*8.0
-		glY := 158.0 + math.Sin(float64(ticks+i*23)*0.06)*12.0
-		alpha := uint8(100 + math.Sin(float64(ticks+i*18)*0.1)*80)
-		ebitenutil.DrawRect(screen, glX, glY, 4, 1, color.RGBA{R: 120, G: 210, B: 240, A: alpha})
-	}
-
-	// 4. Morcegos e aves noturnas cruzando o céu da Amazônia
+	// 2. Aves e garças noturnas sobrevoando a Baía do Guajará
 	drawBelemSkyBirds(screen, screenWidth, ticks)
 
-	// 5. Cabeçalho de Pontuação Arcade estilo anos 90 (1UP e HIGH SCORE)
+	// 3. Cabeçalho de Pontuação Arcade estilo anos 90 (1UP e HIGH SCORE)
 	ebitenutil.DrawRect(screen, 0, 0, screenWidth, 12, color.RGBA{R: 0, G: 0, B: 0, A: 160})
 	ebitenutil.DebugPrintAt(screen, "1UP  00000", 12, 1)
 	ebitenutil.DebugPrintAt(screen, "HIGH 50000", int(screenWidth)-76, 1)
 
-	// 6. Logotipo Oficial Arcade: Tipografia 3D, Ouro Maciço, Fita RUNNER e Runas Marajoaras
+	// 4. Logotipo Oficial Arcade: Tipografia 3D em Ouro Maciço, Fita RUNNER e Faixa Cultural
 	drawArcadeGameLogo(screen, screenWidth, 15.0, ticks, false)
 
-	// 7. Chamada de ação pulsante estilo INSERT COIN / PRESS START BUTTON
+	// 5. Chamada de ação pulsante estilo INSERT COIN / PRESS START BUTTON
 	startW := 250.0
 	startX := (screenWidth - startW) / 2.0
-	startY := 105.0
+	startY := 108.0
 
 	if (ticks/22)%2 == 0 {
 		ebitenutil.DrawRect(screen, startX, startY-2, startW, 18, color.RGBA{R: 8, G: 14, B: 24, A: 220})
@@ -844,23 +833,22 @@ func DrawTitleCoverScreen(screen *ebiten.Image, screenWidth, screenHeight float6
 		ebitenutil.DebugPrintAt(screen, "   APERTE ENTER OU TOQUE NA TELA   ", int(startX)+18, int(startY)+2)
 	}
 
-	// 8. Rodapé clássico de abertura arcade - Dev e Ano
+	// 6. Rodapé clássico de abertura arcade - Dev e Ano
 	botH := 18.0
 	botY := screenHeight - botH
 	ebitenutil.DrawRect(screen, 0, botY, screenWidth, botH, color.RGBA{R: 8, G: 12, B: 22, A: 245})
 	ebitenutil.DrawRect(screen, 0, botY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-
 	ebitenutil.DebugPrintAt(screen, "DEV: LUCIVALDO JUNIOR - 2026", 76, int(botY)+4)
 
-	// 9. Scanlines sutis estilo monitor CRT de Arcade
+	// 7. Scanlines sutis estilo monitor CRT de Arcade
 	for y := 0; y < int(screenHeight); y += 3 {
 		ebitenutil.DrawRect(screen, 0, float64(y), screenWidth, 1, color.RGBA{R: 0, G: 0, B: 0, A: 16})
 	}
 }
 
-// DrawTitleIntro renderiza o menu de opções interativo que surge APÓS o jogador apertar Enter/clicar na tela de título
+// DrawTitleIntro renderiza o menu de opções interativo com layout compacto, elegante e sem poluição visual
 func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int, isAudioPlaying bool, selectedIndex int, isMuted bool, speedLabel string, heroName string, version string) {
-	// 1. Imagem de fundo 16-bit estilo Pitfall / Arcade
+	// 1. Imagem de fundo 8-bit aérea do Mercado do Ver-o-Peso
 	tImg := getTitleScreenImage()
 	if tImg != nil {
 		op := &ebiten.DrawImageOptions{}
@@ -873,41 +861,31 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 		ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 10, G: 16, B: 24, A: 255})
 	}
 
-	// 2. Tochas animadas do templo
-	drawTempleTorches(screen, ticks)
-
-	// 3. Reflexos cintilantes na água
-	for i := 0; i < 7; i++ {
-		glX := 115.0 + float64(i*12) + math.Sin(float64(ticks+i*17)*0.08)*8.0
-		glY := 158.0 + math.Sin(float64(ticks+i*23)*0.06)*12.0
-		alpha := uint8(100 + math.Sin(float64(ticks+i*18)*0.1)*80)
-		ebitenutil.DrawRect(screen, glX, glY, 4, 1, color.RGBA{R: 120, G: 210, B: 240, A: alpha})
-	}
-
-	// 4. Urubus e Garças voando pelo céu
+	// 2. Aves sobrevoando a Baía do Guajará
 	drawBelemSkyBirds(screen, screenWidth, ticks)
 
-	// 5. Logo Principal do Jogo em estilo Arcade
-	drawArcadeGameLogo(screen, screenWidth, 5.0, ticks, true)
+	// 3. Logo Compacto do Jogo no Topo
+	drawArcadeGameLogo(screen, screenWidth, 4.0, ticks, true)
 
-	// 5. Menu Principal Interativo centralizado
-	boxW := 236.0
-	boxH := 94.0
+	// 4. Menu de Opções Compacto e Elegante
+	boxW := 210.0
+	boxH := 86.0
 	boxX := (screenWidth - boxW) / 2.0
-	boxY := 35.0
+	boxY := 62.0
 
-	ebitenutil.DrawRect(screen, boxX+2, boxY+2, boxW, boxH, color.RGBA{R: 0, G: 0, B: 0, A: 140})
-	ebitenutil.DrawRect(screen, boxX, boxY, boxW, boxH, color.RGBA{R: 12, G: 18, B: 32, A: 245})
-	ebitenutil.DrawRect(screen, boxX, boxY, boxW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, boxX, boxY+boxH, boxW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, boxX, boxY, 2, boxH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, boxX+boxW, boxY, 2, boxH+2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	// Painel com borda dourada fina
+	ebitenutil.DrawRect(screen, boxX+2, boxY+2, boxW, boxH, color.RGBA{R: 0, G: 0, B: 0, A: 160})
+	ebitenutil.DrawRect(screen, boxX, boxY, boxW, boxH, color.RGBA{R: 10, G: 16, B: 28, A: 240})
+	ebitenutil.DrawRect(screen, boxX, boxY, boxW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, boxX, boxY+boxH, boxW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, boxX, boxY, 1, boxH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, boxX+boxW, boxY, 1, boxH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 
 	bx := int(boxX)
 	by := int(boxY)
 
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("★ MENU DE AVENTURA (%s) ★", version), bx+28, by+5)
-	ebitenutil.DrawRect(screen, boxX+10, boxY+17, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
+	ebitenutil.DebugPrintAt(screen, "★ OPCOES ★", bx+75, by+4)
+	ebitenutil.DrawRect(screen, boxX+12, boxY+16, boxW-24, 1, color.RGBA{R: 250, G: 205, B: 55, A: 140})
 
 	soundStatus := "SOM: [ LIGADO ]"
 	if isMuted {
@@ -915,54 +893,31 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 	}
 
 	options := []string{
-		"INICIAR AVENTURA",
+		"JOGAR",
 		fmt.Sprintf("HEROI: [ %s ]", heroName),
 		soundStatus,
 		fmt.Sprintf("VELOCIDADE: [ %s ]", speedLabel),
-		"VER CREDITOS",
+		"CREDITOS",
 	}
 
-	startY := by + 21
+	startY := by + 20
 	for i, opt := range options {
-		itemY := startY + i*14
+		itemY := startY + i*13
 		if i == selectedIndex {
-			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), boxW-12, 13, color.RGBA{R: 245, G: 185, B: 45, A: 80})
-			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), 3, 13, color.RGBA{R: 250, G: 210, B: 50, A: 255})
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+10, itemY)
+			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), boxW-12, 12, color.RGBA{R: 245, G: 185, B: 45, A: 75})
+			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), 2, 12, color.RGBA{R: 250, G: 210, B: 50, A: 255})
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+14, itemY)
 		} else {
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+10, itemY)
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+14, itemY)
 		}
 	}
 
-	// 6. Faixa inferior ampla com narrativa cultural de Belém do Pará
-	bannerH := 45.0
-	bannerY := screenHeight - bannerH
-	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, bannerH, color.RGBA{R: 6, G: 12, B: 22, A: 245})
-	ebitenutil.DrawRect(screen, 0, bannerY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-
-	if isAudioPlaying {
-		ebitenutil.DebugPrintAt(screen, "★ TRILHA SONORA: CARIMBO 8-BIT AUTORAL (CHIPTUNE) ★", 10, int(bannerY)+3)
-	} else {
-		ebitenutil.DebugPrintAt(screen, "★ PAID'EGUA RUNNER: UMA AVENTURA EM BELEM DO PARA ★", 10, int(bannerY)+3)
-	}
-
-	// Letreiro de ação e cultura paraense
-	loreTicker := "★ MISSAO: Explore o Mercado do Ver-o-Peso, o cais da Estacao das Docas e o Theatro da Paz!  " +
-		"★ DOIS HEROIS: O destemido Garoto Curumim ou a guardiao Onca-Pintada!  " +
-		"★ CULTURA: Saboreie acai, curta o carimbo de Belem e conquiste as reliquias sagradas!  "
-	loreTextWidth := len(loreTicker) * 6
-	loreOffset := ticks % loreTextWidth
-	loreBaseX := 52 - loreOffset
-	ebitenutil.DebugPrintAt(screen, loreTicker, loreBaseX, int(bannerY)+16)
-	if loreBaseX+loreTextWidth < int(screenWidth) {
-		ebitenutil.DebugPrintAt(screen, loreTicker, loreBaseX+loreTextWidth, int(bannerY)+16)
-	}
-	ebitenutil.DrawRect(screen, 0, bannerY+15, 48, 14, color.RGBA{R: 16, G: 32, B: 52, A: 255})
-	ebitenutil.DrawRect(screen, 48, bannerY+15, 1, 14, color.RGBA{R: 45, G: 215, B: 175, A: 255})
-	ebitenutil.DebugPrintAt(screen, "★BELEM", 4, int(bannerY)+16)
-
-	// Dica clara de navegação
-	ebitenutil.DebugPrintAt(screen, "[CIMA/BAIXO] Navegar | [ENTER/ESPACO] Escolher | [ESC] Voltar", 8, int(bannerY)+30)
+	// 5. Barra inferior discreta e elegante (apenas 16px)
+	botH := 16.0
+	botY := screenHeight - botH
+	ebitenutil.DrawRect(screen, 0, botY, screenWidth, botH, color.RGBA{R: 6, G: 10, B: 18, A: 245})
+	ebitenutil.DrawRect(screen, 0, botY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DebugPrintAt(screen, "[CIMA/BAIXO] Navegar   [ENTER] Escolher   [ESC] Voltar", 20, int(botY)+3)
 
 	// Scanlines sutis estilo monitor CRT de Arcade
 	for y := 0; y < int(screenHeight); y += 3 {
@@ -1230,50 +1185,51 @@ func DrawCreditsScreen(screen *ebiten.Image, screenWidth, screenHeight float64) 
 func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, selectedIndex int, isMuted bool, speedLabel string) {
 	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 10, G: 12, B: 20, A: 140})
 
-	boxW := 214.0
-	boxH := 136.0
+	boxW := 210.0
+	boxH := 122.0
 	boxX := (screenWidth - boxW) / 2.0
 	boxY := (screenHeight - boxH) / 2.0
 
-	ebitenutil.DrawRect(screen, boxX, boxY, boxW, boxH, color.RGBA{R: 22, G: 28, B: 44, A: 245})
-	ebitenutil.DrawRect(screen, boxX, boxY, boxW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, boxX, boxY+boxH, boxW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, boxX, boxY, 2, boxH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, boxX+boxW, boxY, 2, boxH+2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, boxX+2, boxY+2, boxW, boxH, color.RGBA{R: 0, G: 0, B: 0, A: 160})
+	ebitenutil.DrawRect(screen, boxX, boxY, boxW, boxH, color.RGBA{R: 14, G: 20, B: 34, A: 245})
+	ebitenutil.DrawRect(screen, boxX, boxY, boxW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, boxX, boxY+boxH, boxW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, boxX, boxY, 1, boxH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, boxX+boxW, boxY, 1, boxH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 
 	bx := int(boxX)
 	by := int(boxY)
 
-	ebitenutil.DebugPrintAt(screen, "PAUSA - PAID'EGUA RUNNER", bx+34, by+8)
-	ebitenutil.DrawRect(screen, boxX+10, boxY+22, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
+	ebitenutil.DebugPrintAt(screen, "★ PAUSA ★", bx+82, by+6)
+	ebitenutil.DrawRect(screen, boxX+10, boxY+18, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 140})
 
-	soundStatus := "Som: [ LIGADO ]"
+	soundStatus := "SOM: [ LIGADO ]"
 	if isMuted {
-		soundStatus = "Som: [ MUDO ]  "
+		soundStatus = "SOM: [ MUDO ]  "
 	}
 
 	options := []string{
-		"Continuar",
+		"CONTINUAR",
 		soundStatus,
-		fmt.Sprintf("Velocidade: [ %s ]", speedLabel),
-		"Reiniciar Aventura",
-		"Ver Creditos",
-		"Fechar o Jogo",
+		fmt.Sprintf("VELOCIDADE: [ %s ]", speedLabel),
+		"REINICIAR AVENTURA",
+		"VER CREDITOS",
+		"FECHAR O JOGO",
 	}
 
-	startY := by + 28
+	startY := by + 24
 	for i, opt := range options {
-		itemY := startY + i*15
+		itemY := startY + i*13
 		if i == selectedIndex {
-			ebitenutil.DrawRect(screen, boxX+8, float64(itemY-2), boxW-16, 13, color.RGBA{R: 245, G: 185, B: 45, A: 70})
-			ebitenutil.DrawRect(screen, boxX+8, float64(itemY-2), 3, 13, color.RGBA{R: 250, G: 210, B: 50, A: 255})
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+16, itemY)
+			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), boxW-12, 12, color.RGBA{R: 245, G: 185, B: 45, A: 75})
+			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), 2, 12, color.RGBA{R: 250, G: 210, B: 50, A: 255})
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+14, itemY)
 		} else {
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+16, itemY)
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+14, itemY)
 		}
 	}
 
-	ebitenutil.DebugPrintAt(screen, "[CIMA/BAIXO] | [ENTER/DIR] | [ESC]", bx+8, by+int(boxH)-12)
+	ebitenutil.DebugPrintAt(screen, "[CIMA/BAIXO] Navegar   [ENTER] Escolher   [ESC] Voltar", bx+4, by+int(boxH)-12)
 }
 
 func DrawIndigenousWarrior(screen *ebiten.Image, x, y float64, ticks int) {
@@ -1736,4 +1692,121 @@ func DrawStageTransitionLoadingScreen(screen *ebiten.Image, screenWidth, screenH
 		fadeAlpha := uint8(255.0 * (progress - 0.85) / 0.15)
 		ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 12, G: 14, B: 20, A: fadeAlpha})
 	}
+}
+
+// DrawHeroWaterFall renderiza o herói tombando para trás e caindo no rio/baía do Guajará
+func DrawHeroWaterFall(screen *ebiten.Image, x, y float64, heroKind int, vy float64, inWater bool) {
+	if heroKind == 0 { // HeroGaroto
+		cSkin := color.RGBA{R: 228, G: 168, B: 125, A: 255}
+		cHair := color.RGBA{R: 30, G: 25, B: 28, A: 255}
+		cBandana := color.RGBA{R: 235, G: 50, B: 45, A: 255}
+		cShirt := color.RGBA{R: 35, G: 130, B: 220, A: 255}
+		cPants := color.RGBA{R: 190, G: 160, B: 110, A: 255}
+		cWhite := color.RGBA{R: 255, G: 255, B: 255, A: 255}
+		cBlack := color.RGBA{R: 20, G: 20, B: 20, A: 255}
+
+		px := x
+		py := y
+
+		if !inWater {
+			// Garoto caindo para trás de susto com braços para o alto
+			ebitenutil.DrawRect(screen, px-2, py-2, 12, 6, cHair)
+			ebitenutil.DrawRect(screen, px-4, py+3, 14, 3, cBandana)
+			ebitenutil.DrawRect(screen, px+10, py+1, 5, 2, cBandana)
+			ebitenutil.DrawRect(screen, px, py+5, 10, 8, cSkin)
+			ebitenutil.DrawRect(screen, px+2, py+6, 3, 3, cWhite)
+			ebitenutil.DrawRect(screen, px+6, py+6, 3, 3, cWhite)
+			ebitenutil.DrawRect(screen, px+3, py+7, 1, 1, cBlack)
+			ebitenutil.DrawRect(screen, px+7, py+7, 1, 1, cBlack)
+			ebitenutil.DrawRect(screen, px+4, py+10, 3, 2, cBlack)
+
+			// Braços para o alto em pânico cômico
+			ebitenutil.DrawRect(screen, px-5, py+2, 3, 8, cSkin)
+			ebitenutil.DrawRect(screen, px+12, py+2, 3, 8, cSkin)
+
+			// Tronco e bermuda
+			ebitenutil.DrawRect(screen, px-1, py+13, 12, 10, cShirt)
+			ebitenutil.DrawRect(screen, px, py+23, 10, 7, cPants)
+			ebitenutil.DrawRect(screen, px-2, py+28, 4, 6, cSkin)
+			ebitenutil.DrawRect(screen, px+7, py+27, 4, 6, cSkin)
+		} else {
+			// Garoto na água (cabeça e mãos se debatendo)
+			ebitenutil.DrawRect(screen, px-1, py-2, 11, 5, cHair)
+			ebitenutil.DrawRect(screen, px-2, py+2, 12, 2, cBandana)
+			ebitenutil.DrawRect(screen, px, py+4, 10, 7, cSkin)
+			ebitenutil.DrawRect(screen, px+2, py+5, 2, 2, cBlack)
+			ebitenutil.DrawRect(screen, px+6, py+5, 2, 2, cBlack)
+			ebitenutil.DrawRect(screen, px-5, py+1, 3, 4, cSkin)
+			ebitenutil.DrawRect(screen, px+11, py+1, 3, 4, cSkin)
+		}
+	} else { // HeroOnca
+		cFur := color.RGBA{R: 245, G: 190, B: 45, A: 255}
+		cSpot := color.RGBA{R: 35, G: 20, B: 15, A: 255}
+		cWhite := color.RGBA{R: 255, G: 255, B: 255, A: 255}
+		cBlack := color.RGBA{R: 20, G: 20, B: 20, A: 255}
+
+		px := x
+		py := y
+
+		if !inWater {
+			// Onça caindo de costas com patas para cima
+			ebitenutil.DrawRect(screen, px, py+6, 22, 12, cFur)
+			ebitenutil.DrawRect(screen, px+4, py+8, 4, 4, cSpot)
+			ebitenutil.DrawRect(screen, px+12, py+10, 4, 3, cSpot)
+			ebitenutil.DrawRect(screen, px+18, py+2, 10, 10, cFur)
+			ebitenutil.DrawRect(screen, px+22, py, 3, 3, cSpot)
+			ebitenutil.DrawRect(screen, px+22, py+4, 3, 3, cWhite)
+			ebitenutil.DrawRect(screen, px+23, py+5, 1, 1, cBlack)
+			// Patas para cima
+			ebitenutil.DrawRect(screen, px+2, py, 4, 7, cFur)
+			ebitenutil.DrawRect(screen, px+7, py+1, 4, 6, cFur)
+			ebitenutil.DrawRect(screen, px+14, py, 4, 7, cFur)
+			ebitenutil.DrawRect(screen, px+18, py+1, 4, 6, cFur)
+			// Cauda enrolada
+			ebitenutil.DrawRect(screen, px-5, py+10, 6, 3, cFur)
+			ebitenutil.DrawRect(screen, px-7, py+6, 3, 5, cSpot)
+		} else {
+			// Onça na água
+			ebitenutil.DrawRect(screen, px+6, py+2, 10, 8, cFur)
+			ebitenutil.DrawRect(screen, px+10, py+3, 3, 3, cSpot)
+			ebitenutil.DrawRect(screen, px+10, py+4, 2, 2, cBlack)
+			ebitenutil.DrawRect(screen, px+2, py+2, 3, 4, cFur)
+			ebitenutil.DrawRect(screen, px+17, py+2, 3, 4, cFur)
+		}
+	}
+}
+
+// DrawWaterSplash desenha as ondas e o jato de borrifos d'água no rio (Tchibum na Baía!)
+func DrawWaterSplash(screen *ebiten.Image, x, y float64, splashTimer int) {
+	progress := 1.0 - float64(splashTimer)/45.0
+	expand := progress * 32.0
+
+	cWaterWhite := color.RGBA{R: 255, G: 255, B: 255, A: 240}
+	cWaterCyan := color.RGBA{R: 120, G: 230, B: 255, A: 220}
+	cWaterBlue := color.RGBA{R: 45, G: 140, B: 230, A: 190}
+
+	// 1. Ondas concêntricas na superfície do rio
+	ebitenutil.DrawRect(screen, x-expand-10, y, (expand+10)*2, 2, cWaterCyan)
+	ebitenutil.DrawRect(screen, x-expand*0.7-6, y+2, (expand*0.7+6)*2, 2, cWaterBlue)
+	ebitenutil.DrawRect(screen, x-expand*0.4-3, y-1, (expand*0.4+3)*2, 1, cWaterWhite)
+
+	// 2. Colunas e borrifos de água subindo em arco
+	for i := -3; i <= 3; i++ {
+		fi := float64(i)
+		arcHeight := math.Sin(progress*math.Pi) * (20.0 - math.Abs(fi)*3.0)
+		sprayX := x + fi*6.0 + fi*progress*8.0
+		sprayY := y - arcHeight
+
+		if arcHeight > 2.0 {
+			ebitenutil.DrawRect(screen, sprayX, sprayY, 3, 3, cWaterWhite)
+			ebitenutil.DrawRect(screen, sprayX+1, sprayY+3, 2, 4, cWaterCyan)
+		}
+	}
+
+	// 3. Popup estilizado "-1 VIDA!" flutuando
+	popY := y - 28.0 - progress*12.0
+	popX := x - 18.0
+	ebitenutil.DrawRect(screen, popX-2, popY-1, 46, 12, color.RGBA{R: 180, G: 30, B: 30, A: 220})
+	ebitenutil.DrawRect(screen, popX-2, popY-1, 46, 1, color.RGBA{R: 255, G: 220, B: 60, A: 255})
+	ebitenutil.DebugPrintAt(screen, "-1 VIDA!", int(popX)+2, int(popY))
 }

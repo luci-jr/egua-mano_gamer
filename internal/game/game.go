@@ -23,8 +23,8 @@ const (
 )
 
 var (
-	SpeedMultipliers = []float64{0.6, 0.8, 1.0, 1.3}
-	SpeedLabels      = []string{"0.6x CALMO", "0.8x NORMAL", "1.0x RAPIDO", "1.3x TURBO"}
+	SpeedMultipliers = []float64{0.65, 0.85, 1.15}
+	SpeedLabels      = []string{"LENTO", "NORMAL", "RAPIDO"}
 )
 
 type Engine struct {
@@ -56,6 +56,17 @@ type Engine struct {
 	speechBubbleTimer int
 	speechBubbleText  string
 	heatSpeechTimer   int
+
+	// Animação dramática/cômica de queda no rio / baía com splash
+	waterFallActive          bool
+	waterFallTimer           int
+	waterFallHeroX           float64
+	waterFallHeroY           float64
+	waterFallHeroVX          float64
+	waterFallHeroVY          float64
+	waterFallSplashTriggered bool
+	waterFallSplashTimer     int
+
 	stage             int
 	stageDistance     float64
 	stageBannerTimer  int
@@ -437,20 +448,22 @@ func (e *Engine) Update() error {
 
 		// Detecção de clique / toque no Menu
 		mouseTriggered := false
-		boxX := (ScreenWidth - 226.0) / 2.0
-		boxY := 35.0
-		startY := boxY + 21.0
+		boxW := 210.0
+		boxH := 86.0
+		boxX := (ScreenWidth - boxW) / 2.0
+		boxY := 62.0
+		startY := boxY + 20.0
 
 		if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 			mx, my := ebiten.CursorPosition()
 			fmx, fmy := float64(mx), float64(my)
-			if fmx >= boxX && fmx <= boxX+226.0 && fmy >= startY && fmy <= startY+5*14.0 {
-				clickedIdx := int((fmy - startY) / 14.0)
+			if fmx >= boxX && fmx <= boxX+boxW && fmy >= startY && fmy <= startY+5*13.0 {
+				clickedIdx := int((fmy - startY) / 13.0)
 				if clickedIdx >= 0 && clickedIdx < 5 {
 					e.introMenuIndex = clickedIdx
 					mouseTriggered = true
 				}
-			} else if fmy >= boxY && fmy <= boxY+94.0 {
+			} else if fmy >= boxY && fmy <= boxY+boxH {
 				mouseTriggered = true
 			}
 		}
@@ -459,8 +472,8 @@ func (e *Engine) Update() error {
 		for _, id := range menuTouches {
 			tx, ty := ebiten.TouchPosition(id)
 			ftx, fty := float64(tx), float64(ty)
-			if ftx >= boxX && ftx <= boxX+226.0 && fty >= startY && fty <= startY+5*14.0 {
-				clickedIdx := int((fty - startY) / 14.0)
+			if ftx >= boxX && ftx <= boxX+boxW && fty >= startY && fty <= startY+5*13.0 {
+				clickedIdx := int((fty - startY) / 13.0)
 				if clickedIdx >= 0 && clickedIdx < 5 {
 					e.introMenuIndex = clickedIdx
 					mouseTriggered = true
@@ -746,6 +759,58 @@ func (e *Engine) Update() error {
 	}
 
 	e.ticks++
+
+	// Se a animação de queda no rio / baía com splash estiver ativa, processa a cinemática de perda de vida
+	if e.waterFallActive {
+		e.waterFallTimer--
+		if !e.waterFallSplashTriggered {
+			e.waterFallHeroX += e.waterFallHeroVX
+			e.waterFallHeroY += e.waterFallHeroVY
+			e.waterFallHeroVY += 0.32 // Gravidade acelerando a queda
+			if e.waterFallHeroY >= GroundY+6.0 {
+				e.waterFallSplashTriggered = true
+				e.waterFallSplashTimer = 45
+				e.audio.PlaySplash()
+				e.shakeTimer = 10
+				if e.selectedHero == entities.HeroOnca {
+					e.speechBubbleText = "TCHIBUM! ONCA NO GUAJARA!"
+				} else {
+					e.speechBubbleText = "TCHIBUM NA BAIA DO GUAJARA!"
+				}
+				e.speechBubbleTimer = 55
+			}
+		} else {
+			if e.waterFallSplashTimer > 0 {
+				e.waterFallSplashTimer--
+			}
+		}
+
+		if e.waterFallTimer <= 0 {
+			e.waterFallActive = false
+			if e.lives <= 0 {
+				e.lives = 0
+				e.hearts = 0
+				e.isGameOver = true
+				if e.selectedHero == entities.HeroOnca {
+					e.speechBubbleText = "Arrgh! A floresta me chama..."
+				} else {
+					e.speechBubbleText = "Levei o farelo mano, mancada!"
+				}
+				e.speechBubbleTimer = 999999
+				e.audio.PauseBGM()
+				e.audio.PlayGameOver()
+			} else {
+				e.hearts = 3 // Restaura os 3 corações para a próxima vida
+				e.player.Reset()
+				e.player.SetPositionX(45.0)
+				e.player.SetGroundOffset(0)
+				e.invincibleTicks = 100 // Proteção temporária após respawn
+				e.speechBubbleText = fmt.Sprintf("AGORA VAI! RESTAM %d VIDAS", e.lives)
+				e.speechBubbleTimer = 75
+			}
+		}
+		return nil
+	}
 
 	if e.hitDelayTimer > 0 {
 		e.hitDelayTimer--
@@ -1136,29 +1201,23 @@ func (e *Engine) Update() error {
 		e.mudSinkTimer = 0
 		e.hearts--
 		e.shakeTimer = 14
-			if e.hearts <= 0 {
-				e.lives--
-				if e.lives <= 0 {
-					e.lives = 0
-					e.hearts = 0
-					e.isGameOver = true
-					if e.selectedHero == entities.HeroOnca {
-						e.speechBubbleText = "Arrgh! A floresta me chama..."
-					} else {
-						e.speechBubbleText = "Levei o farelo mano, mancada!"
-					}
-					e.speechBubbleTimer = 999999
-					e.audio.PauseBGM()
-					e.audio.PlayGameOver()
-				} else {
-					e.hearts = 3 // Restaura os 3 corações para a próxima vida
-					e.speechBubbleText = fmt.Sprintf("PERDEU 1 VIDA! RESTAM %d", e.lives)
-					e.speechBubbleTimer = 85
-					e.hitDelayTimer = 25
-					e.invincibleTicks = 90
-					e.audio.PlayHit()
-				}
-			} else {
+		if e.hearts <= 0 {
+			e.lives--
+			e.hearts = 0
+			e.audio.PlayHit()
+
+			// Dispara a animação dramática de queda no rio / splash na baía do Guajará
+			e.waterFallActive = true
+			e.waterFallTimer = 75
+			e.waterFallHeroX = playerX
+			e.waterFallHeroY = playerY
+			e.waterFallHeroVX = -1.2
+			e.waterFallHeroVY = -3.8
+			e.waterFallSplashTriggered = false
+			e.waterFallSplashTimer = 0
+			e.hitDelayTimer = 0
+			e.invincibleTicks = 0
+		} else {
 				if hitType == entities.TypeJacare {
 					if e.selectedHero == entities.HeroOnca {
 						e.speechBubbleText = "EGUA DO JACARE FOFOQUEIRO!"
@@ -1232,16 +1291,29 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 		return
 	}
 
-	e.player.Draw(screen, GroundY, e.ticks, e.invincibleTicks)
+	if e.waterFallActive {
+		ui.DrawHeroWaterFall(screen, e.waterFallHeroX, e.waterFallHeroY, e.selectedHero, e.waterFallHeroVY, e.waterFallSplashTriggered)
+		if e.waterFallSplashTriggered {
+			ui.DrawWaterSplash(screen, e.waterFallHeroX, GroundY+8.0, e.waterFallSplashTimer)
+		}
+	} else {
+		e.player.Draw(screen, GroundY, e.ticks, e.invincibleTicks)
+	}
 
 	if e.speechBubbleTimer > 0 && e.speechBubbleText != "" {
-		pX, pY, _, _ := e.player.GetBounds(GroundY)
+		pX, pY := 0.0, 0.0
+		if e.waterFallActive {
+			pX = e.waterFallHeroX
+			pY = e.waterFallHeroY
+		} else {
+			pX, pY, _, _ = e.player.GetBounds(GroundY)
+		}
 		bubbleX := pX - 10
 		if bubbleX < 10 {
 			bubbleX = 10
 		}
 		if bubbleX+float64(len(e.speechBubbleText)*6) > ScreenWidth-10 {
-			bubbleX = pX - 25
+			bubbleX = ScreenWidth - 10 - float64(len(e.speechBubbleText)*6)
 		}
 		ui.DrawSpeechBubble(screen, bubbleX, pY-24, e.speechBubbleText)
 	}

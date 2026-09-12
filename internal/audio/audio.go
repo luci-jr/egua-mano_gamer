@@ -22,6 +22,7 @@ type Manager struct {
 	sndEguaMano   []byte
 	sndGameOver   []byte
 	sndStageUp    []byte
+	sndSplash     []byte
 	bgmPlayer     *ebitenaudio.Player
 	introPlayer   *ebitenaudio.Player
 	isMuted       bool
@@ -86,6 +87,38 @@ func createHitPunch() []byte {
 
 		envelope := math.Exp(-4.5 * t)
 		sample := int16(tone * envelope * 0.35 * 32767.0)
+
+		idx := i * 4
+		buf[idx] = byte(sample)
+		buf[idx+1] = byte(sample >> 8)
+		buf[idx+2] = byte(sample)
+		buf[idx+3] = byte(sample >> 8)
+	}
+	return buf
+}
+
+func createSplashSound() []byte {
+	durationMs := 340
+	numSamples := sampleRate * durationMs / 1000
+	buf := make([]byte, numSamples*4)
+	phase := 0.0
+	noiseSeed := uint32(987654321)
+
+	for i := 0; i < numSamples; i++ {
+		t := float64(i) / float64(numSamples)
+
+		// Impacto aquático: queda de frequência de 240Hz para 50Hz com modulação de borbulhas
+		freq := 240.0*math.Exp(-9.0*t) + 50.0 + 28.0*math.Sin(t*math.Pi*16.0)
+		phase += 2.0 * math.Pi * freq / float64(sampleRate)
+
+		tone := math.Sin(phase) * 0.55
+
+		// Borrifo líquido (ruído filtrado de splash d'água)
+		noiseSeed = noiseSeed*1664525 + 1013904223
+		noise := (float64((noiseSeed>>16)&0xFF)/128.0 - 1.0) * math.Exp(-4.5*t) * 0.45
+
+		envelope := math.Exp(-3.2 * t)
+		sample := int16((tone + noise) * envelope * 0.42 * 32767.0)
 
 		idx := i * 4
 		buf[idx] = byte(sample)
@@ -697,6 +730,7 @@ func NewManager() *Manager {
 		sndEguaMano:   createEguaManoSfx(),
 		sndGameOver:   createSmoothTone(320, 95, 450, 0.3),
 		sndStageUp:    createStageUpJingle(),
+		sndSplash:     createSplashSound(),
 		isMuted:       false,
 		isIntroActive: false,
 	}
@@ -826,6 +860,13 @@ func (m *Manager) PlayTreasure() {
 		return
 	}
 	m.ctx.NewPlayerFromBytes(m.sndTreasure).Play()
+}
+
+func (m *Manager) PlaySplash() {
+	if m.isMuted || m.ctx == nil || len(m.sndSplash) == 0 {
+		return
+	}
+	m.ctx.NewPlayerFromBytes(m.sndSplash).Play()
 }
 
 func (m *Manager) PauseBGM() {
