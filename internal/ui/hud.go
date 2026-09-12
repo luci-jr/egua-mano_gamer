@@ -323,10 +323,10 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 		// Faixa central com destaque
 		ebitenutil.DrawRect(screen, logoX+36, logoY+4, logoW-72, 11, color.RGBA{R: 195, G: 25, B: 40, A: 240})
 		ebitenutil.DrawRect(screen, logoX+36, logoY+4, logoW-72, 1, color.RGBA{R: 255, G: 220, B: 75, A: 255})
-		ebitenutil.DrawRect(screen, logoX+36, logoY+14, logoW-72, 1, color.RGBA{R: 255, G: 220, B: 75, A: 255})
+		ebitenutil.DrawRect(screen, logoX+36, logoY+15, logoW-72, 1, color.RGBA{R: 255, G: 220, B: 75, A: 255})
 
 		ebitenutil.DebugPrintAt(screen, "EGUA MANO! GAMER", 112, int(logoY)+3)
-		ebitenutil.DebugPrintAt(screen, "UMA AVENTURA EM BELEM DO PARA", 73, int(logoY)+16)
+		ebitenutil.DebugPrintAt(screen, "UMA AVENTURA EM BELEM DO PARA", 73, int(logoY)+17)
 		return
 	}
 
@@ -750,24 +750,24 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 		runCurX += float64(rg.w*2 + 6)
 	}
 
-	// 8. SUBTÍTULO CINZELADO NA PEDRA (PERFEITAMENTE ALINHADO E CENTRALIZADO)
+	// 8. SUBTÍTULO CINZELADO NA PEDRA (PERFEITAMENTE ALINHADO E CENTRALIZADO ABAIXO DA FRASE)
 	subY := bgY + 60.0
-	ebitenutil.DrawRect(screen, bgX+24, subY, bgW-48, 15, color.RGBA{R: 8, G: 12, B: 18, A: 210})
+	ebitenutil.DrawRect(screen, bgX+24, subY, bgW-48, 18, color.RGBA{R: 8, G: 12, B: 18, A: 210})
 	ebitenutil.DrawRect(screen, bgX+24, subY, bgW-48, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
-	ebitenutil.DrawRect(screen, bgX+24, subY+14, bgW-48, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
+	ebitenutil.DrawRect(screen, bgX+24, subY+17, bgW-48, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
 
 	// Estrelas ornamentais douradas nas laterais (simetria perfeita)
 	// Esquerda (X = 54)
-	ebitenutil.DrawRect(screen, 54, subY+5, 1, 5, color.RGBA{R: 250, G: 205, B: 55, A: 240})
-	ebitenutil.DrawRect(screen, 52, subY+7, 5, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
-	ebitenutil.DrawRect(screen, 53, subY+6, 3, 3, color.RGBA{R: 255, G: 240, B: 150, A: 255})
+	ebitenutil.DrawRect(screen, 54, subY+6, 1, 5, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+	ebitenutil.DrawRect(screen, 52, subY+8, 5, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+	ebitenutil.DrawRect(screen, 53, subY+7, 3, 3, color.RGBA{R: 255, G: 240, B: 150, A: 255})
 
 	// Direita (X = 266)
-	ebitenutil.DrawRect(screen, 266, subY+5, 1, 5, color.RGBA{R: 250, G: 205, B: 55, A: 240})
-	ebitenutil.DrawRect(screen, 264, subY+7, 5, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
-	ebitenutil.DrawRect(screen, 265, subY+6, 3, 3, color.RGBA{R: 255, G: 240, B: 150, A: 255})
+	ebitenutil.DrawRect(screen, 266, subY+6, 1, 5, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+	ebitenutil.DrawRect(screen, 264, subY+8, 5, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+	ebitenutil.DrawRect(screen, 265, subY+7, 3, 3, color.RGBA{R: 255, G: 240, B: 150, A: 255})
 
-	ebitenutil.DebugPrintAt(screen, "UMA AVENTURA EM BELEM DO PARA", 73, int(subY)+2)
+	ebitenutil.DebugPrintAt(screen, "UMA AVENTURA EM BELEM DO PARA", 73, int(subY)+3)
 
 	// 9. ESTRELAS CINTILANTES (SPARKLES DE 4 PONTAS)
 	sparkleCoords := [][2]float64{

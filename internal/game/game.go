@@ -62,7 +62,6 @@ type Engine struct {
 	mudSinkTimer      int
 	speechBubbleTimer int
 	speechBubbleText  string
-	heatSpeechTimer   int
 
 	// Animação dramática/cômica de queda no rio / baía com splash
 	waterFallActive          bool
@@ -131,7 +130,6 @@ func NewEngine() *Engine {
 		mudSinkTimer:      0,
 		speechBubbleTimer: 0,
 		speechBubbleText:  "",
-		heatSpeechTimer:   0,
 		stage:             1,
 		stageBannerTimer:  120,
 		isTitleCover:      true,
