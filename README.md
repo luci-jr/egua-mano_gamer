@@ -1,5 +1,13 @@
 # 🏹 Égua Mano! Gamer: Uma Aventura em Belém do Pará
 
+<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=00bfbf&height=120&section=header&text=%C3%89GUA%20MANO!%20GAMER&fontSize=38&fontColor=ffffff&fontAlignY=35" alt="Header Wave" />
+
+<div align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Press+Start+2P&size=20&color=00bfbf&background=00000000&center=true&vCenter=true&width=850&height=60&lines=%F0%9F%8E%AE+%C3%89GUA+MANO!+GAMER;%F0%9F%8F%99%EF%B8%8F+UMA+AVENTURA+EM+BEL%C3%89M+DO+PAR%C3%81;%E2%9A%A1+DESENVOLVIDO+100%25+EM+GO+%2B+EBITENGINE+V2;%F0%9F%8F%8F+GAROTO+CURUMIM+%26+ON%C3%87A-PINTADA;%F0%9F%8C%90+JOGUE+ONLINE+VIA+WEBASSEMBLY!" alt="Égua Mano! Gamer Typing SVG" />
+</div>
+
+
+
 <p align="center">
   <a href="https://github.com/luci-jr">
     <img src="https://img.shields.io/badge/Desenvolvedor-Lucivaldo%20Junior-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Lucivaldo Junior" />
@@ -233,3 +241,11 @@ go build -o egua-mano_gamer main.go
 * **Gênero:** Corrida de Aventura & Plataforma Arcade Retrô
 * **Inspiração:** *Pitfall: The Mayan Adventure* (1994)
 * **Cenários & Temática:** Belém do Pará, Amazônia, Brasil 🇧🇷
+
+<br>
+
+<div align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Press+Start+2P&size=20&color=00bfbf&background=00000000&center=true&vCenter=true&width=500&height=50&lines=GAME+OVER%3F+INSERT+COIN!;BORA+L%C3%81+MANINHO!" alt="Finish Typing" />
+</div>
+
+<img width="100%" src="https://capsule-render.vercel.app/api?type=waving&color=00bfbf&height=120&section=footer" alt="Footer Wave" />
