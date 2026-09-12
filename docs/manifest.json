@@ -1,0 +1,25 @@
+{
+  "name": "Égua Mano! Gamer - Uma Aventura em Belém do Pará",
+  "short_name": "Égua Mano!",
+  "description": "Jogo de ação e aventura em pixel art pelas ruas históricas de Belém do Pará.",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#080c14",
+  "theme_color": "#facc15",
+  "categories": ["games", "arcade", "action"],
+  "icons": [
+    {
+      "src": "assets/favicon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}
