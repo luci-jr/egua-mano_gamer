@@ -633,18 +633,34 @@
     const go = new Go();
     const loadingElem = document.getElementById('loading');
 
-    if (!WebAssembly.instantiateStreaming) {
-      WebAssembly.instantiateStreaming = async (resp, importObject) => {
-        const source = await (await resp).arrayBuffer();
-        return await WebAssembly.instantiate(source, importObject);
-      };
-    }
+    // Carrega o WASM compactado (.gz) para contornar o limite de 10MB/arquivo do GitHub Pages
+    async function loadCompressedWasm() {
+      const response = await fetch("game.wasm.gz");
+      if (!response.ok) throw new Error("HTTP " + response.status + " ao baixar game.wasm.gz");
 
-    WebAssembly.instantiateStreaming(fetch("game.wasm"), go.importObject).then((result) => {
+      let wasmBytes;
+      if (typeof DecompressionStream !== 'undefined') {
+        // Navegadores modernos: descomprime via stream nativo
+        const ds = new DecompressionStream('gzip');
+        const decompressed = response.body.pipeThrough(ds);
+        wasmBytes = await new Response(decompressed).arrayBuffer();
+      } else {
+        // Fallback: descomprime via Response (navegadores mais antigos)
+        const compressed = await response.arrayBuffer();
+        const blob = new Blob([compressed]);
+        const dsResponse = new Response(blob, {
+          headers: { 'Content-Encoding': 'gzip', 'Content-Type': 'application/wasm' }
+        });
+        wasmBytes = await dsResponse.arrayBuffer();
+      }
+
+      const result = await WebAssembly.instantiate(wasmBytes, go.importObject);
       if (loadingElem) loadingElem.style.display = 'none';
       go.run(result.instance);
       window.focus();
-    }).catch((err) => {
+    }
+
+    loadCompressedWasm().catch((err) => {
       console.error(err);
       if (loadingElem) {
         loadingElem.innerHTML = "<p style='color: #ef4444; font-weight: bold;'>Erro ao carregar o jogo: " + err + "</p>";

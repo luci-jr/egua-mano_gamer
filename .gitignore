@@ -15,8 +15,9 @@
 *.test
 *.out
 
-# Executáveis WebAssembly temporários na raiz (manter docs/game.wasm rastreado)
+# Executáveis WebAssembly (manter apenas docs/game.wasm.gz rastreado)
 /game.wasm
+docs/game.wasm
 
 # Arquivos e diretórios temporários de build
 /dist/
