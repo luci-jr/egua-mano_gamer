@@ -85,6 +85,7 @@ type Engine struct {
 	pauseMenuIndex    int
 	isGameOver        bool
 	isStageComplete   bool
+	wasFocused        bool
 }
 
 func NewEngine() *Engine {
@@ -135,6 +136,7 @@ func NewEngine() *Engine {
 		pauseMenuIndex:    0,
 		isGameOver:        false,
 		isStageComplete:   false,
+		wasFocused:        true,
 	}
 }
 
@@ -152,6 +154,11 @@ func isPointerJustPressed() bool {
 }
 
 func (e *Engine) Update() error {
+	// Se a tela não estiver em gameplay ativa, consome evento de unfocus pendente
+	if e.isShowingCredits || e.isTitleCover || e.isSaoBrasIntro || e.isCharSelect || e.isTitleScreen || e.isPaused || e.isStageComplete || e.isGameOver {
+		resetVirtualKey("JustUnfocused")
+	}
+
 	// 1. Tela de Créditos (visível sobre qualquer tela)
 	if e.isShowingCredits {
 		exitCredits := isPointerJustPressed() ||
@@ -758,6 +765,19 @@ func (e *Engine) Update() error {
 		return nil
 	}
 
+	// Auto-pausa inteligente e silenciamento se a tela perder foco ou for para segundo plano (ex: alternar para WhatsApp / outro app)
+	currentFocused := ebiten.IsFocused()
+	focusLost := !currentFocused && e.wasFocused
+	e.wasFocused = currentFocused
+
+	if focusLost || !currentFocused || getVirtualKey("JustUnfocused") || getVirtualKey("PageHidden") {
+		resetVirtualKey("JustUnfocused")
+		e.isPaused = true
+		e.pauseMenuIndex = 0
+		e.audio.PauseBGM()
+		return nil
+	}
+
 	e.ticks++
 
 	// Se a animação de queda no rio / baía com splash estiver ativa, processa a cinemática de perda de vida
@@ -1354,6 +1374,7 @@ func (e *Engine) Layout(outsideWidth, outsideHeight int) (int, int) {
 func Start() error {
 	ebiten.SetWindowSize(680, 420)
 	ebiten.SetWindowTitle("PaiD'egua Runner - Uma Aventura em Belém do Pará")
+	ebiten.SetRunnableOnUnfocused(false)
 
 	engine := NewEngine()
 	return ebiten.RunGame(engine)
