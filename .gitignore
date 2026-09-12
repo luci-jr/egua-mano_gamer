@@ -1,8 +1,10 @@
 # Binários e arquivos compilados nativos
-paidegua-game
-paidegua-game.exe
-runner
-runner-game
+/paidegua-runner
+/paidegua-runner.exe
+/paidegua-game
+/paidegua-game.exe
+/runner
+/runner-game
 *.exe
 *.exe~
 *.dll

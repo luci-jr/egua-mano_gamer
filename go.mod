@@ -1,4 +1,4 @@
-module github.com/luci-jr/paidegua-game
+module github.com/luci-jr/paidegua-runner
 
 go 1.26.4
 

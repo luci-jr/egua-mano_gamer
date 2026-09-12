@@ -5,7 +5,7 @@
 > Um jogo de ação e aventura arcade retrô construído 100% em **Go** com **Ebitengine (v2)**, ambientado nas paisagens, cartões-postais e na cultura vibrante de **Belém do Pará**.
 >
 > 🕹️ **Jogue agora online no navegador (WebAssembly):**  
-> 👉 **[https://luci-jr.github.io/paidegua-game/](https://luci-jr.github.io/paidegua-game/)** *(Zero instalação, compatível com PC e Celular / Smartphone Android & iOS!)*
+> 👉 **[https://luci-jr.github.io/paidegua-runner/](https://luci-jr.github.io/paidegua-runner/)** *(Zero instalação, compatível com PC e Celular / Smartphone Android & iOS!)*
 
 ---
 
@@ -152,7 +152,7 @@ Durante o jogo e na tela de abertura, o rodapé exibe um letreiro digital contí
 ## 🏗️ Arquitetura do Software (Standard Go Layout)
 
 ```text
-paidegua-game/
+paidegua-runner/
 ├── cmd/
 │   └── runner/
 │       └── main.go              # Entrypoint oficial da aplicação (< 15 linhas)
@@ -185,7 +185,7 @@ paidegua-game/
 │   └── wasm_exec.js             # Ponte de execução Go-WASM oficial
 ├── GUIA_APRENDIZADO.md          # Guia técnico passo a passo de aprendizado
 ├── main.go                      # Wrapper na raiz para execução rápida
-├── go.mod                       # Módulo Go (github.com/luci-jr/paidegua-game)
+├── go.mod                       # Módulo Go (github.com/luci-jr/paidegua-runner)
 └── go.sum                       # Checksums das bibliotecas
 ```
 
@@ -213,7 +213,7 @@ Ao invés de carregar arquivos `.wav` ou `.mp3` pesados, todos os efeitos e mús
 
 ### 🌐 1. Jogar Online no Navegador (WebAssembly)
 Acesse diretamente o link oficial no GitHub Pages:
-👉 **[https://luci-jr.github.io/paidegua-game/](https://luci-jr.github.io/paidegua-game/)**
+👉 **[https://luci-jr.github.io/paidegua-runner/](https://luci-jr.github.io/paidegua-runner/)**
 
 Para testar localmente:
 ```bash
@@ -228,8 +228,8 @@ python3 -m http.server 8080 --directory docs
 go run ./cmd/runner
 
 # Ou compilar o binário local
-go build -o paidegua-game ./cmd/runner
-./paidegua-game
+go build -o paidegua-runner ./cmd/runner
+./paidegua-runner
 ```
 
 ---
