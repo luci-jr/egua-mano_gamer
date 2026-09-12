@@ -998,20 +998,12 @@ func (e *Engine) Update() error {
 
 	playerX, playerY, playerW, playerH := e.player.GetBounds(GroundY)
 
-	// Lógica de Plataformas Sólidas estilo Pitfall (Pousar e subir no Paneiro de Açaí ou Dorso do Jacaré)
+	// Lógica de Plataformas Sólidas estilo Pitfall (Pousar e subir no Paneiro de Açaí, Dorso do Jacaré ou Banco)
 	if e.currentPlatform != nil {
 		if !e.currentPlatform.IsPlayerOnTop(playerX, playerW) {
 			// O jogador caminhou para fora do obstáculo ou o obstáculo se moveu: queda suave
 			e.currentPlatform = nil
 			e.player.FallFromPlatform()
-		} else if e.currentPlatform.Type == entities.TypeJacare {
-			// Se o herói está em pé sobre o jacaré em movimento e sem andar, desloca-se junto com a montaria
-			if !moveForward && !moveBackward {
-				curX, _ := e.player.GetPosition()
-				if curX > 20.0 {
-					e.player.SetPositionX(curX - 0.85)
-				}
-			}
 		}
 	}
 	if e.currentPlatform == nil {

@@ -483,22 +483,20 @@ func (m *ObstacleManager) Update(speed float64) int {
 			continue
 		}
 
-		// Deslocamento de obstáculos e animais:
-		// Animais mantêm uma velocidade autônoma perfeitamente constante (constância previsível e justa)
-		// Obstáculos fixos do terreno (banco de praça, paneiro, caixotes) deslocam-se exclusivamente com o scroll do mundo
+		// 1. Deslocamento com o scroll da câmera (todos os objetos do mundo acompanham o cenário)
+		obs.X -= speed
+
+		// 2. Movimentação autônoma suave dos predadores no chão/ar em direção ao herói
 		switch obs.Type {
 		case TypeJacare:
-			// Jacaré-Açu: velocidade constante de aproximação predatória
-			obs.X -= 0.85
+			// Jacaré-Açu rasteja sutilmente para a frente no chão
+			obs.X -= 0.35
 		case TypeSnake:
-			// Cobra-Coral: velocidade constante de ondulação rasteira
-			obs.X -= 1.15
+			// Cobra-Coral serpenteia com agilidade natural
+			obs.X -= 0.50
 		case TypeAir:
-			// Ave (Urubu / Gaivota): velocidade constante de voo cortando o céu
-			obs.X -= 1.45
-		default:
-			// Elementos estáticos do terreno (Paneiro de Açaí, Caixote, Cesto, Banco de Praça)
-			obs.X -= speed
+			// Urubu / ave sobrevoa os céus
+			obs.X -= 0.70
 		}
 
 		if obs.X < -40 {
