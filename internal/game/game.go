@@ -21,6 +21,10 @@ const (
 	BaseSpeed           = 2.3
 	StageTargetDistance = 2800.0
 	GameVersion         = "VER. 2.4.0"
+
+	CharSelectSourceTitle    = 0
+	CharSelectSourcePause    = 1
+	CharSelectSourceGameOver = 2
 )
 
 var (
@@ -34,6 +38,7 @@ type Engine struct {
 	onca              *entities.Onca
 	selectedHero      int
 	isCharSelect      bool
+	charSelectSource  int
 	projectiles       *entities.ProjectileManager
 	obstacles         *entities.ObstacleManager
 	currentPlatform   *entities.Obstacle
@@ -103,6 +108,7 @@ func NewEngine() *Engine {
 		onca:              o,
 		selectedHero:      entities.HeroGaroto,
 		isCharSelect:      false,
+		charSelectSource:  CharSelectSourceTitle,
 		projectiles:       entities.NewProjectileManager(ScreenWidth),
 		obstacles:         entities.NewObstacleManager(ScreenWidth, GroundY),
 		vines:             entities.NewVineManager(ScreenWidth),
@@ -438,6 +444,23 @@ func (e *Engine) Update() error {
 				e.player = e.onca
 			}
 			e.isCharSelect = false
+
+			if e.charSelectSource == CharSelectSourcePause {
+				e.applySelectedHero()
+				e.isPaused = false
+				if !e.audio.IsMuted() {
+					e.audio.ResumeBGM()
+				}
+				return nil
+			}
+
+			if e.charSelectSource == CharSelectSourceGameOver {
+				e.applySelectedHero()
+				e.isGameOver = true
+				return nil
+			}
+
+			// Veio da abertura/título (CharSelectSourceTitle): Inicia a partida!
 			e.isSaoBrasIntro = false
 			e.isTitleScreen = false
 			e.currentPlatform = nil
@@ -453,6 +476,14 @@ func (e *Engine) Update() error {
 		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") {
 			resetVirtualKey("Escape")
 			e.isCharSelect = false
+			if e.charSelectSource == CharSelectSourcePause {
+				e.isPaused = true
+				return nil
+			}
+			if e.charSelectSource == CharSelectSourceGameOver {
+				e.isGameOver = true
+				return nil
+			}
 			e.isSaoBrasIntro = true
 			return nil
 		}
@@ -527,8 +558,8 @@ func (e *Engine) Update() error {
 
 		// Detecção de clique / toque no Menu
 		mouseTriggered := false
-		boxW := 210.0
-		boxH := 86.0
+		boxW := 226.0
+		boxH := 88.0
 		boxX := (ScreenWidth - boxW) / 2.0
 		boxY := 62.0
 		startY := boxY + 20.0
@@ -557,7 +588,7 @@ func (e *Engine) Update() error {
 					e.introMenuIndex = clickedIdx
 					mouseTriggered = true
 				}
-			} else {
+			} else if fty >= boxY && fty <= boxY+boxH {
 				mouseTriggered = true
 			}
 		}
@@ -579,19 +610,12 @@ func (e *Engine) Update() error {
 		if selectTriggered {
 			switch e.introMenuIndex {
 			case 0:
+				e.charSelectSource = CharSelectSourceTitle
 				e.isCharSelect = true
 				e.isSaoBrasIntro = false
 				return nil
 			case 1:
-				if e.selectedHero == entities.HeroGaroto {
-					e.selectedHero = entities.HeroOnca
-					e.player = e.onca
-					e.audio.PlayRoar(false)
-				} else {
-					e.selectedHero = entities.HeroGaroto
-					e.player = e.garoto
-					e.audio.PlayShot()
-				}
+				e.charSelectSource = CharSelectSourceTitle
 				e.isCharSelect = true
 				e.isSaoBrasIntro = false
 				return nil
@@ -698,8 +722,11 @@ func (e *Engine) Update() error {
 				if !e.audio.IsMuted() {
 					e.audio.ResumeBGM()
 				}
-			case 1: // ALTERNAR HEROI (GAROTO / ONCA)
-				e.toggleSelectedHero()
+			case 1: // SELECIONAR JOGADOR
+				e.charSelectSource = CharSelectSourcePause
+				e.isCharSelect = true
+				e.isPaused = false
+				return nil
 			case 2: // REINICIAR FASE ATUAL
 				e.restartStage()
 			case 3: // RESETAR JOGO (DO ZERO)
@@ -770,6 +797,14 @@ func (e *Engine) Update() error {
 			resetVirtualKey("ArrowLeft")
 			resetVirtualKey("ArrowRight")
 			e.toggleSelectedHero()
+		}
+
+		if inpututil.IsKeyJustPressed(ebiten.KeyJ) || getVirtualKey("KeyJ") {
+			resetVirtualKey("KeyJ")
+			e.charSelectSource = CharSelectSourceGameOver
+			e.isCharSelect = true
+			e.isGameOver = false
+			return nil
 		}
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyN) || getVirtualKey("KeyN") {

@@ -302,7 +302,7 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 	if isCompact {
 		// Modo compacto para a tela de menu interativo
 		logoW := 294.0
-		logoH := 26.0
+		logoH := 28.0
 		logoX := (screenWidth - logoW) / 2.0
 		logoY := topY
 
@@ -326,7 +326,7 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 		ebitenutil.DrawRect(screen, logoX+36, logoY+14, logoW-72, 1, color.RGBA{R: 255, G: 220, B: 75, A: 255})
 
 		ebitenutil.DebugPrintAt(screen, "EGUA MANO! GAMER", 112, int(logoY)+3)
-		ebitenutil.DebugPrintAt(screen, "UMA AVENTURA EM BELEM DO PARA", 73, int(logoY)+15)
+		ebitenutil.DebugPrintAt(screen, "UMA AVENTURA EM BELEM DO PARA", 73, int(logoY)+16)
 		return
 	}
 
@@ -334,7 +334,7 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 	// MODO ARCADE COMPLETO (TELA DE ABERTURA)
 	// ==========================================
 	bgW := 298.0
-	bgH := 82.0
+	bgH := 88.0
 	bgX := (screenWidth - bgW) / 2.0
 	bgY := topY
 
@@ -751,22 +751,23 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 	}
 
 	// 8. SUBTÍTULO CINZELADO NA PEDRA (PERFEITAMENTE ALINHADO E CENTRALIZADO)
-	ebitenutil.DrawRect(screen, bgX+24, bgY+54, bgW-48, 15, color.RGBA{R: 8, G: 12, B: 18, A: 210})
-	ebitenutil.DrawRect(screen, bgX+24, bgY+54, bgW-48, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
-	ebitenutil.DrawRect(screen, bgX+24, bgY+68, bgW-48, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
+	subY := bgY + 60.0
+	ebitenutil.DrawRect(screen, bgX+24, subY, bgW-48, 15, color.RGBA{R: 8, G: 12, B: 18, A: 210})
+	ebitenutil.DrawRect(screen, bgX+24, subY, bgW-48, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
+	ebitenutil.DrawRect(screen, bgX+24, subY+14, bgW-48, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
 
 	// Estrelas ornamentais douradas nas laterais (simetria perfeita)
 	// Esquerda (X = 54)
-	ebitenutil.DrawRect(screen, 54, bgY+59, 1, 5, color.RGBA{R: 250, G: 205, B: 55, A: 240})
-	ebitenutil.DrawRect(screen, 52, bgY+61, 5, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
-	ebitenutil.DrawRect(screen, 53, bgY+60, 3, 3, color.RGBA{R: 255, G: 240, B: 150, A: 255})
+	ebitenutil.DrawRect(screen, 54, subY+5, 1, 5, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+	ebitenutil.DrawRect(screen, 52, subY+7, 5, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+	ebitenutil.DrawRect(screen, 53, subY+6, 3, 3, color.RGBA{R: 255, G: 240, B: 150, A: 255})
 
 	// Direita (X = 266)
-	ebitenutil.DrawRect(screen, 266, bgY+59, 1, 5, color.RGBA{R: 250, G: 205, B: 55, A: 240})
-	ebitenutil.DrawRect(screen, 264, bgY+61, 5, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
-	ebitenutil.DrawRect(screen, 265, bgY+60, 3, 3, color.RGBA{R: 255, G: 240, B: 150, A: 255})
+	ebitenutil.DrawRect(screen, 266, subY+5, 1, 5, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+	ebitenutil.DrawRect(screen, 264, subY+7, 5, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+	ebitenutil.DrawRect(screen, 265, subY+6, 3, 3, color.RGBA{R: 255, G: 240, B: 150, A: 255})
 
-	ebitenutil.DebugPrintAt(screen, "UMA AVENTURA EM BELEM DO PARA", 73, int(bgY)+56)
+	ebitenutil.DebugPrintAt(screen, "UMA AVENTURA EM BELEM DO PARA", 73, int(subY)+2)
 
 	// 9. ESTRELAS CINTILANTES (SPARKLES DE 4 PONTAS)
 	sparkleCoords := [][2]float64{
@@ -871,8 +872,8 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 	drawArcadeGameLogo(screen, screenWidth, 4.0, ticks, true)
 
 	// 4. Menu de Opções Compacto e Elegante
-	boxW := 210.0
-	boxH := 86.0
+	boxW := 226.0
+	boxH := 88.0
 	boxX := (screenWidth - boxW) / 2.0
 	boxY := 62.0
 
@@ -887,7 +888,7 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 	bx := int(boxX)
 	by := int(boxY)
 
-	ebitenutil.DebugPrintAt(screen, "★ OPCOES ★", bx+75, by+4)
+	ebitenutil.DebugPrintAt(screen, "★ OPCOES ★", bx+83, by+4)
 	ebitenutil.DrawRect(screen, boxX+12, boxY+16, boxW-24, 1, color.RGBA{R: 250, G: 205, B: 55, A: 140})
 
 	soundStatus := "SOM: [ LIGADO ]"
@@ -895,9 +896,14 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 		soundStatus = "SOM: [ MUDO ]  "
 	}
 
+	heroShort := "GAROTO"
+	if strings.Contains(strings.ToUpper(heroName), "ONCA") {
+		heroShort = "ONCA"
+	}
+
 	options := []string{
 		"JOGAR",
-		fmt.Sprintf("HEROI: [ %s ]", heroName),
+		fmt.Sprintf("SELECIONAR JOGADOR: [ %s ]", heroShort),
 		soundStatus,
 		fmt.Sprintf("VELOCIDADE: [ %s ]", speedLabel),
 		"CREDITOS",
@@ -909,9 +915,9 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 		if i == selectedIndex {
 			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), boxW-12, 12, color.RGBA{R: 245, G: 185, B: 45, A: 75})
 			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), 2, 12, color.RGBA{R: 250, G: 210, B: 50, A: 255})
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+14, itemY)
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+8, itemY)
 		} else {
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+14, itemY)
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+8, itemY)
 		}
 	}
 
@@ -940,11 +946,18 @@ func DrawCharacterSelectScreen(screen *ebiten.Image, screenWidth, screenHeight f
 		ebitenutil.DrawRect(screen, fx, fy, 2, 2, color.RGBA{R: 150, G: 255, B: 110, A: alpha})
 	}
 
-	// 2. Banner Superior
+	// 2. Banner Superior Perfeitamente Alinhado e Centralizado
 	ebitenutil.DrawRect(screen, 0, 0, screenWidth, 27, color.RGBA{R: 8, G: 12, B: 22, A: 245})
 	ebitenutil.DrawRect(screen, 0, 27, screenWidth, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DebugPrintAt(screen, "★ ESCOLHA SEU HEROI DA AMAZONIA ★", 56, 4)
-	ebitenutil.DebugPrintAt(screen, "Selecione o heroi para Uma Aventura em Belem do Para", 14, 15)
+
+	// Estrelas ornamentais em pixel art
+	ebitenutil.DrawRect(screen, 96, 7, 2, 4, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, 95, 8, 4, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, 242, 7, 2, 4, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, 241, 8, 4, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+
+	ebitenutil.DebugPrintAt(screen, "SELECAO DE JOGADOR", 116, 4)
+	ebitenutil.DebugPrintAt(screen, "Escolha quem vai correr por Belem do Para", 47, 15)
 
 	cardW := 150.0
 	cardH := 142.0
@@ -971,9 +984,9 @@ func DrawCharacterSelectScreen(screen *ebiten.Image, screenWidth, screenHeight f
 	// Cabeçalho do Card 0
 	if is0Selected {
 		ebitenutil.DrawRect(screen, c0X+4, cardY+4, cardW-8, 14, color.RGBA{R: 245, G: 190, B: 40, A: 220})
-		ebitenutil.DebugPrintAt(screen, "► GAROTO CURUMIM ◄", int(c0X)+18, int(cardY)+5)
+		ebitenutil.DebugPrintAt(screen, "GAROTO CURUMIM", int(c0X)+33, int(cardY)+5)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "  GAROTO CURUMIM", int(c0X)+22, int(cardY)+5)
+		ebitenutil.DebugPrintAt(screen, "GAROTO CURUMIM", int(c0X)+33, int(cardY)+5)
 	}
 	ebitenutil.DrawRect(screen, c0X+6, cardY+20, cardW-12, 1, color.RGBA{R: 200, G: 180, B: 80, A: 120})
 
@@ -998,7 +1011,7 @@ func DrawCharacterSelectScreen(screen *ebiten.Image, screenWidth, screenHeight f
 	cWoodLight := color.RGBA{R: 205, G: 145, B: 85, A: 255}
 	cRubber := color.RGBA{R: 245, G: 125, B: 25, A: 255}
 	cLeatherPouch := color.RGBA{R: 75, G: 38, B: 15, A: 255}
-	cAcai := color.RGBA{R: 60, G: 15, B: 70, A: 255}
+	cAcai := color.RGBA{R: 16, G: 4, B: 20, A: 255}
 
 	ebitenutil.DrawRect(screen, gx+4, gy, 8, 8, cSkin)
 	ebitenutil.DrawRect(screen, gx+2, gy-2, 12, 3, cHair)
@@ -1022,24 +1035,27 @@ func DrawCharacterSelectScreen(screen *ebiten.Image, screenWidth, screenHeight f
 	ebitenutil.DrawRect(screen, gx+4, gy+24, 4, 3, cSkin)
 	ebitenutil.DrawRect(screen, gx+9, gy+24, 4, 3, cSkin)
 
-	// Ficha de Atributos do Garoto (à direita no card)
+	// Ficha de Atributos do Garoto (perfeitamente alinhada na coluna direita)
 	tx0 := int(c0X) + 54
-	ebitenutil.DebugPrintAt(screen, "Arma: Baladeira Paraense", tx0, int(cardY)+25)
-	ebitenutil.DebugPrintAt(screen, "Tiro: Caroco de Acai", tx0, int(cardY)+37)
-	ebitenutil.DebugPrintAt(screen, "Pulo: Salto Duplo", tx0, int(cardY)+49)
-	ebitenutil.DebugPrintAt(screen, "Especial: Super Acai", tx0, int(cardY)+61)
-	ebitenutil.DebugPrintAt(screen, "Modo: Aventureiro", tx0, int(cardY)+73)
+	ebitenutil.DebugPrintAt(screen, "ARMA: Baladeira", tx0, int(cardY)+25)
+	ebitenutil.DebugPrintAt(screen, "TIRO: Acai Puro", tx0, int(cardY)+37)
+	ebitenutil.DebugPrintAt(screen, "PULO: Duplo", tx0, int(cardY)+49)
+	ebitenutil.DebugPrintAt(screen, "PODER: Acai+", tx0, int(cardY)+61)
+	ebitenutil.DebugPrintAt(screen, "MODO: Corredor", tx0, int(cardY)+73)
 
-	// Divisória inferior do card
-	ebitenutil.DrawRect(screen, c0X+6, cardY+90, cardW-12, 1, color.RGBA{R: 150, G: 160, B: 180, A: 100})
-	ebitenutil.DebugPrintAt(screen, "\"Prepara a baladeira, mano!\"", int(c0X)+4, int(cardY)+95)
-	ebitenutil.DebugPrintAt(screen, "\"Nao tem jacare que pegue\"", int(c0X)+4, int(cardY)+107)
+	// Divisória inferior e frases regionais
+	ebitenutil.DrawRect(screen, c0X+6, cardY+88, cardW-12, 1, color.RGBA{R: 150, G: 160, B: 180, A: 100})
+	ebitenutil.DebugPrintAt(screen, "\"Prepara a baladeira!\"", int(c0X)+12, int(cardY)+93)
+	ebitenutil.DebugPrintAt(screen, "\"Nenhum bicho me pega!\"", int(c0X)+9, int(cardY)+106)
 
 	if is0Selected {
-		ebitenutil.DrawRect(screen, c0X+12, cardY+124, cardW-24, 13, color.RGBA{R: 245, G: 185, B: 45, A: 85})
-		ebitenutil.DebugPrintAt(screen, "★ SELECIONADO ★", int(c0X)+24, int(cardY)+125)
+		ebitenutil.DrawRect(screen, c0X+12, cardY+122, cardW-24, 14, color.RGBA{R: 245, G: 185, B: 45, A: 90})
+		ebitenutil.DrawRect(screen, c0X+12, cardY+122, cardW-24, 1, color.RGBA{R: 255, G: 220, B: 60, A: 255})
+		ebitenutil.DrawRect(screen, c0X+12, cardY+135, cardW-24, 1, color.RGBA{R: 255, G: 220, B: 60, A: 255})
+		ebitenutil.DebugPrintAt(screen, "[ JOGADOR ATIVO ]", int(c0X)+24, int(cardY)+123)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "[ ENTER P/ ESCOLHER ]", int(c0X)+12, int(cardY)+125)
+		ebitenutil.DrawRect(screen, c0X+12, cardY+122, cardW-24, 14, color.RGBA{R: 20, G: 28, B: 44, A: 180})
+		ebitenutil.DebugPrintAt(screen, "[ ESCOLHER ]", int(c0X)+39, int(cardY)+123)
 	}
 
 	// ==========================================
@@ -1063,14 +1079,15 @@ func DrawCharacterSelectScreen(screen *ebiten.Image, screenWidth, screenHeight f
 	// Cabeçalho do Card 1
 	if is1Selected {
 		ebitenutil.DrawRect(screen, c1X+4, cardY+4, cardW-8, 14, color.RGBA{R: 245, G: 190, B: 40, A: 220})
-		ebitenutil.DebugPrintAt(screen, "► ONCA PINTADA ◄", int(c1X)+26, int(cardY)+5)
+		ebitenutil.DebugPrintAt(screen, "ONCA-PINTADA", int(c1X)+39, int(cardY)+5)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "  ONCA PINTADA", int(c1X)+30, int(cardY)+5)
+		ebitenutil.DebugPrintAt(screen, "ONCA-PINTADA", int(c1X)+39, int(cardY)+5)
 	}
 	ebitenutil.DrawRect(screen, c1X+6, cardY+20, cardW-12, 1, color.RGBA{R: 200, G: 180, B: 80, A: 120})
 
 	// Pedestal de pedra
 	ped1X := c1X + 8
+	pedY = cardY + 54
 	ebitenutil.DrawRect(screen, ped1X, pedY+26, 46, 6, color.RGBA{R: 70, G: 65, B: 60, A: 255})
 	ebitenutil.DrawRect(screen, ped1X+2, pedY+24, 42, 3, color.RGBA{R: 90, G: 120, B: 50, A: 255})
 
@@ -1100,40 +1117,43 @@ func DrawCharacterSelectScreen(screen *ebiten.Image, screenWidth, screenHeight f
 	ebitenutil.DrawRect(screen, ox-3, oy+4+oTail, 5, 3, cGold)
 	ebitenutil.DrawRect(screen, ox-5, oy+2+oTail, 3, 3, cSpotBlack)
 
-	// Ficha de Atributos da Onça
+	// Ficha de Atributos da Onça (perfeitamente alinhada na coluna direita)
 	tx1 := int(c1X) + 54
-	ebitenutil.DebugPrintAt(screen, "Arma: Rugido", tx1, int(cardY)+25)
-	ebitenutil.DebugPrintAt(screen, "Tiro: Onda sonica", tx1, int(cardY)+37)
-	ebitenutil.DebugPrintAt(screen, "Pulo: Bote Feroz", tx1, int(cardY)+49)
-	ebitenutil.DebugPrintAt(screen, "Passada: 2.4x rapida", tx1, int(cardY)+61)
-	ebitenutil.DebugPrintAt(screen, "Modo: Predadora", tx1, int(cardY)+73)
+	ebitenutil.DebugPrintAt(screen, "ARMA: Rugido", tx1, int(cardY)+25)
+	ebitenutil.DebugPrintAt(screen, "TIRO: Onda Som", tx1, int(cardY)+37)
+	ebitenutil.DebugPrintAt(screen, "PULO: Bote Feroz", tx1, int(cardY)+49)
+	ebitenutil.DebugPrintAt(screen, "PODER: Rugido+", tx1, int(cardY)+61)
+	ebitenutil.DebugPrintAt(screen, "MODO: Predadora", tx1, int(cardY)+73)
 
-	// Divisória inferior do card
-	ebitenutil.DrawRect(screen, c1X+6, cardY+90, cardW-12, 1, color.RGBA{R: 150, G: 160, B: 180, A: 100})
-	ebitenutil.DebugPrintAt(screen, "\"RRRAUW! Rainha!\"", int(c1X)+20, int(cardY)+95)
-	ebitenutil.DebugPrintAt(screen, "\"Ninguem segura a onca!\"", int(c1X)+6, int(cardY)+107)
+	// Divisória inferior e frases regionais
+	ebitenutil.DrawRect(screen, c1X+6, cardY+88, cardW-12, 1, color.RGBA{R: 150, G: 160, B: 180, A: 100})
+	ebitenutil.DebugPrintAt(screen, "\"Rainha da Amazonia!\"", int(c1X)+15, int(cardY)+93)
+	ebitenutil.DebugPrintAt(screen, "\"Ninguem segura a onca!\"", int(c1X)+6, int(cardY)+106)
 
 	if is1Selected {
-		ebitenutil.DrawRect(screen, c1X+12, cardY+124, cardW-24, 13, color.RGBA{R: 245, G: 185, B: 45, A: 85})
-		ebitenutil.DebugPrintAt(screen, "★ SELECIONADO ★", int(c1X)+24, int(cardY)+125)
+		ebitenutil.DrawRect(screen, c1X+12, cardY+122, cardW-24, 14, color.RGBA{R: 245, G: 185, B: 45, A: 90})
+		ebitenutil.DrawRect(screen, c1X+12, cardY+122, cardW-24, 1, color.RGBA{R: 255, G: 220, B: 60, A: 255})
+		ebitenutil.DrawRect(screen, c1X+12, cardY+135, cardW-24, 1, color.RGBA{R: 255, G: 220, B: 60, A: 255})
+		ebitenutil.DebugPrintAt(screen, "[ JOGADOR ATIVO ]", int(c1X)+24, int(cardY)+123)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "[ ENTER P/ ESCOLHER ]", int(c1X)+12, int(cardY)+125)
+		ebitenutil.DrawRect(screen, c1X+12, cardY+122, cardW-24, 14, color.RGBA{R: 28, G: 22, B: 18, A: 180})
+		ebitenutil.DebugPrintAt(screen, "[ ESCOLHER ]", int(c1X)+39, int(cardY)+123)
 	}
 
 	// ==========================================
 	// BARRA INFERIOR DE INSTRUÇÃO E CONFIRMAÇÃO
 	// ==========================================
-	botY := 176.0
-	botH := 34.0
+	botY := 178.0
+	botH := 32.0
 	ebitenutil.DrawRect(screen, 0, botY, screenWidth, botH, color.RGBA{R: 8, G: 12, B: 20, A: 250})
 	ebitenutil.DrawRect(screen, 0, botY, screenWidth, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 
 	if (ticks/24)%2 == 0 {
-		ebitenutil.DebugPrintAt(screen, ">> [ENTER / TOQUE] CONFIRMAR E INICIAR <<", 22, int(botY)+6)
+		ebitenutil.DebugPrintAt(screen, ">> [ENTER / TOQUE] CONFIRMAR JOGADOR <<", 53, int(botY)+4)
 	} else {
-		ebitenutil.DebugPrintAt(screen, "   [ENTER / TOQUE] CONFIRMAR E INICIAR   ", 22, int(botY)+6)
+		ebitenutil.DebugPrintAt(screen, "   [ENTER / TOQUE] CONFIRMAR JOGADOR   ", 53, int(botY)+4)
 	}
-	ebitenutil.DebugPrintAt(screen, "[ESQ/DIR ou A/D] Alternar Heroi  |  [ESC] Voltar ao Menu", 16, int(botY)+19)
+	ebitenutil.DebugPrintAt(screen, "[A / D ou SETAS] Alternar  |  [ESC] Voltar", 44, int(botY)+17)
 }
 
 func DrawTitleScreen(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int) {
@@ -1221,9 +1241,9 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 	ebitenutil.DebugPrintAt(screen, "★ PAUSA ★", bx+90, by+6)
 	ebitenutil.DrawRect(screen, boxX+10, boxY+19, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 140})
 
-	heroName := "GAROTO CURUMIM"
+	heroShort := "GAROTO"
 	if selectedHero == 1 {
-		heroName = "ONCA-PINTADA  "
+		heroShort = "ONCA"
 	}
 
 	soundStatus := "SOM: [ LIGADO ]"
@@ -1233,7 +1253,7 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 
 	options := []string{
 		"CONTINUAR",
-		fmt.Sprintf("HEROI: [ %s ]", heroName),
+		fmt.Sprintf("SELECIONAR JOGADOR: [ %s ]", heroShort),
 		"REINICIAR FASE",
 		"RESETAR JOGO (DO ZERO)",
 		soundStatus,
@@ -1247,13 +1267,13 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 		if i == selectedIndex {
 			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), boxW-12, 13, color.RGBA{R: 245, G: 185, B: 45, A: 75})
 			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), 2, 13, color.RGBA{R: 250, G: 210, B: 50, A: 255})
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+10, itemY)
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+8, itemY)
 		} else {
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+10, itemY)
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+8, itemY)
 		}
 	}
 
-	ebitenutil.DebugPrintAt(screen, "[W/S] Mover  [A/D/ENTER] Alterar  [ESC] Sair", bx+6, by+int(boxH)-12)
+	ebitenutil.DebugPrintAt(screen, "[W/S] Mover  [A/D/ENTER] Escolher  [ESC] Sair", bx+6, by+int(boxH)-12)
 }
 
 func DrawIndigenousWarrior(screen *ebiten.Image, x, y float64, ticks int) {
@@ -1466,9 +1486,9 @@ func DrawGameOverScreen(screen *ebiten.Image, screenWidth, screenHeight float64,
 	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 5, G: 5, B: 12, A: 150})
 
 	boxW := 236.0
-	boxH := 102.0
+	boxH := 114.0
 	boxX := (screenWidth - boxW) / 2.0
-	boxY := 14.0
+	boxY := 10.0
 
 	ebitenutil.DrawRect(screen, boxX+2, boxY+2, boxW, boxH, color.RGBA{R: 0, G: 0, B: 0, A: 180})
 	ebitenutil.DrawRect(screen, boxX, boxY, boxW, boxH, color.RGBA{R: 28, G: 16, B: 24, A: 245})
@@ -1487,18 +1507,19 @@ func DrawGameOverScreen(screen *ebiten.Image, screenWidth, screenHeight float64,
 		stgStr = "3. THEATRO"
 	}
 
-	heroLabel := "< GAROTO CURUMIM >"
+	heroShort := "GAROTO"
 	if selectedHero == 1 {
-		heroLabel = "< ONCA-PINTADA >  "
+		heroShort = "ONCA"
 	}
 
 	ebitenutil.DebugPrintAt(screen, "★ GAME OVER ★", bx+78, by+6)
 	ebitenutil.DrawRect(screen, boxX+10, boxY+19, boxW-20, 1, color.RGBA{R: 240, G: 65, B: 65, A: 160})
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("SCORE: %05d  |  FASE: %s", finalScore, stgStr), bx+14, by+24)
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("HEROI: %s [A/D]", heroLabel), bx+14, by+38)
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("[ENTER / R] Reiniciar Fase %d", stage), bx+14, by+54)
-	ebitenutil.DebugPrintAt(screen, "[N] Resetar Jogo (Do Zero)", bx+14, by+68)
-	ebitenutil.DebugPrintAt(screen, "[ESC] Voltar ao Menu Inicial", bx+14, by+82)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("SELECIONAR JOGADOR: < %s > [A/D]", heroShort), bx+14, by+38)
+	ebitenutil.DebugPrintAt(screen, "[J] Abrir Tela de Selecao", bx+14, by+52)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("[ENTER / R] Reiniciar Fase %d", stage), bx+14, by+66)
+	ebitenutil.DebugPrintAt(screen, "[N] Resetar Jogo (Do Zero)", bx+14, by+80)
+	ebitenutil.DebugPrintAt(screen, "[ESC] Voltar ao Menu Inicial", bx+14, by+94)
 }
 
 func DrawSpeechBubble(screen *ebiten.Image, x, y float64, text string) {
