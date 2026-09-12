@@ -128,8 +128,22 @@ func (obs *Obstacle) drawGround(screen *ebiten.Image, ticks int, stage int) {
 
 	switch stage {
 	case 2:
-		// Na Estação das Docas, ao invés de barris genéricos, um Jacaré na beirada do cais!
-		obs.drawJacare(screen, ticks, stage)
+		// Caixote de madeira de carga portuária (Estação das Docas)
+		cCrate := color.RGBA{R: 145, G: 95, B: 45, A: 255}
+		cCrateDark := color.RGBA{R: 105, G: 65, B: 30, A: 255}
+		cCrateLight := color.RGBA{R: 185, G: 125, B: 65, A: 255}
+		cMetal := color.RGBA{R: 80, G: 85, B: 90, A: 255}
+		ebitenutil.DrawRect(screen, obs.X+2, obsRealY+4, 20, 20, cCrate)
+		ebitenutil.DrawRect(screen, obs.X+2, obsRealY+4, 20, 2, cCrateLight)
+		ebitenutil.DrawRect(screen, obs.X+2, obsRealY+22, 20, 2, cCrateDark)
+		ebitenutil.DrawRect(screen, obs.X+2, obsRealY+4, 2, 20, cCrateLight)
+		ebitenutil.DrawRect(screen, obs.X+20, obsRealY+4, 2, 20, cCrateDark)
+		ebitenutil.DrawRect(screen, obs.X+3, obsRealY+5, 4, 4, cMetal)
+		ebitenutil.DrawRect(screen, obs.X+17, obsRealY+5, 4, 4, cMetal)
+		ebitenutil.DrawRect(screen, obs.X+3, obsRealY+19, 4, 4, cMetal)
+		ebitenutil.DrawRect(screen, obs.X+17, obsRealY+19, 4, 4, cMetal)
+		ebitenutil.DrawLine(screen, obs.X+5, obsRealY+7, obs.X+19, obsRealY+21, cCrateDark)
+		ebitenutil.DrawLine(screen, obs.X+19, obsRealY+7, obs.X+5, obsRealY+21, cCrateDark)
 
 	case 3:
 		// Cesto artesanal com castanhas e cupuaçus (Theatro da Paz)
@@ -469,20 +483,25 @@ func (m *ObstacleManager) Update(speed float64) int {
 			continue
 		}
 
-		// 1. Deslocamento pelo scroll do mundo
-		obs.X -= speed
-
-		// 2. Movimentação autônoma dos animais animados (mesmo com herói parado no Pitfall!)
+		// Deslocamento de obstáculos e animais:
+		// Animais mantêm uma velocidade autônoma perfeitamente constante (constância previsível e justa)
+		// Obstáculos fixos do terreno (banco de praça, paneiro, caixotes) deslocam-se exclusivamente com o scroll do mundo
 		switch obs.Type {
 		case TypeJacare:
-			obs.X -= 0.65 // Rastejo predatório do jacaré-açu em direção ao herói
+			// Jacaré-Açu: velocidade constante de aproximação predatória
+			obs.X -= 0.85
 		case TypeSnake:
-			obs.X -= 0.95 // Ondulação rasteira rápida da cobra-coral
+			// Cobra-Coral: velocidade constante de ondulação rasteira
+			obs.X -= 1.15
 		case TypeAir:
-			obs.X -= 1.35 // Voo cortando os ares em direção ao herói
+			// Ave (Urubu / Gaivota): velocidade constante de voo cortando o céu
+			obs.X -= 1.45
+		default:
+			// Elementos estáticos do terreno (Paneiro de Açaí, Caixote, Cesto, Banco de Praça)
+			obs.X -= speed
 		}
 
-		if speed > 0 && obs.X < -40 {
+		if obs.X < -40 {
 			furthestX := m.screenWidth
 			for _, other := range m.Obstacles {
 				if other != obs && other.X > furthestX {
