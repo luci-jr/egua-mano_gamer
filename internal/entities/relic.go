@@ -155,26 +155,31 @@ func (r *Relic) Draw(screen *ebiten.Image, ticks int) {
 		}
 
 	case RelicAcaiBowl:
-		// 🥣 Cuia de Tacacá Fumegante com Jambu & Camarão Seco (Recupera 1 Coração!)
-		cCuia := color.RGBA{R: 110, G: 65, B: 30, A: 255}
-		cCuiaDark := color.RGBA{R: 75, G: 40, B: 18, A: 255}
-		cTucupi := color.RGBA{R: 245, G: 205, B: 40, A: 255}
-		cJambu := color.RGBA{R: 45, G: 165, B: 55, A: 255}
-		cCamarao := color.RGBA{R: 235, G: 95, B: 45, A: 255}
+		// 🥣 Tigela de Açaí Tradicional com Tapioca e Energia Vital (Recupera 1 Coração!)
+		cBowl := color.RGBA{R: 110, G: 65, B: 30, A: 255}
+		cBowlDark := color.RGBA{R: 75, G: 40, B: 18, A: 255}
+		cAcaiPurple := color.RGBA{R: 50, G: 15, B: 55, A: 255}
+		cAcaiLight := color.RGBA{R: 95, G: 30, B: 100, A: 255}
+		cTapioca := color.RGBA{R: 250, G: 245, B: 215, A: 255}
 		cHeartRed := color.RGBA{R: 255, G: 45, B: 65, A: 255}
-		cHeartLight := color.RGBA{R: 255, G: 175, B: 190, A: 255}
+		cHeartLight := color.RGBA{R: 255, G: 185, B: 200, A: 255}
 
-		// Cuia arredondada
-		ebitenutil.DrawRect(screen, float64(rx+2), float64(ry+8), 12, 7, cCuia)
-		ebitenutil.DrawRect(screen, float64(rx+4), float64(ry+14), 8, 2, cCuiaDark)
-		ebitenutil.DrawRect(screen, float64(rx+1), float64(ry+7), 14, 2, cCuiaDark)
+		// Tigela de barro / madeira
+		ebitenutil.DrawRect(screen, float64(rx+2), float64(ry+8), 12, 7, cBowl)
+		ebitenutil.DrawRect(screen, float64(rx+4), float64(ry+14), 8, 2, cBowlDark)
+		ebitenutil.DrawRect(screen, float64(rx+1), float64(ry+7), 14, 2, cBowlDark)
 
-		// Caldo de tucupi borbulhante e folhas
-		ebitenutil.DrawRect(screen, float64(rx+3), float64(ry+8), 10, 3, cTucupi)
-		ebitenutil.DrawRect(screen, float64(rx+4), float64(ry+9), 3, 2, cJambu)
-		ebitenutil.DrawRect(screen, float64(rx+8), float64(ry+8), 4, 2, cCamarao)
+		// Açaí cremoso roxo escuro paraense
+		ebitenutil.DrawRect(screen, float64(rx+3), float64(ry+8), 10, 4, cAcaiPurple)
+		ebitenutil.DrawRect(screen, float64(rx+4), float64(ry+8), 8, 2, cAcaiLight)
 
-		// Coração flutuante pulsante sobre a cuia
+		// Granulados crocantes de farinha de tapioca
+		ebitenutil.DrawRect(screen, float64(rx+4), float64(ry+8), 1, 1, cTapioca)
+		ebitenutil.DrawRect(screen, float64(rx+7), float64(ry+9), 1, 1, cTapioca)
+		ebitenutil.DrawRect(screen, float64(rx+10), float64(ry+8), 1, 1, cTapioca)
+		ebitenutil.DrawRect(screen, float64(rx+6), float64(ry+10), 1, 1, cTapioca)
+
+		// Coração flutuante pulsante de energia sobre o açaí
 		pulse := (ticks / 8) % 2
 		hy := float64(ry + 1)
 		if pulse == 0 {

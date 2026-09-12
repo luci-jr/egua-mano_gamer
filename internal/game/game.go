@@ -1085,12 +1085,13 @@ func (e *Engine) Update() error {
 		if r.Type == entities.RelicAcaiBowl {
 			if e.hearts < 3 {
 				e.hearts++
-				e.projectiles.AddTextPopup(r.X-20, r.Y-14, "+1 CORACAO!", color.RGBA{R: 255, G: 65, B: 85, A: 255})
-				e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 255, G: 65, B: 85, A: 255}, 16)
+				e.projectiles.AddTextPopup(r.X-20, r.Y-14, "+1 ENERGIA!", color.RGBA{R: 215, G: 65, B: 245, A: 255})
+				e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 190, G: 45, B: 230, A: 255}, 16)
 			} else {
 				e.score += r.Value
 				e.projectiles.AddScorePopup(r.X, r.Y-8, r.Value)
-				e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 255, G: 220, B: 50, A: 255}, 12)
+				e.projectiles.AddTextPopup(r.X-20, r.Y-24, "ACAI POWER!", color.RGBA{R: 255, G: 220, B: 50, A: 255})
+				e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 255, G: 220, B: 50, A: 255}, 14)
 			}
 			e.audio.PlayTreasure()
 		} else {
@@ -1107,6 +1108,26 @@ func (e *Engine) Update() error {
 	// Pontuação por avanço ativo: a cada 60 ticks em deslocamento para frente
 	if worldScrollSpeed > 0 && e.ticks%60 == 0 {
 		e.score += 1
+	}
+
+	// Coleta de energia nutritiva do Paneiro de Açaí no solo (o açaí nunca machuca, ele dá energia!)
+	if collected, obs := e.obstacles.CheckEnergyCollection(playerX, playerY, playerW, playerH); collected {
+		ox, oy, ow, _ := obs.GetBounds()
+		centerX := ox + ow/2.0
+		centerY := oy + 4.0
+
+		if e.hearts < 3 {
+			e.hearts++
+			e.projectiles.AddTextPopup(centerX-24, centerY-14, "+1 ENERGIA!", color.RGBA{R: 215, G: 65, B: 245, A: 255})
+			e.projectiles.SpawnHitBurst(centerX, centerY, color.RGBA{R: 190, G: 45, B: 230, A: 255}, 16)
+		} else {
+			bonus := 100
+			e.score += bonus
+			e.projectiles.AddScorePopup(centerX-12, centerY-14, bonus)
+			e.projectiles.AddTextPopup(centerX-20, centerY-26, "ACAI POWER!", color.RGBA{R: 255, G: 220, B: 50, A: 255})
+			e.projectiles.SpawnHitBurst(centerX, centerY, color.RGBA{R: 255, G: 220, B: 50, A: 255}, 14)
+		}
+		e.audio.PlayTreasure()
 	}
 
 	hit, hitType := e.obstacles.CheckCollision(playerX, playerY, playerW, playerH, e.player.GetVelocityY(), GroundY, e.currentPlatform)
