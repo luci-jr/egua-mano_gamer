@@ -15,6 +15,7 @@ const (
 	RelicMuiraquita RelicType = 0 // Sapinho sagrado de jade verde (+100 pts)
 	RelicUrna       RelicType = 1 // Vaso ancestral de cerâmica marajoara (+200 pts)
 	RelicOuro       RelicType = 2 // Pepita de ouro do Tapajós (+50 pts)
+	RelicAcaiBowl   RelicType = 3 // 🥣 Cuia de Tacacá / Tigela de Açaí Nutritiva (Recupera 1 Coração!)
 )
 
 type Relic struct {
@@ -34,6 +35,8 @@ func NewRelic(x, baseY float64, rType RelicType) *Relic {
 		val = 200
 	case RelicOuro:
 		val = 50
+	case RelicAcaiBowl:
+		val = 150
 	}
 	return &Relic{
 		X:        x,
@@ -150,6 +153,39 @@ func (r *Relic) Draw(screen *ebiten.Image, ticks int) {
 		if (ticks/8)%2 == 0 {
 			ebitenutil.DrawRect(screen, float64(rx+4), float64(ry+4), 2, 2, cSparkle)
 		}
+
+	case RelicAcaiBowl:
+		// 🥣 Cuia de Tacacá Fumegante com Jambu & Camarão Seco (Recupera 1 Coração!)
+		cCuia := color.RGBA{R: 110, G: 65, B: 30, A: 255}
+		cCuiaDark := color.RGBA{R: 75, G: 40, B: 18, A: 255}
+		cTucupi := color.RGBA{R: 245, G: 205, B: 40, A: 255}
+		cJambu := color.RGBA{R: 45, G: 165, B: 55, A: 255}
+		cCamarao := color.RGBA{R: 235, G: 95, B: 45, A: 255}
+		cHeartRed := color.RGBA{R: 255, G: 45, B: 65, A: 255}
+		cHeartLight := color.RGBA{R: 255, G: 175, B: 190, A: 255}
+
+		// Cuia arredondada
+		ebitenutil.DrawRect(screen, float64(rx+2), float64(ry+8), 12, 7, cCuia)
+		ebitenutil.DrawRect(screen, float64(rx+4), float64(ry+14), 8, 2, cCuiaDark)
+		ebitenutil.DrawRect(screen, float64(rx+1), float64(ry+7), 14, 2, cCuiaDark)
+
+		// Caldo de tucupi borbulhante e folhas
+		ebitenutil.DrawRect(screen, float64(rx+3), float64(ry+8), 10, 3, cTucupi)
+		ebitenutil.DrawRect(screen, float64(rx+4), float64(ry+9), 3, 2, cJambu)
+		ebitenutil.DrawRect(screen, float64(rx+8), float64(ry+8), 4, 2, cCamarao)
+
+		// Coração flutuante pulsante sobre a cuia
+		pulse := (ticks / 8) % 2
+		hy := float64(ry + 1)
+		if pulse == 0 {
+			hy -= 1.0
+		}
+		ebitenutil.DrawRect(screen, float64(rx+4), hy, 3, 2, cHeartRed)
+		ebitenutil.DrawRect(screen, float64(rx+8), hy, 3, 2, cHeartRed)
+		ebitenutil.DrawRect(screen, float64(rx+3), hy+2, 9, 2, cHeartRed)
+		ebitenutil.DrawRect(screen, float64(rx+4), hy+4, 7, 2, cHeartRed)
+		ebitenutil.DrawRect(screen, float64(rx+6), hy+6, 3, 1, cHeartRed)
+		ebitenutil.DrawRect(screen, float64(rx+5), hy+1, 1, 1, cHeartLight)
 	}
 }
 
@@ -181,11 +217,10 @@ func (rm *RelicManager) SpawnRelic(x, y float64, rType RelicType) {
 
 func (rm *RelicManager) Update(speed float64) {
 	rm.spawnTimer++
-	// Spawna uma relíquia a cada ~280 ticks (cerca de 4.5 segundos)
-	if rm.spawnTimer >= 260 {
+	// Spawna uma relíquia/item de cura a cada ~230 ticks
+	if rm.spawnTimer >= 230 {
 		rm.spawnTimer = 0
-		rType := RelicType(rand.Intn(3))
-		// Altura suspensa no ar (alcançável por pulo duplo ou balanço do cipó)
+		rType := RelicType(rand.Intn(4)) // Sorteia entre Muiraquitã, Urna, Ouro e Cuia de Tacacá/Açaí
 		spawnY := rm.groundY - 55.0 - float64(rand.Intn(35))
 		rm.SpawnRelic(rm.screenWidth+40.0, spawnY, rType)
 	}

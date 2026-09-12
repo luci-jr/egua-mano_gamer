@@ -15,30 +15,50 @@ const (
 )
 
 type Projectile struct {
-	X       float64
-	Y       float64
-	VX      float64
-	VY      float64
-	Kind    int
-	Active  bool
-	Life    int
-	MaxLife int
+	X         float64
+	Y         float64
+	VX        float64
+	VY        float64
+	Kind      int
+	IsSpecial bool
+	HitsLeft  int
+	Active    bool
+	Life      int
+	MaxLife   int
 }
 
-func NewProjectile(x, y, vx, vy float64, kind int) *Projectile {
+func NewProjectile(x, y, vx, vy float64, kind int, isSpecial bool) *Projectile {
+	hits := 1
+	maxLife := 85
+	if isSpecial {
+		maxLife = 95
+		if kind == ProjKindRoar {
+			hits = 3 // Mega Rugido Alfa perfura até 3 obstáculos
+		} else {
+			hits = 2 // Super Caroço de Açaí perfura até 2 obstáculos
+		}
+	}
 	return &Projectile{
-		X:       x,
-		Y:       y,
-		VX:      vx,
-		VY:      vy,
-		Kind:    kind,
-		Active:  true,
-		Life:    0,
-		MaxLife: 85,
+		X:         x,
+		Y:         y,
+		VX:        vx,
+		VY:        vy,
+		Kind:      kind,
+		IsSpecial: isSpecial,
+		HitsLeft:  hits,
+		Active:    true,
+		Life:      0,
+		MaxLife:   maxLife,
 	}
 }
 
 func (p *Projectile) GetBounds() (x, y, w, h float64) {
+	if p.IsSpecial {
+		if p.Kind == ProjKindRoar {
+			return p.X - 8.0, p.Y - 8.0, 18.0, 18.0
+		}
+		return p.X - 6.0, p.Y - 6.0, 13.0, 13.0
+	}
 	if p.Kind == ProjKindRoar {
 		return p.X - 4.0, p.Y - 5.0, 10.0, 10.0
 	}
@@ -70,14 +90,22 @@ func NewProjectileManager(screenWidth float64) *ProjectileManager {
 }
 
 func (pm *ProjectileManager) ShootAcai(x, y, vx, vy float64) {
-	pm.Shoot(x, y, vx, vy, ProjKindAcai)
+	pm.Shoot(x, y, vx, vy, ProjKindAcai, false)
 }
 
 func (pm *ProjectileManager) ShootRoar(x, y, vx, vy float64) {
-	pm.Shoot(x, y, vx, vy, ProjKindRoar)
+	pm.Shoot(x, y, vx, vy, ProjKindRoar, false)
 }
 
-func (pm *ProjectileManager) Shoot(x, y, vx, vy float64, kind int) {
+func (pm *ProjectileManager) ShootSpecialAcai(x, y, vx, vy float64) {
+	pm.Shoot(x, y, vx*1.2, vy*1.2, ProjKindAcai, true)
+}
+
+func (pm *ProjectileManager) ShootSpecialRoar(x, y, vx, vy float64) {
+	pm.Shoot(x, y, vx*1.2, vy*1.2, ProjKindRoar, true)
+}
+
+func (pm *ProjectileManager) Shoot(x, y, vx, vy float64, kind int, isSpecial bool) {
 	// Limite máximo de disparos simultâneos na tela
 	activeCount := 0
 	for _, p := range pm.Projectiles {
@@ -85,33 +113,43 @@ func (pm *ProjectileManager) Shoot(x, y, vx, vy float64, kind int) {
 			activeCount++
 		}
 	}
-	if activeCount >= 5 {
+	if activeCount >= 6 {
 		return
 	}
 
-	pm.Projectiles = append(pm.Projectiles, NewProjectile(x, y, vx, vy, kind))
+	pm.Projectiles = append(pm.Projectiles, NewProjectile(x, y, vx, vy, kind, isSpecial))
 
 	// Partículas de disparo
 	sparkColor := color.RGBA{R: 245, G: 215, B: 85, A: 240}
-	if kind == ProjKindRoar {
+	if isSpecial {
+		sparkColor = color.RGBA{R: 255, G: 240, B: 120, A: 255}
+	} else if kind == ProjKindRoar {
 		sparkColor = color.RGBA{R: 255, G: 165, B: 40, A: 255}
 	}
 
-	for i := 0; i < 5; i++ {
+	count := 5
+	if isSpecial {
+		count = 10
+	}
+	for i := 0; i < count; i++ {
 		angle := float64(i)*0.5 - 1.0
 		if vx < 0 {
 			angle = math.Pi - angle
 		} else if vy < 0 {
 			angle = -math.Pi/2.0 + (float64(i)-2.0)*0.35
 		}
+		speed := 2.0 + float64(i)*0.4
+		if isSpecial {
+			speed *= 1.4
+		}
 		pm.Particles = append(pm.Particles, &Particle{
 			X:     x,
 			Y:     y,
-			VX:    math.Cos(angle) * (2.0 + float64(i)*0.4),
-			VY:    math.Sin(angle) * (2.0 + float64(i)*0.4),
+			VX:    math.Cos(angle) * speed,
+			VY:    math.Sin(angle) * speed,
 			Life:  0,
-			Max:   12,
-			Size:  2.5,
+			Max:   14,
+			Size:  2.8,
 			Color: sparkColor,
 		})
 	}
@@ -142,6 +180,17 @@ func (pm *ProjectileManager) AddScorePopup(x, y float64, score int) {
 		Life:    0,
 		MaxLife: 32,
 		Color:   color.RGBA{R: 255, G: 225, B: 60, A: 255},
+	})
+}
+
+func (pm *ProjectileManager) AddTextPopup(x, y float64, text string, col color.RGBA) {
+	pm.Popups = append(pm.Popups, &ScorePopup{
+		X:       x,
+		Y:       y,
+		Text:    text,
+		Life:    0,
+		MaxLife: 38,
+		Color:   col,
 	})
 }
 
@@ -235,6 +284,28 @@ func (pm *ProjectileManager) Draw(screen *ebiten.Image, ticks int) {
 			py := p.Y
 			isUp := p.VY < 0
 
+			if p.IsSpecial {
+				// Mega Rugido Alfa: Onda tripla gigante com brilho radiante
+				cSpecialGold := color.RGBA{R: 255, G: 235, B: 80, A: 255}
+				cSpecialCrimson := color.RGBA{R: 255, G: 85, B: 30, A: 240}
+				if isUp {
+					ebitenutil.DrawRect(screen, px-12, py+4, 24, 3, cSpecialCrimson)
+					ebitenutil.DrawRect(screen, px-10, py+1, 20, 3, cSpecialGold)
+					ebitenutil.DrawRect(screen, px-7, py-2, 14, 3, cRoarCore)
+					ebitenutil.DrawRect(screen, px-3, py-5, 6, 3, cRoarCore)
+				} else {
+					dir := 1.0
+					if p.VX < 0 {
+						dir = -1.0
+					}
+					ebitenutil.DrawRect(screen, px, py-9, 3, 18, cSpecialCrimson)
+					ebitenutil.DrawRect(screen, px+dir*3, py-7, 3, 14, cSpecialGold)
+					ebitenutil.DrawRect(screen, px+dir*6, py-4, 3, 8, cRoarCore)
+					ebitenutil.DrawRect(screen, px-dir*3, py-5, 2, 10, cSpecialCrimson)
+				}
+				continue
+			}
+
 			if isUp {
 				// Arco virado para cima: ^
 				ebitenutil.DrawRect(screen, px-6, py+2, 12, 2, cRoarOuter)
@@ -255,6 +326,20 @@ func (pm *ProjectileManager) Draw(screen *ebiten.Image, ticks int) {
 				ebitenutil.DrawRect(screen, px-dir*3, py-3, 2, 6, cRoarOuter)
 				ebitenutil.DrawRect(screen, px-dir*2, py-2, 2, 4, cRoarInner)
 			}
+			continue
+		}
+
+		if p.IsSpecial {
+			// Super Semente de Açaí Dourada Energizada (10x10 brilhante)
+			px := p.X - 5.0
+			py := p.Y - 5.0
+			cAura := color.RGBA{R: 255, G: 200, B: 40, A: 160}
+			cGoldAcai := color.RGBA{R: 245, G: 165, B: 25, A: 255}
+			ebitenutil.DrawRect(screen, px-1, py-1, 12, 12, cAura)
+			ebitenutil.DrawRect(screen, px+1, py, 8, 10, cAcaiOuter)
+			ebitenutil.DrawRect(screen, px, py+1, 10, 8, cAcaiOuter)
+			ebitenutil.DrawRect(screen, px+2, py+2, 6, 6, cGoldAcai)
+			ebitenutil.DrawRect(screen, px+3, py+3, 4, 4, cAcaiCore)
 			continue
 		}
 
