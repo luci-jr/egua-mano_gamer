@@ -508,7 +508,7 @@ func NewManager() *Manager {
 			bgmLoop := ebitenaudio.NewInfiniteLoop(stream, stream.Length())
 			p, err := ctx.NewPlayer(bgmLoop)
 			if err == nil {
-				p.SetVolume(0.40)
+				p.SetVolume(0.18) // Volume suave e equilibrado para a trilha de fundo
 				bgmPlayer = p
 			}
 		}
@@ -520,7 +520,7 @@ func NewManager() *Manager {
 		bgmLoop := ebitenaudio.NewInfiniteLoop(bytes.NewReader(bgmBytes), int64(len(bgmBytes)))
 		p, err := ctx.NewPlayer(bgmLoop)
 		if err == nil {
-			p.SetVolume(0.32)
+			p.SetVolume(0.15) // Volume calibrado suave para o fallback procedural
 			bgmPlayer = p
 		}
 	}
@@ -530,7 +530,7 @@ func NewManager() *Manager {
 	introLoop := ebitenaudio.NewInfiniteLoop(bytes.NewReader(introBytes), int64(len(introBytes)))
 	introPlayer, err := ctx.NewPlayer(introLoop)
 	if err == nil {
-		introPlayer.SetVolume(0.50) // Volume presente e audível em smartphones e notebooks
+		introPlayer.SetVolume(0.22) // Volume confortável e agradável para a tela de introdução e menus
 		m.introPlayer = introPlayer
 	}
 
