@@ -121,7 +121,12 @@ Entre cada fase, o jogador navega pelas águas da Baía do Guajará a bordo do t
 
 ---
 
-### 📱 2. Execução no Celular Android (Smartphone Mobile)
+### 📱 2. Execução no Celular Mobile (iPhone iOS Safari & Android)
+| iPhone iOS Vertical (Safari Portrait) | iPhone iOS Horizontal (Safari Landscape) |
+| :---: | :---: |
+| ![iPhone Portrait](assets/mobile_iphone_portrait.jpg) | ![iPhone Landscape](assets/mobile_iphone_landscape.jpg) |
+| *Layout vertical responsivo com D-Pad e botões virtuas NES no iOS* | *Execução limpa em aba única do Safari no iPhone* |
+
 | Android Horizontal (Landscape) | Android Vertical (Portrait) |
 | :---: | :---: |
 | ![Android Horizontal](assets/mobile_gameplay_landscape.png) | ![Android Vertical](assets/mobile_gameplay_portrait.png) |
