@@ -313,8 +313,8 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 		ebitenutil.DrawRect(screen, logoX+36, logoY+4, logoW-72, 1, color.RGBA{R: 255, G: 220, B: 75, A: 255})
 		ebitenutil.DrawRect(screen, logoX+36, logoY+14, logoW-72, 1, color.RGBA{R: 255, G: 220, B: 75, A: 255})
 
-		ebitenutil.DebugPrintAt(screen, "★ E G U A   M A N O !   G A M E R ★", int(logoX)+42, int(logoY)+3)
-		ebitenutil.DebugPrintAt(screen, "★ UMA AVENTURA EM BELEM DO PARA ★", int(logoX)+45, int(logoY)+15)
+		ebitenutil.DebugPrintAt(screen, "EGUA MANO! GAMER", 112, int(logoY)+3)
+		ebitenutil.DebugPrintAt(screen, "UMA AVENTURA EM BELEM DO PARA", 73, int(logoY)+15)
 		return
 	}
 
@@ -625,17 +625,17 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 		curColX += float64(g.width+2) * blockW
 	}
 
-	// 7. FAIXA "RUNNER" EM RELEVO VERMELHO RUBI E OURO
-	ribbonW := 158.0
-	ribbonH := 16.0
+	// 7. FAIXA "GAMER" EM RELEVO VERMELHO RUBI E OURO (MENOR E PROPORCIONAL)
+	ribbonW := 120.0
+	ribbonH := 14.0
 	ribbonX := (screenWidth - ribbonW) / 2.0
-	ribbonY := lettersStartY + 23.0 // Sobrepõe suavemente os pés das letras
+	ribbonY := lettersStartY + 24.0 // Encaixe harmonioso sob a tipografia principal
 
 	// Sombra da fita
 	ebitenutil.DrawRect(screen, ribbonX+2, ribbonY+2, ribbonW, ribbonH, color.RGBA{R: 0, G: 0, B: 0, A: 190})
 
 	// Abas chanfradas nas pontas esquerda e direita (estilo flâmula de vitória)
-	for d := 0; d < 8; d++ {
+	for d := 0; d < 6; d++ {
 		// Ponta esquerda com corte triangular
 		cutW := float64(d)
 		ebitenutil.DrawRect(screen, ribbonX+cutW, ribbonY+float64(d), 2, 1, color.RGBA{R: 120, G: 12, B: 22, A: 255})
@@ -646,74 +646,64 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 	}
 
 	// Corpo central da fita com degradê carmim
-	ebitenutil.DrawRect(screen, ribbonX+8, ribbonY, ribbonW-16, ribbonH, color.RGBA{R: 195, G: 22, B: 38, A: 255})
-	ebitenutil.DrawRect(screen, ribbonX+8, ribbonY, ribbonW-16, 2, color.RGBA{R: 240, G: 60, B: 75, A: 255}) // Brilho superior
-	ebitenutil.DrawRect(screen, ribbonX+8, ribbonY+ribbonH-2, ribbonW-16, 2, color.RGBA{R: 110, G: 10, B: 20, A: 255}) // Sombra inferior
+	ebitenutil.DrawRect(screen, ribbonX+6, ribbonY, ribbonW-12, ribbonH, color.RGBA{R: 195, G: 22, B: 38, A: 255})
+	ebitenutil.DrawRect(screen, ribbonX+6, ribbonY, ribbonW-12, 1, color.RGBA{R: 240, G: 60, B: 75, A: 255}) // Brilho superior
+	ebitenutil.DrawRect(screen, ribbonX+6, ribbonY+ribbonH-1, ribbonW-12, 1, color.RGBA{R: 110, G: 10, B: 20, A: 255}) // Sombra inferior
 
 	// Moldura dourada reluzente na fita
-	ebitenutil.DrawRect(screen, ribbonX+8, ribbonY, ribbonW-16, 1, color.RGBA{R: 250, G: 215, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, ribbonX+8, ribbonY+ribbonH-1, ribbonW-16, 1, color.RGBA{R: 250, G: 215, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, ribbonX+6, ribbonY, ribbonW-12, 1, color.RGBA{R: 250, G: 215, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, ribbonX+6, ribbonY+ribbonH-1, ribbonW-12, 1, color.RGBA{R: 250, G: 215, B: 55, A: 255})
 
 	// Tachas/rebites dourados nas extremidades
-	for _, pegX := range []float64{ribbonX + 11, ribbonX + ribbonW - 14} {
-		ebitenutil.DrawRect(screen, pegX, ribbonY+6, 3, 3, color.RGBA{R: 255, G: 225, B: 85, A: 255})
-		ebitenutil.DrawRect(screen, pegX+1, ribbonY+7, 1, 1, color.RGBA{R: 255, G: 255, B: 240, A: 255})
+	for _, pegX := range []float64{ribbonX + 9, ribbonX + ribbonW - 12} {
+		ebitenutil.DrawRect(screen, pegX, ribbonY+5, 3, 3, color.RGBA{R: 255, G: 225, B: 85, A: 255})
+		ebitenutil.DrawRect(screen, pegX+1, ribbonY+6, 1, 1, color.RGBA{R: 255, G: 255, B: 240, A: 255})
 	}
 
-	// Letras estilizadas de "GAMER" em relevo branco puro e sombra
+	// Letras estilizadas de "GAMER" compactas em relevo branco puro e sombra
 	runnerGlyphs := []struct {
 		w int
 		m []string
 	}{
-		// G (largura 5)
-		{5, []string{
-			".####",
-			"##...",
-			"##.##",
-			"##..#",
-			"##.##",
-			"#####",
-			".###.",
+		// G (largura 4)
+		{4, []string{
+			".###",
+			"##..",
+			"#.##",
+			"##.#",
+			".###",
 		}},
-		// A (largura 5)
-		{5, []string{
-			".###.",
-			"##.##",
-			"#####",
-			"##.##",
-			"##.##",
-			"##.##",
-			"##.##",
+		// A (largura 4)
+		{4, []string{
+			".##.",
+			"#..#",
+			"####",
+			"#..#",
+			"#..#",
 		}},
-		// M (largura 6)
-		{6, []string{
-			"##..##",
-			"######",
-			"######",
-			"##.###",
-			"##..##",
-			"##..##",
-			"##..##",
-		}},
-		// E (largura 5)
+		// M (largura 5)
 		{5, []string{
-			"#####",
-			"##...",
-			"####.",
-			"##...",
-			"##...",
-			"#####",
-			"#####",
+			"#...#",
+			"##.##",
+			"#.#.#",
+			"#...#",
+			"#...#",
 		}},
-		// R (largura 5)
-		{5, []string{
-			"####.",
-			"##.##",
-			"####.",
-			"###..",
-			"##.##",
-			"##.##",
-			"##.##",
+		// E (largura 4)
+		{4, []string{
+			"####",
+			"#...",
+			"###.",
+			"#...",
+			"####",
+		}},
+		// R (largura 4)
+		{4, []string{
+			"###.",
+			"#..#",
+			"###.",
+			"#.#.",
+			"#..#",
 		}},
 	}
 
@@ -721,12 +711,12 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 	for idx, rg := range runnerGlyphs {
 		totalRunnerW += rg.w * 2
 		if idx < len(runnerGlyphs)-1 {
-			totalRunnerW += 8 // Espaço entre as letras de GAMER
+			totalRunnerW += 6 // Espaço entre as letras de GAMER
 		}
 	}
 
 	runStartX := ribbonX + (ribbonW-float64(totalRunnerW))/2.0
-	runStartY := ribbonY + 1.0
+	runStartY := ribbonY + 2.0
 
 	runCurX := runStartX
 	for _, rg := range runnerGlyphs {
@@ -745,22 +735,33 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 				ebitenutil.DrawRect(screen, rx, ry, 2, 2, color.RGBA{R: 255, G: 250, B: 245, A: 255})
 			}
 		}
-		runCurX += float64(rg.w*2 + 8)
+		runCurX += float64(rg.w*2 + 6)
 	}
 
-	// 8. SUBTÍTULO CINZELADO NA PEDRA
-	ebitenutil.DrawRect(screen, bgX+28, bgY+54, bgW-56, 15, color.RGBA{R: 8, G: 12, B: 18, A: 210})
-	ebitenutil.DrawRect(screen, bgX+28, bgY+54, bgW-56, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
-	ebitenutil.DrawRect(screen, bgX+28, bgY+68, bgW-56, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
+	// 8. SUBTÍTULO CINZELADO NA PEDRA (PERFEITAMENTE ALINHADO E CENTRALIZADO)
+	ebitenutil.DrawRect(screen, bgX+24, bgY+54, bgW-48, 15, color.RGBA{R: 8, G: 12, B: 18, A: 210})
+	ebitenutil.DrawRect(screen, bgX+24, bgY+54, bgW-48, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
+	ebitenutil.DrawRect(screen, bgX+24, bgY+68, bgW-48, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
 
-	ebitenutil.DebugPrintAt(screen, "★ UMA AVENTURA EM BELEM DO PARA ★", int(bgX)+47, int(bgY)+57)
+	// Estrelas ornamentais douradas nas laterais (simetria perfeita)
+	// Esquerda (X = 54)
+	ebitenutil.DrawRect(screen, 54, bgY+59, 1, 5, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+	ebitenutil.DrawRect(screen, 52, bgY+61, 5, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+	ebitenutil.DrawRect(screen, 53, bgY+60, 3, 3, color.RGBA{R: 255, G: 240, B: 150, A: 255})
+
+	// Direita (X = 266)
+	ebitenutil.DrawRect(screen, 266, bgY+59, 1, 5, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+	ebitenutil.DrawRect(screen, 264, bgY+61, 5, 1, color.RGBA{R: 250, G: 205, B: 55, A: 240})
+	ebitenutil.DrawRect(screen, 265, bgY+60, 3, 3, color.RGBA{R: 255, G: 240, B: 150, A: 255})
+
+	ebitenutil.DebugPrintAt(screen, "UMA AVENTURA EM BELEM DO PARA", 73, int(bgY)+56)
 
 	// 9. ESTRELAS CINTILANTES (SPARKLES DE 4 PONTAS)
 	sparkleCoords := [][2]float64{
 		{lettersStartX - 2.0, lettersStartY + 1.0},
 		{lettersStartX + logoTextWidth - 6.0, lettersStartY + 3.0},
-		{ribbonX + 38.0, ribbonY - 2.0},
-		{ribbonX + ribbonW - 40.0, ribbonY + 12.0},
+		{ribbonX + 22.0, ribbonY - 2.0},
+		{ribbonX + ribbonW - 24.0, ribbonY + 11.0},
 	}
 
 	for spIdx, sp := range sparkleCoords {
@@ -1187,11 +1188,11 @@ func DrawCreditsScreen(screen *ebiten.Image, screenWidth, screenHeight float64) 
 	ebitenutil.DebugPrintAt(screen, "[ENTER / ESC / C] Voltar", bx+30, by+112)
 }
 
-func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, selectedIndex int, isMuted bool, speedLabel string) {
+func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, selectedIndex int, isMuted bool, speedLabel string, selectedHero int) {
 	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 10, G: 12, B: 20, A: 140})
 
-	boxW := 210.0
-	boxH := 122.0
+	boxW := 226.0
+	boxH := 142.0
 	boxX := (screenWidth - boxW) / 2.0
 	boxY := (screenHeight - boxH) / 2.0
 
@@ -1205,8 +1206,13 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 	bx := int(boxX)
 	by := int(boxY)
 
-	ebitenutil.DebugPrintAt(screen, "★ PAUSA ★", bx+82, by+6)
-	ebitenutil.DrawRect(screen, boxX+10, boxY+18, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 140})
+	ebitenutil.DebugPrintAt(screen, "★ PAUSA ★", bx+90, by+6)
+	ebitenutil.DrawRect(screen, boxX+10, boxY+19, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 140})
+
+	heroName := "GAROTO CURUMIM"
+	if selectedHero == 1 {
+		heroName = "ONCA-PINTADA  "
+	}
 
 	soundStatus := "SOM: [ LIGADO ]"
 	if isMuted {
@@ -1215,26 +1221,27 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 
 	options := []string{
 		"CONTINUAR",
+		fmt.Sprintf("HEROI: [ %s ]", heroName),
+		"REINICIAR FASE",
+		"RESETAR JOGO (DO ZERO)",
 		soundStatus,
 		fmt.Sprintf("VELOCIDADE: [ %s ]", speedLabel),
-		"REINICIAR AVENTURA",
-		"VER CREDITOS",
-		"FECHAR O JOGO",
+		"MENU INICIAL",
 	}
 
-	startY := by + 24
+	startY := by + 23
 	for i, opt := range options {
-		itemY := startY + i*13
+		itemY := startY + i*14
 		if i == selectedIndex {
-			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), boxW-12, 12, color.RGBA{R: 245, G: 185, B: 45, A: 75})
-			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), 2, 12, color.RGBA{R: 250, G: 210, B: 50, A: 255})
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+14, itemY)
+			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), boxW-12, 13, color.RGBA{R: 245, G: 185, B: 45, A: 75})
+			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), 2, 13, color.RGBA{R: 250, G: 210, B: 50, A: 255})
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+10, itemY)
 		} else {
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+14, itemY)
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+10, itemY)
 		}
 	}
 
-	ebitenutil.DebugPrintAt(screen, "[CIMA/BAIXO] Navegar   [ENTER] Escolher   [ESC] Voltar", bx+4, by+int(boxH)-12)
+	ebitenutil.DebugPrintAt(screen, "[W/S] Mover  [A/D/ENTER] Alterar  [ESC] Sair", bx+6, by+int(boxH)-12)
 }
 
 func DrawIndigenousWarrior(screen *ebiten.Image, x, y float64, ticks int) {
@@ -1443,14 +1450,15 @@ func DrawStageCompleteScreen(screen *ebiten.Image, screenWidth, screenHeight flo
 	}
 }
 
-func DrawGameOverScreen(screen *ebiten.Image, screenWidth, screenHeight float64, finalScore int, stage int) {
-	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 5, G: 5, B: 12, A: 140})
+func DrawGameOverScreen(screen *ebiten.Image, screenWidth, screenHeight float64, finalScore int, stage int, selectedHero int) {
+	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 5, G: 5, B: 12, A: 150})
 
-	boxW := 216.0
-	boxH := 76.0
+	boxW := 236.0
+	boxH := 102.0
 	boxX := (screenWidth - boxW) / 2.0
-	boxY := 18.0
+	boxY := 14.0
 
+	ebitenutil.DrawRect(screen, boxX+2, boxY+2, boxW, boxH, color.RGBA{R: 0, G: 0, B: 0, A: 180})
 	ebitenutil.DrawRect(screen, boxX, boxY, boxW, boxH, color.RGBA{R: 28, G: 16, B: 24, A: 245})
 	ebitenutil.DrawRect(screen, boxX, boxY, boxW, 2, color.RGBA{R: 240, G: 65, B: 65, A: 255})
 	ebitenutil.DrawRect(screen, boxX, boxY+boxH, boxW, 2, color.RGBA{R: 240, G: 65, B: 65, A: 255})
@@ -1460,18 +1468,25 @@ func DrawGameOverScreen(screen *ebiten.Image, screenWidth, screenHeight float64,
 	bx := int(boxX)
 	by := int(boxY)
 
-	stgStr := "VER-O-PESO"
+	stgStr := "1. VER-O-PESO"
 	if stage == 2 {
-		stgStr = "ESTACAO DAS DOCAS"
+		stgStr = "2. DOCAS"
 	} else if stage == 3 {
-		stgStr = "THEATRO DA PAZ"
+		stgStr = "3. THEATRO"
 	}
 
-	ebitenutil.DebugPrintAt(screen, "★ GAME OVER ★", bx+64, by+8)
-	ebitenutil.DrawRect(screen, boxX+10, boxY+21, boxW-20, 1, color.RGBA{R: 240, G: 65, B: 65, A: 160})
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Pontos: %05d  |  %s", finalScore, stgStr), bx+14, by+27)
-	ebitenutil.DebugPrintAt(screen, "[ENTER / R] Jogar Novamente", bx+24, by+44)
-	ebitenutil.DebugPrintAt(screen, "[ESC] Voltar ao Menu", bx+42, by+58)
+	heroLabel := "< GAROTO CURUMIM >"
+	if selectedHero == 1 {
+		heroLabel = "< ONCA-PINTADA >  "
+	}
+
+	ebitenutil.DebugPrintAt(screen, "★ GAME OVER ★", bx+78, by+6)
+	ebitenutil.DrawRect(screen, boxX+10, boxY+19, boxW-20, 1, color.RGBA{R: 240, G: 65, B: 65, A: 160})
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("SCORE: %05d  |  FASE: %s", finalScore, stgStr), bx+14, by+24)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("HEROI: %s [A/D]", heroLabel), bx+14, by+38)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("[ENTER / R] Reiniciar Fase %d", stage), bx+14, by+54)
+	ebitenutil.DebugPrintAt(screen, "[N] Resetar Jogo (Do Zero)", bx+14, by+68)
+	ebitenutil.DebugPrintAt(screen, "[ESC] Voltar ao Menu Inicial", bx+14, by+82)
 }
 
 func DrawSpeechBubble(screen *ebiten.Image, x, y float64, text string) {

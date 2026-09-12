@@ -714,8 +714,17 @@ func createSaoBrasIntroBGM() []byte {
 	return buf
 }
 
+var globalAudioCtx *ebitenaudio.Context
+
+func getAudioContext() *ebitenaudio.Context {
+	if globalAudioCtx == nil {
+		globalAudioCtx = ebitenaudio.NewContext(sampleRate)
+	}
+	return globalAudioCtx
+}
+
 func NewManager() *Manager {
-	ctx := ebitenaudio.NewContext(sampleRate)
+	ctx := getAudioContext()
 
 	m := &Manager{
 		ctx:           ctx,
