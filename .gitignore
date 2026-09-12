@@ -15,7 +15,7 @@
 *.test
 *.out
 
-# Executáveis WebAssembly (manter apenas docs/game.wasm.gz rastreado)
+# Executáveis WebAssembly (rastrear apenas game.dat = WASM compactado com gzip)
 /game.wasm
 docs/game.wasm
 
