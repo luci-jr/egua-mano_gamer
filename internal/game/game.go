@@ -5,6 +5,7 @@ import (
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/luci-jr/paidegua-game/internal/audio"
 	"github.com/luci-jr/paidegua-game/internal/entities"
@@ -57,6 +58,7 @@ type Engine struct {
 	isLoadingStage    bool
 	loadingTimer      int
 	targetStage       int
+	stageFadeTimer    int
 	isTitleCover      bool
 	isSaoBrasIntro    bool
 	saoBrasTimer      int
@@ -222,6 +224,7 @@ func (e *Engine) Update() error {
 			e.stage = e.targetStage
 			e.stageDistance = 0
 			e.stageBannerTimer = 130
+			e.stageFadeTimer = 25
 			e.hearts = 3
 			e.projectiles.Reset()
 			e.obstacles.Reset()
@@ -339,6 +342,7 @@ func (e *Engine) Update() error {
 			e.stage = 1
 			e.stageDistance = 0
 			e.stageBannerTimer = 120
+			e.stageFadeTimer = 25
 			e.audio.StopIntroBGM()
 			e.audio.RestartBGM()
 			return nil
@@ -726,6 +730,10 @@ func (e *Engine) Update() error {
 		return nil
 	}
 
+	if e.stageFadeTimer > 0 {
+		e.stageFadeTimer--
+	}
+
 	if e.speechBubbleTimer > 0 {
 		e.speechBubbleTimer--
 	} else {
@@ -1074,6 +1082,11 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 
 	e.obstacles.Draw(screen, e.ticks, e.stage)
 	e.projectiles.Draw(screen, e.ticks)
+
+	if e.stageFadeTimer > 0 {
+		fadeAlpha := uint8(255.0 * float64(e.stageFadeTimer) / 25.0)
+		ebitenutil.DrawRect(screen, 0, 0, ScreenWidth, ScreenHeight, color.RGBA{R: 12, G: 14, B: 20, A: fadeAlpha})
+	}
 
 	isDoubleJump := e.player.GetJumpCount() == 2
 	ui.DrawHUD(screen, e.lives, e.hearts, e.score, e.stage, isDoubleJump, e.stageBannerTimer, e.audio.IsMuted(), e.ticks, e.relicsCount, heroName, e.stageDistance)

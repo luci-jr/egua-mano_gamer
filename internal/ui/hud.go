@@ -1207,4 +1207,13 @@ func DrawStageTransitionLoadingScreen(screen *ebiten.Image, screenWidth, screenH
 
 	// Atalho rápido
 	ebitenutil.DebugPrintAt(screen, "[ENTER] Pular >>", int(barBoxX)+176, int(barBoxY)+16)
+
+	// 6. Transição cinematográfica: Fade-in suave ao entrar e Fade-out ao sair da tela náutica
+	if progress < 0.15 {
+		fadeAlpha := uint8(255.0 * (1.0 - progress/0.15))
+		ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 12, G: 14, B: 20, A: fadeAlpha})
+	} else if progress > 0.85 {
+		fadeAlpha := uint8(255.0 * (progress - 0.85) / 0.15)
+		ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 12, G: 14, B: 20, A: fadeAlpha})
+	}
 }
