@@ -314,7 +314,7 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 		ebitenutil.DrawRect(screen, logoX+36, logoY+14, logoW-72, 1, color.RGBA{R: 255, G: 220, B: 75, A: 255})
 
 		ebitenutil.DebugPrintAt(screen, "★ P A I D ' E G U A   R U N N E R ★", int(logoX)+44, int(logoY)+3)
-		ebitenutil.DebugPrintAt(screen, "AVENTURA AMAZONICA: RUINAS DE MARAJO", int(logoX)+34, int(logoY)+15)
+		ebitenutil.DebugPrintAt(screen, "★ UMA AVENTURA EM BELEM DO PARA ★", int(logoX)+45, int(logoY)+15)
 		return
 	}
 
@@ -763,7 +763,7 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 	ebitenutil.DrawRect(screen, bgX+28, bgY+54, bgW-56, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
 	ebitenutil.DrawRect(screen, bgX+28, bgY+68, bgW-56, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
 
-	ebitenutil.DebugPrintAt(screen, "★ AVENTURA AMAZONICA: RUINAS DE MARAJO ★", int(bgX)+34, int(bgY)+56)
+	ebitenutil.DebugPrintAt(screen, "★ UMA AVENTURA EM BELEM DO PARA ★", int(bgX)+47, int(bgY)+57)
 
 	// 9. ESTRELAS CINTILANTES (SPARKLES DE 4 PONTAS)
 	sparkleCoords := [][2]float64{
@@ -986,7 +986,7 @@ func DrawCharacterSelectScreen(screen *ebiten.Image, screenWidth, screenHeight f
 	ebitenutil.DrawRect(screen, 0, 0, screenWidth, 27, color.RGBA{R: 8, G: 12, B: 22, A: 245})
 	ebitenutil.DrawRect(screen, 0, 27, screenWidth, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
 	ebitenutil.DebugPrintAt(screen, "★ ESCOLHA SEU HEROI DA AMAZONIA ★", 56, 4)
-	ebitenutil.DebugPrintAt(screen, "Selecione o protagonista para a jornada no Marajo e Belem", 14, 15)
+	ebitenutil.DebugPrintAt(screen, "Selecione o heroi para Uma Aventura em Belem do Para", 14, 15)
 
 	cardW := 150.0
 	cardH := 142.0
