@@ -40,28 +40,31 @@ type Garoto struct {
 	SwingingVine *Vine
 
 	Particles []*Particle
+
+	StarPowerTimer int
 }
 
 func NewGaroto() *Garoto {
 	return &Garoto{
-		X:            45.0,
-		Y:            0,
-		GroundOffset: 0,
-		VelocityY:    0,
-		IsJumping:    false,
-		IsCrouching:  false,
-		IsRunning:    false,
-		FacingRight:  true,
-		AimUp:        false,
-		IsAttacking:  false,
-		AttackTimer:  0,
-		JumpCount:    0,
-		JumpHolding:  false,
-		CoyoteTimer:  0,
-		RunTicks:     0,
-		IsSwinging:   false,
-		SwingingVine: nil,
-		Particles:    make([]*Particle, 0),
+		X:              45.0,
+		Y:              0,
+		GroundOffset:   0,
+		VelocityY:      0,
+		IsJumping:      false,
+		IsCrouching:    false,
+		IsRunning:      false,
+		FacingRight:    true,
+		AimUp:          false,
+		IsAttacking:    false,
+		AttackTimer:    0,
+		JumpCount:      0,
+		JumpHolding:    false,
+		CoyoteTimer:    0,
+		RunTicks:       0,
+		IsSwinging:     false,
+		SwingingVine:   nil,
+		Particles:      make([]*Particle, 0),
+		StarPowerTimer: 0,
 	}
 }
 
@@ -360,6 +363,28 @@ func (g *Garoto) Reset() {
 	g.IsSwinging = false
 	g.SwingingVine = nil
 	g.Particles = g.Particles[:0]
+	g.StarPowerTimer = 0
+}
+
+func (g *Garoto) Bounce(strength float64) {
+	g.GroundOffset = 0
+	g.IsJumping = true
+	g.IsCrouching = false
+	g.JumpCount = 1
+	if strength == 0 {
+		strength = -6.0
+	}
+	g.VelocityY = strength
+	g.JumpHolding = true
+	g.spawnJumpBurst(g.X+7, g.Y+20)
+}
+
+func (g *Garoto) SetStarPower(timer int) {
+	g.StarPowerTimer = timer
+}
+
+func (g *Garoto) GetStarPower() int {
+	return g.StarPowerTimer
 }
 
 func (g *Garoto) GetBounds(groundY float64) (x, y, w, h float64) {
@@ -434,6 +459,29 @@ func (g *Garoto) Draw(screen *ebiten.Image, groundY float64, ticks int, invincib
 
 	px := g.X
 	py := groundY - 28.0 + g.Y
+
+	// Efeito Star Power (Guaraná da Amazônia): herói brilha em arco-íris cintilante estilo Super Mario
+	if g.StarPowerTimer > 0 {
+		rainbowColors := []color.RGBA{
+			{R: 255, G: 225, B: 50, A: 255},  // Ouro solar
+			{R: 50, G: 240, B: 255, A: 255},  // Ciano cósmico
+			{R: 255, G: 80, B: 220, A: 255},  // Magenta néon
+			{R: 255, G: 255, B: 255, A: 255}, // Branco estelar
+			{R: 70, G: 255, B: 110, A: 255},  // Verde esmeralda
+			{R: 255, G: 140, B: 30, A: 255},  // Laranja elétrico
+		}
+		starCol := rainbowColors[(ticks/4)%len(rainbowColors)]
+		starColLight := rainbowColors[(ticks/4+1)%len(rainbowColors)]
+		cShirt = starCol
+		cShirtLight = starColLight
+		cBandana = rainbowColors[(ticks/4+2)%len(rainbowColors)]
+		cBandanaShade = rainbowColors[(ticks/4+3)%len(rainbowColors)]
+
+		// Aura de contorno radiante em volta do corpo
+		auraAlpha := uint8(110 + (ticks%5)*25)
+		auraCol := color.RGBA{R: starCol.R, G: starCol.G, B: starCol.B, A: auraAlpha}
+		ebitenutil.DrawRect(screen, px-2, py-2, 20, 31, auraCol)
+	}
 
 	// Helper para desenhar com espelhamento horizontal relativo ao centro do garoto
 	centerX := px + 8.0

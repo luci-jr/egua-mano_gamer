@@ -829,6 +829,15 @@ func (m *Manager) PlayHit() {
 	}
 }
 
+func (m *Manager) PlayEguaMano() {
+	if m.isMuted || m.ctx == nil {
+		return
+	}
+	if len(m.sndEguaMano) > 0 {
+		m.ctx.NewPlayerFromBytes(m.sndEguaMano).Play()
+	}
+}
+
 func (m *Manager) PlayGameOver() {
 	if m.isMuted || m.ctx == nil {
 		return

@@ -38,4 +38,7 @@ type PlayerCharacter interface {
 	GetJumpCount() int
 	GetHeroKind() int
 	GetName() string
+	Bounce(strength float64)
+	SetStarPower(timer int)
+	GetStarPower() int
 }

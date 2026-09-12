@@ -119,7 +119,7 @@ func DrawCityFooter(screen *ebiten.Image, screenWidth, screenHeight float64, sta
 	ebitenutil.DebugPrintAt(screen, "★BELEM", 4, int(footerY)+1)
 }
 
-func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, isDoubleJump bool, stageBannerTimer int, isMuted bool, ticks int, relicsCount int, heroName string, stageDistance float64) {
+func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, isDoubleJump bool, stageBannerTimer int, isMuted bool, ticks int, relicsCount int, heroName string, stageDistance float64, starPowerTimer int) {
 	for i := 0; i < 3; i++ {
 		hx := 8.0 + float64(i*12)
 		DrawHeart(screen, hx, 9, i < hearts)
@@ -153,7 +153,19 @@ func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, 
 	distText := fmt.Sprintf("DIST: %dm/%dm", currDist, targetDist)
 	ebitenutil.DebugPrintAt(screen, distText, 115, 22)
 
-	if isMuted {
+	if starPowerTimer > 0 {
+		secs := (starPowerTimer + 59) / 60
+		starGlow := []color.RGBA{
+			{R: 255, G: 220, B: 40, A: 255},
+			{R: 50, G: 240, B: 255, A: 255},
+			{R: 255, G: 90, B: 220, A: 255},
+		}
+		starCol := starGlow[(ticks/5)%len(starGlow)]
+		ebitenutil.DrawRect(screen, 218, 21, 96, 12, color.RGBA{R: 20, G: 25, B: 35, A: 220})
+		ebitenutil.DrawRect(screen, 218, 21, 96, 1, starCol)
+		ebitenutil.DrawRect(screen, 218, 32, 96, 1, starCol)
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("GUARANA: %02ds", secs), 224, 22)
+	} else if isMuted {
 		ebitenutil.DebugPrintAt(screen, "[MUDO]", 226, 22)
 	}
 

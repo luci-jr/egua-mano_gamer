@@ -15,7 +15,8 @@ const (
 	RelicMuiraquita RelicType = 0 // Sapinho sagrado de jade verde (+100 pts)
 	RelicUrna       RelicType = 1 // Vaso ancestral de cerâmica marajoara (+200 pts)
 	RelicOuro       RelicType = 2 // Pepita de ouro do Tapajós (+50 pts)
-	RelicAcaiBowl   RelicType = 3 // 🥣 Cuia de Tacacá / Tigela de Açaí Nutritiva (Recupera 1 Coração!)
+	RelicAcaiBowl   RelicType = 3 // 🥣 Cuia de Tacacá / Tigela de Açaí Nutritiva (Raro: Recupera 1 Coração!)
+	RelicGuarana    RelicType = 4 // 🌟 Fruto do Guaraná da Amazônia (Raro: Concede Super Invencibilidade Estilo Mario!)
 )
 
 type Relic struct {
@@ -37,6 +38,8 @@ func NewRelic(x, baseY float64, rType RelicType) *Relic {
 		val = 50
 	case RelicAcaiBowl:
 		val = 150
+	case RelicGuarana:
+		val = 300
 	}
 	return &Relic{
 		X:        x,
@@ -191,6 +194,45 @@ func (r *Relic) Draw(screen *ebiten.Image, ticks int) {
 		ebitenutil.DrawRect(screen, float64(rx+4), hy+4, 7, 2, cHeartRed)
 		ebitenutil.DrawRect(screen, float64(rx+6), hy+6, 3, 1, cHeartRed)
 		ebitenutil.DrawRect(screen, float64(rx+5), hy+1, 1, 1, cHeartLight)
+
+	case RelicGuarana:
+		// 🌟 Fruto do Guaraná da Amazônia (Olho da floresta, invencibilidade estelar estilo Mario!)
+		cLeaf := color.RGBA{R: 40, G: 180, B: 65, A: 255}
+		ebitenutil.DrawRect(screen, float64(rx+7), float64(ry), 3, 2, cLeaf)
+		ebitenutil.DrawRect(screen, float64(rx+8), float64(ry-1), 2, 2, cLeaf)
+
+		// Casca externa rubi/alaranjada entreaberta
+		cRindRed := color.RGBA{R: 225, G: 35, B: 30, A: 255}
+		cRindDark := color.RGBA{R: 155, G: 20, B: 20, A: 255}
+		cRindOrange := color.RGBA{R: 250, G: 115, B: 30, A: 255}
+		ebitenutil.DrawRect(screen, float64(rx+2), float64(ry+3), 12, 11, cRindRed)
+		ebitenutil.DrawRect(screen, float64(rx+3), float64(ry+2), 10, 13, cRindOrange)
+		ebitenutil.DrawRect(screen, float64(rx+4), float64(ry+13), 8, 2, cRindDark)
+
+		// Polpa branca interior ("esclera")
+		cPulpWhite := color.RGBA{R: 252, G: 250, B: 245, A: 255}
+		ebitenutil.DrawRect(screen, float64(rx+4), float64(ry+4), 8, 8, cPulpWhite)
+		ebitenutil.DrawRect(screen, float64(rx+5), float64(ry+3), 6, 10, cPulpWhite)
+
+		// Semente negra mística central ("pupila")
+		cSeedBlack := color.RGBA{R: 18, G: 16, B: 22, A: 255}
+		cSeedShine := color.RGBA{R: 255, G: 255, B: 255, A: 255}
+		ebitenutil.DrawRect(screen, float64(rx+6), float64(ry+5), 4, 6, cSeedBlack)
+		ebitenutil.DrawRect(screen, float64(rx+5), float64(ry+6), 6, 4, cSeedBlack)
+		// Brilho estelar na pupila (olho vivo)
+		ebitenutil.DrawRect(screen, float64(rx+6), float64(ry+5), 2, 2, cSeedShine)
+
+		// Faíscas mágicas de arco-íris ao redor
+		starColors := []color.RGBA{
+			{R: 255, G: 235, B: 60, A: 255},  // Dourado
+			{R: 60, G: 240, B: 255, A: 255},  // Ciano
+			{R: 255, G: 110, B: 230, A: 255}, // Rosa
+		}
+		starColor := starColors[(ticks/5)%len(starColors)]
+		ebitenutil.DrawRect(screen, float64(rx+1), float64(ry+1), 1, 3, starColor)
+		ebitenutil.DrawRect(screen, float64(rx), float64(ry+2), 3, 1, starColor)
+		ebitenutil.DrawRect(screen, float64(rx+14), float64(ry+11), 1, 3, starColor)
+		ebitenutil.DrawRect(screen, float64(rx+13), float64(ry+12), 3, 1, starColor)
 	}
 }
 
@@ -222,10 +264,23 @@ func (rm *RelicManager) SpawnRelic(x, y float64, rType RelicType) {
 
 func (rm *RelicManager) Update(speed float64) {
 	rm.spawnTimer++
-	// Spawna uma relíquia/item de cura a cada ~230 ticks
-	if rm.spawnTimer >= 230 {
+	// Spawna uma relíquia balanceada a cada ~280 ticks (~4.6s)
+	if rm.spawnTimer >= 280 {
 		rm.spawnTimer = 0
-		rType := RelicType(rand.Intn(4)) // Sorteia entre Muiraquitã, Urna, Ouro e Cuia de Tacacá/Açaí
+		roll := rand.Intn(100)
+		var rType RelicType
+		switch {
+		case roll < 35:
+			rType = RelicMuiraquita // 35% Muiraquitã (+100 pts)
+		case roll < 65:
+			rType = RelicOuro       // 30% Pepita de Ouro (+50 pts)
+		case roll < 85:
+			rType = RelicUrna       // 20% Urna Marajoara (+200 pts)
+		case roll < 94:
+			rType = RelicGuarana    // 9% Guaraná Power (Super Invencibilidade!)
+		default:
+			rType = RelicAcaiBowl   // 6% Coração de cura (Raro e valioso!)
+		}
 		spawnY := rm.groundY - 55.0 - float64(rand.Intn(35))
 		rm.SpawnRelic(rm.screenWidth+40.0, spawnY, rType)
 	}

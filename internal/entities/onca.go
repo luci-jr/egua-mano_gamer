@@ -42,28 +42,31 @@ type Onca struct {
 	SwingingVine *Vine
 
 	Particles []*Particle
+
+	StarPowerTimer int
 }
 
 func NewOnca() *Onca {
 	return &Onca{
-		X:            45.0,
-		Y:            0,
-		GroundOffset: 0,
-		VelocityY:    0,
-		IsJumping:    false,
-		IsCrouching:  false,
-		IsRunning:    false,
-		FacingRight:  true,
-		AimUp:        false,
-		IsAttacking:  false,
-		AttackTimer:  0,
-		JumpCount:    0,
-		JumpHolding:  false,
-		CoyoteTimer:  0,
-		RunTicks:     0,
-		IsSwinging:   false,
-		SwingingVine: nil,
-		Particles:    make([]*Particle, 0),
+		X:              45.0,
+		Y:              0,
+		GroundOffset:   0,
+		VelocityY:      0,
+		IsJumping:      false,
+		IsCrouching:    false,
+		IsRunning:      false,
+		FacingRight:    true,
+		AimUp:          false,
+		IsAttacking:    false,
+		AttackTimer:    0,
+		JumpCount:      0,
+		JumpHolding:    false,
+		CoyoteTimer:    0,
+		RunTicks:       0,
+		IsSwinging:     false,
+		SwingingVine:   nil,
+		Particles:      make([]*Particle, 0),
+		StarPowerTimer: 0,
 	}
 }
 
@@ -358,6 +361,28 @@ func (o *Onca) Reset() {
 	o.IsSwinging = false
 	o.SwingingVine = nil
 	o.Particles = o.Particles[:0]
+	o.StarPowerTimer = 0
+}
+
+func (o *Onca) Bounce(strength float64) {
+	o.GroundOffset = 0
+	o.IsJumping = true
+	o.IsCrouching = false
+	o.JumpCount = 1
+	if strength == 0 {
+		strength = -6.4
+	}
+	o.VelocityY = strength
+	o.JumpHolding = true
+	o.spawnJumpBurst(o.X+16, o.Y+18)
+}
+
+func (o *Onca) SetStarPower(timer int) {
+	o.StarPowerTimer = timer
+}
+
+func (o *Onca) GetStarPower() int {
+	return o.StarPowerTimer
 }
 
 func (o *Onca) GetBounds(groundY float64) (x, y, w, h float64) {
@@ -415,6 +440,28 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 	cRoarWave1 := color.RGBA{R: 255, G: 255, B: 255, A: 220} // Onda de pressão de ar sônica
 	cRoarWave2 := color.RGBA{R: 235, G: 110, B: 40, A: 180}  // Laranja terracota
 	cRoarWave3 := color.RGBA{R: 200, G: 60, B: 30, A: 140}   // Carmesim rugido
+
+	// Efeito Star Power (Guaraná da Amazônia): Onça mística reluzente em arco-íris estilo Super Mario
+	if o.StarPowerTimer > 0 {
+		rainbowColors := []color.RGBA{
+			{R: 255, G: 235, B: 55, A: 255},  // Ouro radiante
+			{R: 55, G: 245, B: 240, A: 255},  // Ciano místico
+			{R: 255, G: 85, B: 225, A: 255},  // Rosa cósmico
+			{R: 255, G: 255, B: 255, A: 255}, // Branco celestial
+			{R: 80, G: 255, B: 110, A: 255},  // Verde esmeralda
+		}
+		starCol := rainbowColors[(ticks/4)%len(rainbowColors)]
+		starColLight := rainbowColors[(ticks/4+1)%len(rainbowColors)]
+		cGold = starCol
+		cGoldLight = starColLight
+		cSpotCenter = rainbowColors[(ticks/4+2)%len(rainbowColors)]
+
+		// Aura luminosa ao redor da Onça
+		auraAlpha := uint8(110 + (ticks%5)*25)
+		auraCol := color.RGBA{R: starCol.R, G: starCol.G, B: starCol.B, A: auraAlpha}
+		baseY := groundY - 24.0 + o.Y
+		ebitenutil.DrawRect(screen, posX-2, baseY-2, 38, 28, auraCol)
+	}
 
 	// Helper com espelhamento horizontal relativo ao centro da onça
 	centerX := posX + 19.0
