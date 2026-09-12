@@ -114,17 +114,17 @@ Entre cada fase, o jogador navega pelas águas da Baía do Guajará a bordo do t
 ## 📸 Galeria de Cenários & Modos de Jogo (PC e Celular)
 
 ### 💻 1. Execução no Navegador Web (PC / Desktop)
-| Tela Inicial Oficial Arcade | Gameplay PC (Garoto Curumim) |
+| Tela Inicial no Navegador Web (GitHub Pages) | Gameplay PC (Garoto Curumim) |
 | :---: | :---: |
-| ![Navegador PC Tela Inicial](assets/screenshot_pc_title.png) | ![Gameplay PC Curumim](assets/pc_gameplay_curumim.png) |
-| *Logotipo 3D Ouro Maciço, subtítulo e Ver-o-Peso Aéreo* | *Corrida no cais do Ver-o-Peso com disparo de açaí* |
+| ![Navegador PC Tela Inicial](assets/screenshot_browser_desktop.png) | ![Gameplay PC Curumim](assets/pc_gameplay_curumim.png) |
+| *Jogo online rodando em WebAssembly no navegador Chrome/Edge* | *Corrida no cais do Ver-o-Peso com disparo de açaí* |
 
 ---
 
 ### 📱 2. Execução no Celular Android (Smartphone Mobile)
 | Android Horizontal (Landscape) | Android Vertical (Portrait) |
 | :---: | :---: |
-| ![Android Horizontal](assets/mobile_real_landscape.jpg) | ![Android Vertical](assets/mobile_real_portrait.jpg) |
+| ![Android Horizontal](assets/mobile_gameplay_landscape.png) | ![Android Vertical](assets/mobile_gameplay_portrait.png) |
 | *Controles Virtuais D-Pad e Botões NES em Tela Cheia* | *Modo Retrô Vertical com layout fluido e trivia paraense* |
 
 ---
@@ -132,7 +132,7 @@ Entre cada fase, o jogador navega pelas águas da Baía do Guajará a bordo do t
 ### 🎨 3. Elementos Visuais & UI Retrô Ajustada
 | Favicon Personalizado Arcade | Cenário 8-Bit (Estação das Docas) |
 | :---: | :---: |
-| ![Favicon 16-Bit](assets/favicon.png) | ![Fase 2 Estação das Docas](assets/bg_fase2_8bit.png) |
+| <img src="assets/favicon.png" alt="Favicon 16-Bit" width="120" style="image-rendering: pixelated; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);" /> | ![Fase 2 Estação das Docas](assets/bg_fase2_8bit.png) |
 | *Ícone em Pixel Art com Curumim, Onça, Açaí e Ouro Marajoara* | *Galpões ingleses vermelhos, guindaste e pedras portuguesas* |
 
 ---

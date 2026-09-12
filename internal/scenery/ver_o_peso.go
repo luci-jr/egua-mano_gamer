@@ -121,7 +121,6 @@ func (b *Background) drawVerOPeso(screen *ebiten.Image, screenWidth, groundY flo
 		// 3. Postes coloniais vitorianos de ferro fundido do cais (Belle Époque) em primeiro plano
 		lampIron := color.RGBA{R: 28, G: 32, B: 42, A: 255}
 		lampGlow := color.RGBA{R: 255, G: 215, B: 90, A: 220}
-		lampLightBeam := color.RGBA{R: 255, G: 220, B: 120, A: 25}
 
 		for p := 0; p < 3; p++ {
 			px := float64(p*130) + 50.0 - math.Mod(b.scrollOffset*0.75, 130.0)
@@ -129,7 +128,6 @@ func (b *Background) drawVerOPeso(screen *ebiten.Image, screenWidth, groundY flo
 			ebitenutil.DrawRect(screen, px-2, groundY-48, 6, 2, lampIron)
 			ebitenutil.DrawRect(screen, px-1, groundY-50, 4, 3, lampIron)
 			ebitenutil.DrawRect(screen, px-1, groundY-47, 4, 3, lampGlow)
-			ebitenutil.DrawRect(screen, px-5, groundY-44, 12, 44, lampLightBeam)
 		}
 
 		// 4. Chão: Cais de pedra de cantaria histórica do Ver-o-Peso
@@ -230,14 +228,12 @@ func (b *Background) drawTheatroDaPaz(screen *ebiten.Image, screenWidth, groundY
 		// 2. Postes republicanos de ferro com globo de iluminação da Praça da República em primeiro plano
 		cRepIron := color.RGBA{R: 30, G: 34, B: 38, A: 255}
 		cGlobeWhite := color.RGBA{R: 255, G: 250, B: 230, A: 240}
-		cGlobeBeam := color.RGBA{R: 255, G: 245, B: 200, A: 20}
 
 		for p := 0; p < 3; p++ {
 			px := float64(p*135) + 45.0 - math.Mod(b.scrollOffset*0.75, 135.0)
 			ebitenutil.DrawRect(screen, px, groundY-46, 2, 46, cRepIron)
 			ebitenutil.DrawRect(screen, px-2, groundY-48, 6, 2, cRepIron)
 			ebitenutil.DrawRect(screen, px-2, groundY-54, 6, 6, cGlobeWhite)
-			ebitenutil.DrawRect(screen, px-6, groundY-46, 14, 46, cGlobeBeam)
 		}
 
 		// 3. Chão: Calçadão clássico de pedras portuguesas preto e branco (Mosaico da Praça da República)

@@ -88,10 +88,11 @@ func (r *Relic) Draw(screen *ebiten.Image, ticks int) {
 	rx := int(r.X)
 	ry := int(r.Y)
 
-	// Brilho pulsante em volta da relíquia
-	glowAlpha := uint8(80 + int(math.Sin(float64(ticks)*0.15)*40.0))
-	glowColor := color.RGBA{R: 255, G: 240, B: 150, A: glowAlpha}
-	ebitenutil.DrawRect(screen, r.X-2, r.Y-2, 20, 20, glowColor)
+	// Brilho estelar discreto (sem caixa retangular sólida no fundo)
+	if (ticks/12)%2 == 0 {
+		ebitenutil.DrawRect(screen, r.X+1, r.Y+1, 1, 1, color.RGBA{R: 255, G: 255, B: 200, A: 200})
+		ebitenutil.DrawRect(screen, r.X+14, r.Y+14, 1, 1, color.RGBA{R: 255, G: 255, B: 200, A: 200})
+	}
 
 	switch r.Type {
 	case RelicMuiraquita:
@@ -264,24 +265,22 @@ func (rm *RelicManager) SpawnRelic(x, y float64, rType RelicType) {
 
 func (rm *RelicManager) Update(speed float64) {
 	rm.spawnTimer++
-	// Spawna uma relíquia balanceada a cada ~280 ticks (~4.6s)
-	if rm.spawnTimer >= 280 {
+	// Spawna uma relíquia bem espaçada a cada ~480 ticks (~8s) em altura moderada para o pulo
+	if rm.spawnTimer >= 480 {
 		rm.spawnTimer = 0
 		roll := rand.Intn(100)
 		var rType RelicType
 		switch {
-		case roll < 35:
-			rType = RelicMuiraquita // 35% Muiraquitã (+100 pts)
-		case roll < 65:
-			rType = RelicOuro       // 30% Pepita de Ouro (+50 pts)
-		case roll < 85:
-			rType = RelicUrna       // 20% Urna Marajoara (+200 pts)
-		case roll < 94:
-			rType = RelicGuarana    // 9% Guaraná Power (Super Invencibilidade!)
+		case roll < 40:
+			rType = RelicMuiraquita // 40% Sapinho Muiraquitã de Jade (+100 pts)
+		case roll < 78:
+			rType = RelicOuro       // 38% Pepita de Ouro do Tapajós (+50 pts)
+		case roll < 90:
+			rType = RelicGuarana    // 12% Fruto do Guaraná da Amazônia (Star Power)
 		default:
-			rType = RelicAcaiBowl   // 6% Coração de cura (Raro e valioso!)
+			rType = RelicAcaiBowl   // 10% Cuia de Tacacá / Tigela de Açaí
 		}
-		spawnY := rm.groundY - 55.0 - float64(rand.Intn(35))
+		spawnY := rm.groundY - 32.0 - float64(rand.Intn(20))
 		rm.SpawnRelic(rm.screenWidth+40.0, spawnY, rType)
 	}
 

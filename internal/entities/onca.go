@@ -512,12 +512,11 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 			drawBox(headRelX+8, headRelY+4, 2, 3, oncaY, cNose)
 		}
 
-		// Patas agachadas
-		step := float64((ticks / 4) % 2)
-		drawBox(4+step*2, 9, 7, 3, oncaY, cGold)
-		drawBox(3+step*2, 11, 8, 2, oncaY, cCream)
-		drawBox(28-step*2, 9, 7, 3, oncaY, cGold)
-		drawBox(29-step*2, 11, 8, 2, oncaY, cCream)
+		// Patas agachadas (firmes no chão)
+		drawBox(4, 9, 7, 3, oncaY, cGold)
+		drawBox(3, 11, 8, 2, oncaY, cCream)
+		drawBox(28, 9, 7, 3, oncaY, cGold)
+		drawBox(29, 11, 8, 2, oncaY, cCream)
 
 		// Rabo abaixado
 		drawBox(-10, 5, 11, 3, oncaY, cGold)
@@ -527,14 +526,18 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 
 	// 2. ESTADO: EM PÉ / CORRENDO / SALTANDO
 	oncaY := groundY - 22.0 + o.Y
-	gallopFrame := (ticks / 5) % 4
-	if o.IsJumping {
-		gallopFrame = 0
-	}
 
+	// As patinhas só se movimentam quando ela estiver de fato andando/correndo!
+	gallopFrame := -1 // -1 indica repouso (em pé com 4 patas firmes no solo)
 	bodyYOffset := 0.0
-	if gallopFrame == 1 || gallopFrame == 3 {
-		bodyYOffset = 1.0
+
+	if o.IsJumping {
+		gallopFrame = 0 // No salto: pose acrobática estendida
+	} else if o.IsRunning {
+		gallopFrame = (o.RunTicks / 4) % 4
+		if gallopFrame == 1 || gallopFrame == 3 {
+			bodyYOffset = 1.0
+		}
 	}
 
 	// Tronco da Onça
@@ -624,42 +627,56 @@ func (o *Onca) Draw(screen *ebiten.Image, groundY float64, ticks int, invincible
 	drawBox(-5, -3+tailWave+bodyYOffset, 4, 5, oncaY, cSpotBlack)
 	drawBox(-3, -4+tailWave+bodyYOffset, 3, 3, oncaY, cSpotBlack)
 
-	// Patas animadas com ciclo de galope 4-frames
-	switch gallopFrame {
-	case 0:
-		drawBox(-2, 14, 6, 6, oncaY, cGold)
-		drawBox(-5, 18, 5, 5, oncaY, cGold)
-		drawBox(-7, 21, 5, 2, oncaY, cCream)
+	// Renderização das Patas:
+	if gallopFrame == -1 {
+		// POSE EM PÉ FIRME (PARADA / IDLE): 4 patas plantadas no solo com perfeição felina
+		// Pata Traseira
+		drawBox(2, 13, 6, 6, oncaY, cGold)
+		drawBox(2, 17, 5, 5, oncaY, cGold)
+		drawBox(1, 21, 6, 2, oncaY, cCream)
 
-		drawBox(24, 13, 6, 6, oncaY, cGold)
-		drawBox(28, 17, 5, 5, oncaY, cGold)
-		drawBox(30, 21, 5, 2, oncaY, cCream)
+		// Pata Dianteira
+		drawBox(23, 13, 6, 6, oncaY, cGold)
+		drawBox(24, 17, 5, 5, oncaY, cGold)
+		drawBox(24, 21, 6, 2, oncaY, cCream)
+	} else {
+		// CICLO DE GALOPE (APENAS QUANDO ESTIVER ANDANDO OU SALTANDO)
+		switch gallopFrame {
+		case 0:
+			drawBox(-2, 14, 6, 6, oncaY, cGold)
+			drawBox(-5, 18, 5, 5, oncaY, cGold)
+			drawBox(-7, 21, 5, 2, oncaY, cCream)
 
-	case 1:
-		drawBox(2, 15, 6, 5, oncaY, cGold)
-		drawBox(1, 18, 5, 4, oncaY, cGold)
-		drawBox(0, 21, 5, 2, oncaY, cCream)
+			drawBox(24, 13, 6, 6, oncaY, cGold)
+			drawBox(28, 17, 5, 5, oncaY, cGold)
+			drawBox(30, 21, 5, 2, oncaY, cCream)
 
-		drawBox(22, 14, 6, 5, oncaY, cGold)
-		drawBox(25, 17, 5, 5, oncaY, cGold)
-		drawBox(26, 21, 5, 2, oncaY, cCream)
+		case 1:
+			drawBox(2, 15, 6, 5, oncaY, cGold)
+			drawBox(1, 18, 5, 4, oncaY, cGold)
+			drawBox(0, 21, 5, 2, oncaY, cCream)
 
-	case 2:
-		drawBox(8, 14, 6, 5, oncaY, cGold)
-		drawBox(10, 17, 5, 5, oncaY, cGold)
-		drawBox(11, 21, 5, 2, oncaY, cCream)
+			drawBox(22, 14, 6, 5, oncaY, cGold)
+			drawBox(25, 17, 5, 5, oncaY, cGold)
+			drawBox(26, 21, 5, 2, oncaY, cCream)
 
-		drawBox(17, 14, 6, 5, oncaY, cGold)
-		drawBox(18, 17, 5, 5, oncaY, cGold)
-		drawBox(19, 21, 5, 2, oncaY, cCream)
+		case 2:
+			drawBox(8, 14, 6, 5, oncaY, cGold)
+			drawBox(10, 17, 5, 5, oncaY, cGold)
+			drawBox(11, 21, 5, 2, oncaY, cCream)
 
-	case 3:
-		drawBox(5, 14, 6, 5, oncaY, cGold)
-		drawBox(3, 18, 5, 4, oncaY, cGold)
-		drawBox(2, 21, 5, 2, oncaY, cCream)
+			drawBox(17, 14, 6, 5, oncaY, cGold)
+			drawBox(18, 17, 5, 5, oncaY, cGold)
+			drawBox(19, 21, 5, 2, oncaY, cCream)
 
-		drawBox(20, 13, 6, 6, oncaY, cGold)
-		drawBox(23, 17, 5, 5, oncaY, cGold)
-		drawBox(24, 21, 5, 2, oncaY, cCream)
+		case 3:
+			drawBox(5, 14, 6, 5, oncaY, cGold)
+			drawBox(3, 18, 5, 4, oncaY, cGold)
+			drawBox(2, 21, 5, 2, oncaY, cCream)
+
+			drawBox(20, 13, 6, 6, oncaY, cGold)
+			drawBox(23, 17, 5, 5, oncaY, cGold)
+			drawBox(24, 21, 5, 2, oncaY, cCream)
+		}
 	}
 }
