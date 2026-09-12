@@ -536,7 +536,7 @@ func (m *ObstacleManager) CheckPlatformSupport(playerX, playerY, playerW, player
 	return false, 0, nil
 }
 
-// CheckStomp verifica se o jogador pulou em cima de um inimigo (Jacaré, Cobra ou Ave Aérea), derrotando-o instantaneamente e quicando no ar
+// CheckStomp verifica se o jogador caiu em cima de um inimigo (Jacaré, Cobra ou Ave Aérea), derrotando-o instantaneamente e quicando no ar
 func (m *ObstacleManager) CheckStomp(playerX, playerY, playerW, playerH, playerVY, groundY float64) (bool, float64, float64, ObstacleType) {
 	var playerBottom float64
 	if playerY > 50.0 {
@@ -558,14 +558,15 @@ func (m *ObstacleManager) CheckStomp(playerX, playerY, playerW, playerH, playerV
 		obsTop := oy
 		obsBottom := oy + oh
 
-		// Sobreposição horizontal com margem confortável para gameplay fluida
-		overlapX := playerX+playerW > ox-3.0 && playerX < ox+ow+3.0
+		// Sobreposição horizontal com margem justa para exigir que caia realmente sobre o corpo
+		overlapX := playerX+playerW > ox+1.0 && playerX < ox+ow-1.0
 
-		// O jogador está no ar (saltando) e seus pés tocam/estão no corpo do inimigo vindo de cima
-		isJumping := playerBottom < groundY-1.0 || playerVY != 0
-		isAboveBase := playerBottom <= obsBottom+4.0 && playerBottom >= obsTop-16.0
+		// Só mata se o herói estiver efetivamente CAINDO EM CIMA (movimento descendente playerVY > 0)
+		isFalling := playerVY > 0.0
+		// Os pés do jogador devem tocar na parte superior do inimigo (sem matar quem está voando muito alto por cima)
+		isLandingOnTop := playerBottom >= obsTop-3.0 && playerBottom <= obsBottom
 
-		if overlapX && isJumping && isAboveBase {
+		if overlapX && isFalling && isLandingOnTop {
 			obs.Defeated = true
 			obs.DefeatTicks = 26
 			return true, ox + ow/2.0, oy + oh/2.0, obs.Type
@@ -595,26 +596,16 @@ func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH, pla
 		}
 
 		// Banco de Praça e Paneiro de Açaí NUNCA causam dano ao herói!
-		// O açaí é sagrado e nutritivo: concede energia em vez de machucar!
 		if obs.Type == TypeBench || obs.Type == TypeGround {
 			continue
 		}
 
-		ox, oy, ow, oh := obs.GetBounds()
+		_, oy, _, _ := obs.GetBounds()
 		obsTop := oy
-		obsBottom := oy + oh
 
-		// SALVAGUARDA ABSOLUTA DE PULO:
-		// Se for bicho inimigo (Jacaré, Cobra, Ave aérea) e o herói estiver saltando no ar com sobreposição,
-		// ele NUNCA deve tomar dano ou perder vida; se atingir o bicho no pulo, o bicho é derrotado!
-		if obs.Type == TypeJacare || obs.Type == TypeSnake || obs.Type == TypeAir {
-			overlapX := playerX+playerW > ox-3.0 && playerX < ox+ow+3.0
-			isJumping := playerBottom < groundY-1.0 || playerVY != 0
-			if overlapX && isJumping && playerBottom <= obsBottom+4.0 {
-				obs.Defeated = true
-				obs.DefeatTicks = 26
-				continue
-			}
+		// Se o herói está saltando por cima do obstáculo (pés acima do topo), não sofre colisão
+		if playerBottom <= obsTop+1.0 {
+			continue
 		}
 
 		// Se for obstáculo no chão e o herói colide vindo de cima em movimento descendente, evita dano

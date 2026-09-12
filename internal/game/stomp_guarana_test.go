@@ -62,16 +62,26 @@ func TestCheckStompMechanics(t *testing.T) {
 		t.Fatalf("Esperado TypeAir, obtido %v", obsType3)
 	}
 
-	// 4. Teste de Salvaguarda de Pulo em CheckCollision:
-	// Ao saltar sobre a cobra (TypeSnake), o herói NUNCA toma dano; a cobra é derrotada!
+	// 4. Teste de Salto Limpo por Cima da Cobra (Jump Over):
+	// Ao saltar alto por cima da cobra, o herói não toma dano e a cobra NÃO morre prematuramente
 	mgr.Obstacles[1].Collided = false
 	mgr.Obstacles[1].Defeated = false
-	collisionHit, _ := mgr.CheckCollision(204.0, -12.0, playerW, playerH, 1.0, GroundY, nil)
-	if collisionHit {
-		t.Fatalf("Pulo sobre o bicho NUNCA deve causar dano ao herói!")
+	jumpOverHit, _, _, _ := mgr.CheckStomp(204.0, -30.0, playerW, playerH, 1.0, GroundY)
+	if jumpOverHit {
+		t.Fatalf("Salto alto por cima do bicho NÃO deve matar o bicho prematuramente!")
 	}
-	if !mgr.Obstacles[1].Defeated {
-		t.Fatalf("A cobra deveria ser derrotada ao ser pisada/saltada por cima!")
+	collisionHit, _ := mgr.CheckCollision(204.0, -30.0, playerW, playerH, 1.0, GroundY, nil)
+	if collisionHit {
+		t.Fatalf("Salto por cima do bicho NÃO deve causar dano ao herói!")
+	}
+	if mgr.Obstacles[1].Defeated {
+		t.Fatalf("A cobra deve continuar viva se o herói apenas saltar por cima dela!")
+	}
+
+	// 4.1. Ao subir no pulo (playerVY < 0), não mata por pisão
+	jumpUpHit, _, _, _ := mgr.CheckStomp(204.0, -12.0, playerW, playerH, -2.5, GroundY)
+	if jumpUpHit {
+		t.Fatalf("Subir no pulo (playerVY < 0) não deve matar por pisão!")
 	}
 
 	// 5. Teste de Colisão Frontal no Chão:
