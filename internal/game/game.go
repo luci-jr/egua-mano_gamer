@@ -46,6 +46,9 @@ type Engine struct {
 	ticks             int
 	lives             int
 	hearts            int
+	attackCooldown    int
+	chargeTimer       int
+	isCharged         bool
 	invincibleTicks   int
 	shakeTimer        int
 	hitDelayTimer     int
@@ -98,6 +101,9 @@ func NewEngine() *Engine {
 		ticks:             0,
 		lives:             3,
 		hearts:            3,
+		attackCooldown:    0,
+		chargeTimer:       0,
+		isCharged:         false,
 		invincibleTicks:   0,
 		shakeTimer:        0,
 		hitDelayTimer:     0,
@@ -228,6 +234,9 @@ func (e *Engine) Update() error {
 			e.stageFadeTimer = 25
 			e.hearts = 3
 			e.currentPlatform = nil
+			e.attackCooldown = 0
+			e.chargeTimer = 0
+			e.isCharged = false
 			e.projectiles.Reset()
 			e.obstacles.Reset()
 			e.relics.Reset()
@@ -587,6 +596,9 @@ func (e *Engine) Update() error {
 			case 3:
 				e.player.Reset()
 				e.currentPlatform = nil
+				e.attackCooldown = 0
+				e.chargeTimer = 0
+				e.isCharged = false
 				e.projectiles.Reset()
 				e.obstacles.Reset()
 				e.vines.Reset()
@@ -620,6 +632,9 @@ func (e *Engine) Update() error {
 		if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 			e.player.Reset()
 			e.currentPlatform = nil
+			e.attackCooldown = 0
+			e.chargeTimer = 0
+			e.isCharged = false
 			e.projectiles.Reset()
 			e.obstacles.Reset()
 			e.vines.Reset()
@@ -652,6 +667,9 @@ func (e *Engine) Update() error {
 			} else {
 				e.player.Reset()
 				e.currentPlatform = nil
+				e.attackCooldown = 0
+				e.chargeTimer = 0
+				e.isCharged = false
 				e.projectiles.Reset()
 				e.obstacles.Reset()
 				e.vines.Reset()
@@ -687,6 +705,9 @@ func (e *Engine) Update() error {
 		if restartPressed {
 			e.player.Reset()
 			e.currentPlatform = nil
+			e.attackCooldown = 0
+			e.chargeTimer = 0
+			e.isCharged = false
 			e.projectiles.Reset()
 			e.obstacles.Reset()
 			e.vines.Reset()
@@ -834,22 +855,75 @@ func (e *Engine) Update() error {
 	aimUp := (ebiten.IsKeyPressed(ebiten.KeyArrowUp) || ebiten.IsKeyPressed(ebiten.KeyW) || getVirtualKey("ArrowUp")) && !e.player.IsPlayerJumping()
 	e.player.SetAimUp(aimUp)
 
-	attackJustPressed := inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
-		inpututil.IsKeyJustPressed(ebiten.KeyX) ||
-		inpututil.IsKeyJustPressed(ebiten.KeyJ) ||
-		getVirtualKey("Attack")
-	if getVirtualKey("Attack") {
-		resetVirtualKey("Attack")
+	if e.attackCooldown > 0 {
+		e.attackCooldown--
 	}
-	if attackJustPressed {
-		e.player.TriggerAttack()
-		origX, origY, vx, vy := e.player.GetShootOrigin(GroundY)
-		if e.selectedHero == entities.HeroOnca {
-			e.projectiles.ShootRoar(origX, origY, vx, vy)
-			e.audio.PlayRoar(false)
+
+	attackHeld := ebiten.IsKeyPressed(ebiten.KeySpace) ||
+		ebiten.IsKeyPressed(ebiten.KeyX) ||
+		ebiten.IsKeyPressed(ebiten.KeyJ) ||
+		getVirtualKey("Attack")
+
+	if attackHeld {
+		e.chargeTimer++
+		// Efeito visual de carregamento de energia (partículas douradas e de açaí)
+		if e.chargeTimer >= 18 {
+			pX, pY, pW, pH := e.player.GetBounds(GroundY)
+			sparkColor := color.RGBA{R: 245, G: 200, B: 50, A: 220}
+			if e.chargeTimer >= 42 {
+				sparkColor = color.RGBA{R: 255, G: 240, B: 120, A: 255}
+			}
+			if e.chargeTimer%2 == 0 {
+				e.projectiles.Particles = append(e.projectiles.Particles, &entities.Particle{
+					X:     pX + pW/2.0 + float64(e.ticks%9-4)*2.0,
+					Y:     pY + pH/2.0 + float64(e.ticks%7-3)*2.0,
+					VX:    float64(e.ticks%5-2) * 0.4,
+					VY:    -1.2 - float64(e.ticks%3)*0.4,
+					Life:  0,
+					Max:   12,
+					Size:  2.5,
+					Color: sparkColor,
+				})
+			}
+			if e.chargeTimer == 42 {
+				// Halo luminoso anunciando carga máxima pronta!
+				e.projectiles.SpawnHitBurst(pX+pW/2.0, pY+pH/2.0, color.RGBA{R: 255, G: 240, B: 100, A: 255}, 12)
+			}
+		}
+		e.isCharged = (e.chargeTimer >= 42)
+	} else if e.chargeTimer > 0 {
+		// Soltou o botão de ataque!
+		if e.chargeTimer >= 42 {
+			// ★ DISPARO DO TIRO ESPECIAL CARREGADO!
+			e.player.TriggerAttack()
+			origX, origY, vx, vy := e.player.GetShootOrigin(GroundY)
+			if e.selectedHero == entities.HeroOnca {
+				e.projectiles.ShootSpecialRoar(origX, origY, vx, vy)
+				e.audio.PlayRoar(true)
+			} else {
+				e.projectiles.ShootSpecialAcai(origX, origY, vx, vy)
+				e.audio.PlayShot()
+			}
+			e.attackCooldown = 26
 		} else {
-			e.projectiles.ShootAcai(origX, origY, vx, vy)
-			e.audio.PlayShot()
+			// Toque rápido: disparo de tiro comum com cooldown cadenciado anti-spam
+			if e.attackCooldown == 0 {
+				e.player.TriggerAttack()
+				origX, origY, vx, vy := e.player.GetShootOrigin(GroundY)
+				if e.selectedHero == entities.HeroOnca {
+					e.projectiles.ShootRoar(origX, origY, vx, vy)
+					e.audio.PlayRoar(false)
+				} else {
+					e.projectiles.ShootAcai(origX, origY, vx, vy)
+					e.audio.PlayShot()
+				}
+				e.attackCooldown = 18 // Cadência equilibrada de disparo (~0.3s)
+			}
+		}
+		e.chargeTimer = 0
+		e.isCharged = false
+		if getVirtualKey("Attack") {
+			resetVirtualKey("Attack")
 		}
 	}
 
@@ -949,7 +1023,10 @@ func (e *Engine) Update() error {
 		px, py, pw, ph := proj.GetBounds()
 		hit, hitX, hitY, obsType := e.obstacles.CheckProjectileHit(px, py, pw, ph)
 		if hit {
-			proj.Active = false
+			proj.HitsLeft--
+			if proj.HitsLeft <= 0 {
+				proj.Active = false
+			}
 			e.audio.PlayDefeat()
 
 			scoreBonus := 50
@@ -969,8 +1046,12 @@ func (e *Engine) Update() error {
 				burstColor = color.RGBA{R: 120, G: 45, B: 140, A: 255} // Açaí
 			}
 
+			if proj.IsSpecial {
+				scoreBonus += 30
+			}
+
 			e.score += scoreBonus
-			e.projectiles.SpawnHitBurst(hitX, hitY, burstColor, 10)
+			e.projectiles.SpawnHitBurst(hitX, hitY, burstColor, 12)
 			e.projectiles.AddScorePopup(hitX-8, hitY-10, scoreBonus)
 		}
 	}
@@ -998,13 +1079,26 @@ func (e *Engine) Update() error {
 		return nil
 	}
 
-	// Coleta de Relíquias e Tesouros Amazônicos (soma pontos e tesouros, SEM mudar de fase!)
+	// Coleta de Relíquias e Tesouros Amazônicos (incluindo Cuia de Tacacá que recupera 1 coração!)
 	if collected, r := e.relics.CheckCollection(playerX, playerY, playerW, playerH); collected {
 		e.relicsCount++
-		e.score += r.Value
-		e.audio.PlayTreasure()
-		e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 255, G: 220, B: 50, A: 255}, 12)
-		e.projectiles.AddScorePopup(r.X, r.Y-8, r.Value)
+		if r.Type == entities.RelicAcaiBowl {
+			if e.hearts < 3 {
+				e.hearts++
+				e.projectiles.AddTextPopup(r.X-20, r.Y-14, "+1 CORACAO!", color.RGBA{R: 255, G: 65, B: 85, A: 255})
+				e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 255, G: 65, B: 85, A: 255}, 16)
+			} else {
+				e.score += r.Value
+				e.projectiles.AddScorePopup(r.X, r.Y-8, r.Value)
+				e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 255, G: 220, B: 50, A: 255}, 12)
+			}
+			e.audio.PlayTreasure()
+		} else {
+			e.score += r.Value
+			e.audio.PlayTreasure()
+			e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 255, G: 220, B: 50, A: 255}, 12)
+			e.projectiles.AddScorePopup(r.X, r.Y-8, r.Value)
+		}
 	}
 
 	if passed := e.obstacles.Update(worldScrollSpeed); passed > 0 && worldScrollSpeed > 0 {

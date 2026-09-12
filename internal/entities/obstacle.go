@@ -16,6 +16,7 @@ const (
 	TypeJacare ObstacleType = 2 // Jacaré-Açu Amazônico com bocarra, dentes e escamas
 	TypeSnake  ObstacleType = 3 // Cobra-Coral Amazônica ondulando com língua bífida
 	TypeMudPit ObstacleType = 4 // Poço de Lama Movediça / Areia Movediça (Estilo Pitfall)
+	TypeBench  ObstacleType = 5 // Banco de Praça Colonial de Belém (Madeira de lei & ferro) - Plataforma segura!
 )
 
 type Obstacle struct {
@@ -70,6 +71,11 @@ func (obs *Obstacle) GetBounds() (x, y, w, h float64) {
 		h = 10.0
 		x = obs.X
 		y = obs.groundY - 2.0
+	case TypeBench:
+		w = 38.0
+		h = 16.0
+		x = obs.X
+		y = obs.groundY - h
 	default:
 		w = 22.0
 		h = 24.0
@@ -112,6 +118,8 @@ func (obs *Obstacle) Draw(screen *ebiten.Image, ticks int, stage int) {
 		obs.drawSnake(screen, ticks, stage)
 	case TypeMudPit:
 		obs.drawMudPit(screen, ticks)
+	case TypeBench:
+		obs.drawBench(screen, ticks, stage)
 	}
 }
 
@@ -395,8 +403,51 @@ func (obs *Obstacle) drawMudPit(screen *ebiten.Image, ticks int) {
 	}
 }
 
+func (obs *Obstacle) drawBench(screen *ebiten.Image, ticks int, stage int) {
+	benchY := obs.groundY - 16.0
+	bx := obs.X
+
+	// Paleta de Cores: Ferro fundido colonial de Belém + Madeira de Lei
+	cIron := color.RGBA{R: 28, G: 55, B: 38, A: 255}       // Ferro ornamental verde escuro colonial
+	cIronDark := color.RGBA{R: 16, G: 32, B: 22, A: 255}   // Sombra do ferro
+	cWood := color.RGBA{R: 165, G: 100, B: 45, A: 255}     // Madeira de lei castanho dourado
+	cWoodDark := color.RGBA{R: 115, G: 65, B: 25, A: 255}  // Sombra das ripas
+	cWoodLight := color.RGBA{R: 205, G: 135, B: 70, A: 255} // Brilho superior da madeira
+	cShadow := color.RGBA{R: 10, G: 15, B: 20, A: 120}     // Sombra de contato no solo
+
+	// 1. Sombra suave sob o banco no piso
+	ebitenutil.DrawRect(screen, bx+2, obs.groundY-2, 34, 2, cShadow)
+
+	// 2. Pés e braços de ferro trabalhado (estilo Praça da República / Theatro da Paz)
+	ebitenutil.DrawRect(screen, bx+3, benchY+7, 3, 9, cIron)
+	ebitenutil.DrawRect(screen, bx+32, benchY+7, 3, 9, cIron)
+	ebitenutil.DrawRect(screen, bx+1, benchY+14, 6, 2, cIronDark)
+	ebitenutil.DrawRect(screen, bx+30, benchY+14, 6, 2, cIronDark)
+
+	// Apoio de braço curvo nas laterais
+	ebitenutil.DrawRect(screen, bx+2, benchY+3, 3, 5, cIron)
+	ebitenutil.DrawRect(screen, bx+1, benchY+2, 5, 2, cIron)
+	ebitenutil.DrawRect(screen, bx+33, benchY+3, 3, 5, cIron)
+	ebitenutil.DrawRect(screen, bx+32, benchY+2, 5, 2, cIron)
+
+	// Haste de suporte vertical do encosto
+	ebitenutil.DrawRect(screen, bx+4, benchY-1, 2, 7, cIronDark)
+	ebitenutil.DrawRect(screen, bx+32, benchY-1, 2, 7, cIronDark)
+
+	// 3. Ripas de Madeira do Assento (plataforma sólida de aterrissagem)
+	ebitenutil.DrawRect(screen, bx+2, benchY+6, 34, 2, cWoodLight)
+	ebitenutil.DrawRect(screen, bx+2, benchY+8, 34, 2, cWood)
+	ebitenutil.DrawRect(screen, bx+2, benchY+10, 34, 2, cWoodDark)
+
+	// 4. Ripas de Madeira do Encosto (estilo praça colonial)
+	ebitenutil.DrawRect(screen, bx+4, benchY-1, 30, 2, cWoodLight)
+	ebitenutil.DrawRect(screen, bx+4, benchY+2, 30, 2, cWood)
+}
+
 func (m *ObstacleManager) Update(speed float64) int {
 	passedCount := 0
+	validTypes := []ObstacleType{TypeGround, TypeJacare, TypeBench, TypeSnake, TypeAir}
+
 	for _, obs := range m.Obstacles {
 		if obs.Defeated {
 			obs.DefeatTicks--
@@ -409,7 +460,7 @@ func (m *ObstacleManager) Update(speed float64) int {
 					}
 				}
 				obs.X = furthestX + 140.0 + float64(rand.Intn(50))
-				obs.Type = ObstacleType(rand.Intn(4))
+				obs.Type = validTypes[rand.Intn(len(validTypes))]
 				obs.collided = false
 				obs.Defeated = false
 				obs.DefeatTicks = 0
@@ -418,7 +469,19 @@ func (m *ObstacleManager) Update(speed float64) int {
 			continue
 		}
 
+		// 1. Deslocamento pelo scroll do mundo
 		obs.X -= speed
+
+		// 2. Movimentação autônoma dos animais animados (mesmo com herói parado no Pitfall!)
+		switch obs.Type {
+		case TypeJacare:
+			obs.X -= 0.65 // Rastejo predatório do jacaré-açu em direção ao herói
+		case TypeSnake:
+			obs.X -= 0.95 // Ondulação rasteira rápida da cobra-coral
+		case TypeAir:
+			obs.X -= 1.35 // Voo cortando os ares em direção ao herói
+		}
+
 		if speed > 0 && obs.X < -40 {
 			furthestX := m.screenWidth
 			for _, other := range m.Obstacles {
@@ -427,7 +490,7 @@ func (m *ObstacleManager) Update(speed float64) int {
 				}
 			}
 			obs.X = furthestX + 140.0 + float64(rand.Intn(50))
-			obs.Type = ObstacleType(rand.Intn(4))
+			obs.Type = validTypes[rand.Intn(len(validTypes))]
 			obs.collided = false
 			obs.Defeated = false
 			obs.DefeatTicks = 0
@@ -439,7 +502,7 @@ func (m *ObstacleManager) Update(speed float64) int {
 	return passedCount
 }
 
-// CheckPlatformSupport verifica se o jogador está aterrissando ou em pé sobre o topo de um obstáculo sólido (Paneiro ou Jacaré)
+// CheckPlatformSupport verifica se o jogador está aterrissando ou em pé sobre o topo de um obstáculo sólido (Paneiro, Dorso do Jacaré ou Banco de Praça)
 func (m *ObstacleManager) CheckPlatformSupport(playerX, playerY, playerW, playerH, playerVY, groundY float64) (bool, float64, *Obstacle) {
 	playerBottom := groundY + playerY
 	playerCenterX := playerX + playerW/2.0
@@ -448,8 +511,8 @@ func (m *ObstacleManager) CheckPlatformSupport(playerX, playerY, playerW, player
 		if obs.Defeated {
 			continue
 		}
-		// Apenas TypeGround (paneiro) e TypeJacare (dorso do jacaré) funcionam como plataformas sólidas
-		if obs.Type != TypeGround && obs.Type != TypeJacare {
+		// Apenas TypeGround (paneiro), TypeJacare (dorso do jacaré) e TypeBench (banco de praça) funcionam como plataformas sólidas
+		if obs.Type != TypeGround && obs.Type != TypeJacare && obs.Type != TypeBench {
 			continue
 		}
 
@@ -466,7 +529,7 @@ func (m *ObstacleManager) CheckPlatformSupport(playerX, playerY, playerW, player
 	return false, 0, nil
 }
 
-// CheckCollision realiza checagem de dano ignorando a plataforma onde o herói está em pé ou aterrissando
+// CheckCollision realiza checagem de dano ignorando plataformas onde o herói está em pé ou o Banco de Praça amigável
 func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH, playerVY, groundY float64, currentPlatform *Obstacle) (bool, ObstacleType) {
 	playerBottom := groundY + playerY
 	for _, obs := range m.Obstacles {
@@ -478,12 +541,16 @@ func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH, pla
 			continue
 		}
 
-		_, obsY, _, obsH := obs.GetBounds()
+		// Banco de Praça é plataforma urbana e refúgio 100% amigável: NUNCA causa dano!
+		if obs.Type == TypeBench {
+			continue
+		}
+
+		_, obsY, _, _ := obs.GetBounds()
 		obsTop := obsY
 
 		// Se for obstáculo escalável e o herói colide vindo de cima em movimento descendente, evita dano e prioriza aterrissagem
-		if (obs.Type == TypeGround || obs.Type == TypeJacare) && playerBottom <= obsTop+5.0 && playerVY >= -0.5 {
-			_ = obsH
+		if (obs.Type == TypeGround || obs.Type == TypeJacare || obs.Type == TypeBench) && playerBottom <= obsTop+5.0 && playerVY >= -0.5 {
 			continue
 		}
 
@@ -497,6 +564,10 @@ func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH, pla
 
 func (m *ObstacleManager) CheckProjectileHit(projX, projY, projW, projH float64) (bool, float64, float64, ObstacleType) {
 	for _, obs := range m.Obstacles {
+		// Banco de praça não é destruído por tiros normais
+		if obs.Type == TypeBench {
+			continue
+		}
 		if !obs.Defeated && obs.X > -20 && obs.X < m.screenWidth+20 {
 			ox, oy, ow, oh := obs.GetBounds()
 			overlapX := projX < ox+ow && projX+projW > ox
@@ -521,7 +592,7 @@ func (m *ObstacleManager) Draw(screen *ebiten.Image, ticks int, stage int) {
 
 func (m *ObstacleManager) Reset() {
 	spacing := 165.0
-	types := []ObstacleType{TypeGround, TypeAir, TypeJacare, TypeSnake}
+	types := []ObstacleType{TypeGround, TypeJacare, TypeBench, TypeSnake, TypeAir}
 	for i, obs := range m.Obstacles {
 		obs.X = m.screenWidth + 25.0 + float64(i)*spacing
 		obs.Type = types[i%len(types)]
