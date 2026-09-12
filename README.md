@@ -1,6 +1,18 @@
 # 🏹 PaiD'Egua Runner: Uma Aventura em Belém do Pará
 
 <p align="center">
+  <a href="https://github.com/luci-jr">
+    <img src="https://img.shields.io/badge/Desenvolvedor-Lucivaldo%20Junior-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Lucivaldo Junior" />
+  </a>
+  <a href="https://github.com/luci-jr/paidegua-runner">
+    <img src="https://img.shields.io/badge/Repositório-paidegua--runner-blue?style=for-the-badge&logo=git&logoColor=white" alt="Repositório GitHub" />
+  </a>
+  <a href="https://luci-jr.github.io/paidegua-runner/">
+    <img src="https://img.shields.io/badge/Jogar%20Online-WebAssembly-green?style=for-the-badge&logo=webassembly&logoColor=white" alt="Jogar Online" />
+  </a>
+</p>
+
+<p align="center">
   <img src="assets/title_screen.jpg" alt="PaiD'Egua Runner: Uma Aventura em Belém do Pará" width="680" style="max-width: 100%; image-rendering: pixelated; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);" />
 </p>
 
@@ -13,7 +25,7 @@
 
 ## 🌟 Sobre o Projeto
 
-**PaiD'Egua Runner: Uma Aventura em Belém do Pará** foi concebido e desenvolvido pelo engenheiro de software **Lucivaldo Junior** em co-criação com o **Nexus AI Ecosystem** (sob a liderança técnica de **Lucy — Agente-Mor, Tech Lead & Arquiteto Sênior**).
+**PaiD'Egua Runner: Uma Aventura em Belém do Pará** foi concebido e desenvolvido pelo desenvolvedor [**Lucivaldo Junior**](https://github.com/luci-jr).
 
 O projeto une rigor de engenharia de software em Go às melhores práticas arquiteturais do **Standard Go Project Layout** (`cmd/` e `internal/`), integrando:
 * **Física de Plataforma Customizada:** Colisão AABB, salto com altura variável, pulo duplo (*double jump*), queda rápida (*fast drop*), aterrissagem no dorso de animais (*Pitfall ledge landing*) e refúgio em bancos de praça coloniais.
@@ -183,8 +195,9 @@ go build -o paidegua-runner main.go
 
 ## 👥 Autoria & Créditos
 
-* **Desenvolvedor:** **Lucivaldo Junior** ([@luci-jr](https://github.com/luci-jr))
-* **Co-criação & Squad de Inteligência:** **Nexus AI Ecosystem** (sob a liderança técnica do **Lucy — Tech Lead & Arquiteto Sênior**)
+* **Desenvolvedor:** [**Lucivaldo Junior**](https://github.com/luci-jr)
+  * 🐙 **GitHub:** [https://github.com/luci-jr](https://github.com/luci-jr) (`@luci-jr`)
+  * 💻 **Repositório:** [https://github.com/luci-jr/paidegua-runner](https://github.com/luci-jr/paidegua-runner)
 * **Linguagem:** Go (Golang 1.22+)
 * **Engine Gráfica:** [Ebitengine (v2)](https://ebitengine.org/)
 * **Trilha Sonora:** Carimbó Chiptune 8-Bit autoral sintetizado proceduralmente (livre de direitos autorais)
