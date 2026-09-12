@@ -990,15 +990,30 @@ func DrawCharacterSelectScreen(screen *ebiten.Image, screenWidth, screenHeight f
 	cBandana := color.RGBA{R: 235, G: 50, B: 45, A: 255}
 	cShirt := color.RGBA{R: 35, G: 130, B: 220, A: 255}
 	cPants := color.RGBA{R: 175, G: 145, B: 100, A: 255}
-	cWood := color.RGBA{R: 145, G: 85, B: 40, A: 255}
+	cWoodDark := color.RGBA{R: 105, G: 55, B: 25, A: 255}
+	cWood := color.RGBA{R: 155, G: 95, B: 45, A: 255}
+	cWoodLight := color.RGBA{R: 205, G: 145, B: 85, A: 255}
+	cRubber := color.RGBA{R: 245, G: 125, B: 25, A: 255}
+	cLeatherPouch := color.RGBA{R: 75, G: 38, B: 15, A: 255}
+	cAcai := color.RGBA{R: 60, G: 15, B: 70, A: 255}
 
 	ebitenutil.DrawRect(screen, gx+4, gy, 8, 8, cSkin)
 	ebitenutil.DrawRect(screen, gx+2, gy-2, 12, 3, cHair)
 	ebitenutil.DrawRect(screen, gx+3, gy+1, 10, 2, cBandana)
 	ebitenutil.DrawRect(screen, gx+9, gy+3, 2, 2, color.RGBA{R: 10, G: 10, B: 10, A: 255})
 	ebitenutil.DrawRect(screen, gx+3, gy+8, 9, 8, cShirt)
-	ebitenutil.DrawRect(screen, gx+12, gy+7, 3, 5, cWood)
-	ebitenutil.DrawRect(screen, gx+13, gy+6, 4, 2, color.RGBA{R: 230, G: 110, B: 50, A: 255})
+
+	// Baladeira Regional Paraense em Y destacada na mão do Garoto
+	ebitenutil.DrawRect(screen, gx+11, gy+9, 3, 3, cSkin)        // Mão
+	ebitenutil.DrawRect(screen, gx+13, gy+9, 2, 5, cWood)        // Cabo de madeira da baladeira
+	ebitenutil.DrawRect(screen, gx+13, gy+7, 2, 2, cWoodDark)    // Bifurcação central do Y
+	ebitenutil.DrawRect(screen, gx+11, gy+4, 2, 3, cWood)        // Haste esquerda
+	ebitenutil.DrawRect(screen, gx+15, gy+4, 2, 3, cWoodLight)   // Haste direita
+	ebitenutil.DrawRect(screen, gx+10, gy+5, 2, 2, cRubber)      // Liga elástica esquerda
+	ebitenutil.DrawRect(screen, gx+15, gy+5, 2, 2, cRubber)      // Liga elástica direita
+	ebitenutil.DrawRect(screen, gx+9, gy+7, 3, 3, cLeatherPouch) // Malha de couro
+	ebitenutil.DrawRect(screen, gx+10, gy+7, 2, 2, cAcai)        // Caroço de açaí
+
 	ebitenutil.DrawRect(screen, gx+4, gy+16, 3, 8, cPants)
 	ebitenutil.DrawRect(screen, gx+9, gy+16, 3, 8, cPants)
 	ebitenutil.DrawRect(screen, gx+4, gy+24, 4, 3, cSkin)
@@ -1006,15 +1021,15 @@ func DrawCharacterSelectScreen(screen *ebiten.Image, screenWidth, screenHeight f
 
 	// Ficha de Atributos do Garoto (à direita no card)
 	tx0 := int(c0X) + 54
-	ebitenutil.DebugPrintAt(screen, "Arma: Baladeira", tx0, int(cardY)+25)
-	ebitenutil.DebugPrintAt(screen, "Tiro: Acai veloz", tx0, int(cardY)+37)
+	ebitenutil.DebugPrintAt(screen, "Arma: Baladeira Paraense", tx0, int(cardY)+25)
+	ebitenutil.DebugPrintAt(screen, "Tiro: Caroco de Acai", tx0, int(cardY)+37)
 	ebitenutil.DebugPrintAt(screen, "Pulo: Salto Duplo", tx0, int(cardY)+49)
-	ebitenutil.DebugPrintAt(screen, "Esquiva: Agil no ar", tx0, int(cardY)+61)
+	ebitenutil.DebugPrintAt(screen, "Especial: Super Acai", tx0, int(cardY)+61)
 	ebitenutil.DebugPrintAt(screen, "Modo: Aventureiro", tx0, int(cardY)+73)
 
 	// Divisória inferior do card
 	ebitenutil.DrawRect(screen, c0X+6, cardY+90, cardW-12, 1, color.RGBA{R: 150, G: 160, B: 180, A: 100})
-	ebitenutil.DebugPrintAt(screen, "\"Bora la, maninho!\"", int(c0X)+14, int(cardY)+95)
+	ebitenutil.DebugPrintAt(screen, "\"Prepara a baladeira, mano!\"", int(c0X)+4, int(cardY)+95)
 	ebitenutil.DebugPrintAt(screen, "\"Nao tem jacare que pegue\"", int(c0X)+4, int(cardY)+107)
 
 	if is0Selected {

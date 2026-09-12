@@ -19,7 +19,10 @@
 > Um jogo de ação e aventura arcade retrô 16-bit construído 100% em **Go** com a engine **Ebitengine (v2)**, ambientado nos cartões-postais históricos, na rica culinária e na cultura vibrante de **Belém do Pará**.
 >
 > 🕹️ **Jogue agora online no navegador (WebAssembly):**  
-> 👉 **[https://luci-jr.github.io/paidegua-runner/](https://luci-jr.github.io/paidegua-runner/)** *(Zero instalação, compatível com PC e Celular / Smartphone Android & iOS!)*
+> 👉 **[https://luci-jr.github.io/paidegua-runner/](https://luci-jr.github.io/paidegua-runner/)** *(Zero instalação, compatível com PC e Celular / Smartphone Android & iOS!)*  
+>  
+> 📜 **Documentação de Design & Engenharia:**  
+> 👉 **[Consulte o Game Design Document (GDD) Oficial](docs/GDD.md)**
 
 ---
 
@@ -154,7 +157,8 @@ paidegua-runner/
 │   ├── bg_fase1_8bit.png        # Cenário 8-bit da Fase 1 (Ver-o-Peso)
 │   ├── bg_fase2_8bit.png        # Cenário 8-bit da Fase 2 (Estação das Docas)
 │   └── bg_fase3_8bit.png        # Cenário 8-bit da Fase 3 (Theatro da Paz)
-├── docs/                        # Deploy WebAssembly para GitHub Pages
+├── docs/                        # Deploy WebAssembly & Documentação Oficial
+│   ├── GDD.md                   # Game Design Document (GDD) completo do jogo
 │   ├── index.html               # Frontend responsivo para PC e Mobile
 │   ├── game.wasm                # Binário executável Go compilado para WebAssembly
 │   └── wasm_exec.js             # Runtime oficial de ponte Go-JS
