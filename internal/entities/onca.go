@@ -21,16 +21,17 @@ type Particle struct {
 }
 
 type Onca struct {
-	X           float64
-	Y           float64
-	VelocityY   float64
-	IsJumping   bool
-	IsCrouching bool
-	IsRunning   bool
-	FacingRight bool
-	AimUp       bool
-	IsAttacking bool
-	AttackTimer int
+	X            float64
+	Y            float64
+	GroundOffset float64
+	VelocityY    float64
+	IsJumping    bool
+	IsCrouching  bool
+	IsRunning    bool
+	FacingRight  bool
+	AimUp        bool
+	IsAttacking  bool
+	AttackTimer  int
 
 	JumpCount   int
 	JumpHolding bool
@@ -47,6 +48,7 @@ func NewOnca() *Onca {
 	return &Onca{
 		X:            45.0,
 		Y:            0,
+		GroundOffset: 0,
 		VelocityY:    0,
 		IsJumping:    false,
 		IsCrouching:  false,
@@ -62,6 +64,42 @@ func NewOnca() *Onca {
 		IsSwinging:   false,
 		SwingingVine: nil,
 		Particles:    make([]*Particle, 0),
+	}
+}
+
+func (o *Onca) SetPositionX(x float64) {
+	o.X = x
+}
+
+func (o *Onca) GetPosition() (x, y float64) {
+	return o.X, o.Y
+}
+
+func (o *Onca) SetGroundOffset(offset float64) {
+	o.GroundOffset = offset
+	o.Y = offset
+	o.VelocityY = 0
+	o.IsJumping = false
+	o.JumpCount = 0
+}
+
+func (o *Onca) GetGroundOffset() float64 {
+	return o.GroundOffset
+}
+
+func (o *Onca) GetVelocityY() float64 {
+	return o.VelocityY
+}
+
+func (o *Onca) FallFromPlatform() {
+	if o.GroundOffset != 0 {
+		o.GroundOffset = 0
+		if o.Y < 0 {
+			o.IsJumping = true
+			if o.VelocityY < 0 {
+				o.VelocityY = 0
+			}
+		}
 	}
 }
 
@@ -130,13 +168,14 @@ func (o *Onca) Jump() (jumped bool, isDouble bool) {
 		return true, false
 	}
 	if !o.IsJumping || o.CoyoteTimer > 0 {
+		o.GroundOffset = 0 // Pulo liberta da plataforma atual
 		o.IsJumping = true
 		o.IsCrouching = false
 		o.JumpCount = 1
 		o.VelocityY = -7.0 // Salto ágil felino
 		o.JumpHolding = true
 		o.CoyoteTimer = 0
-		o.spawnDust(o.X+10, 0, 6)
+		o.spawnDust(o.X+10, o.Y, 6)
 		return true, false
 	} else if o.JumpCount == 1 {
 		o.JumpCount = 2
@@ -183,7 +222,7 @@ func (o *Onca) ReleaseJump() {
 
 func (o *Onca) SetCrouch(crouch bool) {
 	if !o.IsCrouching && crouch && !o.IsJumping && !o.IsSwinging {
-		o.spawnDust(o.X+30, 0, 4)
+		o.spawnDust(o.X+30, o.Y, 4)
 	}
 	o.IsCrouching = crouch
 	if crouch {
@@ -201,7 +240,7 @@ func (o *Onca) Update() {
 	if o.IsRunning && !o.IsSwinging {
 		o.RunTicks++
 		if o.RunTicks%8 == 0 && !o.IsJumping {
-			o.spawnDust(o.X+4, 0, 2)
+			o.spawnDust(o.X+4, o.Y, 2)
 		}
 	} else {
 		o.RunTicks = 0
@@ -221,7 +260,8 @@ func (o *Onca) Update() {
 			o.Y = tipY - 155.0 + 8.0
 			o.VelocityY = 0
 			o.IsJumping = false
-			o.FacingRight = o.SwingingVine.AngleVelocity >= 0
+			gFacing := o.SwingingVine.AngleVelocity >= 0
+			o.FacingRight = gFacing
 		} else {
 			o.IsSwinging = false
 			o.IsJumping = true
@@ -235,14 +275,18 @@ func (o *Onca) Update() {
 		o.Y += o.VelocityY
 		o.VelocityY += gravity
 
-		if o.Y >= 0 {
-			o.Y = 0
+		targetY := o.GroundOffset
+		if o.Y >= targetY {
+			o.Y = targetY
 			o.IsJumping = false
 			o.JumpCount = 0
 			o.VelocityY = 0
-			o.spawnDust(o.X+12, 0, 8)
+			o.spawnDust(o.X+12, targetY, 8)
 		}
 	} else {
+		if o.Y < o.GroundOffset {
+			o.IsJumping = true
+		}
 		o.CoyoteTimer = 6
 	}
 
@@ -298,6 +342,7 @@ func (o *Onca) spawnJumpBurst(x, y float64) {
 func (o *Onca) Reset() {
 	o.X = 45.0
 	o.Y = 0
+	o.GroundOffset = 0
 	o.VelocityY = 0
 	o.IsJumping = false
 	o.IsCrouching = false

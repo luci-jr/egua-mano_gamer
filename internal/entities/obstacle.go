@@ -86,6 +86,15 @@ func (obs *Obstacle) CheckCollision(playerX, playerY, playerW, playerH float64) 
 	return overlapX && overlapY
 }
 
+func (obs *Obstacle) IsPlayerOnTop(playerX, playerW float64) bool {
+	if obs.Defeated {
+		return false
+	}
+	obsX, _, obsW, _ := obs.GetBounds()
+	playerCenterX := playerX + playerW/2.0
+	return playerCenterX >= obsX-4.0 && playerCenterX <= obsX+obsW+4.0
+}
+
 func (obs *Obstacle) Draw(screen *ebiten.Image, ticks int, stage int) {
 	if obs.Defeated {
 		if (obs.DefeatTicks/3)%2 != 0 {
@@ -392,7 +401,7 @@ func (m *ObstacleManager) Update(speed float64) int {
 		if obs.Defeated {
 			obs.DefeatTicks--
 			obs.X -= speed * 0.4
-			if obs.DefeatTicks <= 0 || obs.X < -40 {
+			if obs.DefeatTicks <= 0 || (speed > 0 && obs.X < -40) {
 				furthestX := m.screenWidth
 				for _, other := range m.Obstacles {
 					if other != obs && other.X > furthestX {
@@ -410,7 +419,7 @@ func (m *ObstacleManager) Update(speed float64) int {
 		}
 
 		obs.X -= speed
-		if obs.X < -40 {
+		if speed > 0 && obs.X < -40 {
 			furthestX := m.screenWidth
 			for _, other := range m.Obstacles {
 				if other != obs && other.X > furthestX {
@@ -423,14 +432,62 @@ func (m *ObstacleManager) Update(speed float64) int {
 			obs.Defeated = false
 			obs.DefeatTicks = 0
 			passedCount++
+		} else if speed < 0 && obs.X > m.screenWidth+250.0 {
+			obs.X = m.screenWidth + 250.0
 		}
 	}
 	return passedCount
 }
 
-func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH float64) (bool, ObstacleType) {
+// CheckPlatformSupport verifica se o jogador está aterrissando ou em pé sobre o topo de um obstáculo sólido (Paneiro ou Jacaré)
+func (m *ObstacleManager) CheckPlatformSupport(playerX, playerY, playerW, playerH, playerVY, groundY float64) (bool, float64, *Obstacle) {
+	playerBottom := groundY + playerY
+	playerCenterX := playerX + playerW/2.0
+
 	for _, obs := range m.Obstacles {
-		if !obs.collided && !obs.Defeated && obs.CheckCollision(playerX, playerY, playerW, playerH) {
+		if obs.Defeated {
+			continue
+		}
+		// Apenas TypeGround (paneiro) e TypeJacare (dorso do jacaré) funcionam como plataformas sólidas
+		if obs.Type != TypeGround && obs.Type != TypeJacare {
+			continue
+		}
+
+		obsX, obsY, obsW, obsH := obs.GetBounds()
+		obsTop := obsY // groundY - obsH
+
+		if playerCenterX >= obsX-4.0 && playerCenterX <= obsX+obsW+4.0 {
+			dist := playerBottom - obsTop
+			if dist >= -7.0 && dist <= 8.0 && playerVY >= -1.0 {
+				return true, -obsH, obs
+			}
+		}
+	}
+	return false, 0, nil
+}
+
+// CheckCollision realiza checagem de dano ignorando a plataforma onde o herói está em pé ou aterrissando
+func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH, playerVY, groundY float64, currentPlatform *Obstacle) (bool, ObstacleType) {
+	playerBottom := groundY + playerY
+	for _, obs := range m.Obstacles {
+		if obs.collided || obs.Defeated {
+			continue
+		}
+		// Se o jogador está apoiado neste obstáculo, não recebe dano
+		if obs == currentPlatform {
+			continue
+		}
+
+		_, obsY, _, obsH := obs.GetBounds()
+		obsTop := obsY
+
+		// Se for obstáculo escalável e o herói colide vindo de cima em movimento descendente, evita dano e prioriza aterrissagem
+		if (obs.Type == TypeGround || obs.Type == TypeJacare) && playerBottom <= obsTop+5.0 && playerVY >= -0.5 {
+			_ = obsH
+			continue
+		}
+
+		if obs.CheckCollision(playerX, playerY, playerW, playerH) {
 			obs.collided = true
 			return true, obs.Type
 		}

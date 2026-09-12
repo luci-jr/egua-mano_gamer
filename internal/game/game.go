@@ -35,6 +35,7 @@ type Engine struct {
 	isCharSelect      bool
 	projectiles       *entities.ProjectileManager
 	obstacles         *entities.ObstacleManager
+	currentPlatform   *entities.Obstacle
 	vines             *entities.VineManager
 	relics            *entities.RelicManager
 	scenery           *scenery.Background
@@ -226,6 +227,7 @@ func (e *Engine) Update() error {
 			e.stageBannerTimer = 130
 			e.stageFadeTimer = 25
 			e.hearts = 3
+			e.currentPlatform = nil
 			e.projectiles.Reset()
 			e.obstacles.Reset()
 			e.relics.Reset()
@@ -339,6 +341,7 @@ func (e *Engine) Update() error {
 			e.isCharSelect = false
 			e.isSaoBrasIntro = false
 			e.isTitleScreen = false
+			e.currentPlatform = nil
 			e.stage = 1
 			e.stageDistance = 0
 			e.stageBannerTimer = 120
@@ -583,6 +586,7 @@ func (e *Engine) Update() error {
 				e.speedIndex = (e.speedIndex + 1) % len(SpeedMultipliers)
 			case 3:
 				e.player.Reset()
+				e.currentPlatform = nil
 				e.projectiles.Reset()
 				e.obstacles.Reset()
 				e.vines.Reset()
@@ -615,6 +619,7 @@ func (e *Engine) Update() error {
 
 		if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 			e.player.Reset()
+			e.currentPlatform = nil
 			e.projectiles.Reset()
 			e.obstacles.Reset()
 			e.vines.Reset()
@@ -646,6 +651,7 @@ func (e *Engine) Update() error {
 				return nil
 			} else {
 				e.player.Reset()
+				e.currentPlatform = nil
 				e.projectiles.Reset()
 				e.obstacles.Reset()
 				e.vines.Reset()
@@ -680,6 +686,7 @@ func (e *Engine) Update() error {
 
 		if restartPressed {
 			e.player.Reset()
+			e.currentPlatform = nil
 			e.projectiles.Reset()
 			e.obstacles.Reset()
 			e.vines.Reset()
@@ -846,13 +853,34 @@ func (e *Engine) Update() error {
 		}
 	}
 
+	// Câmera dinâmica de plataforma estilo Pitfall:
+	// O herói se desloca livremente pela tela.
+	// Ao correr à frente ultrapassando o limiar (135px), a câmera avança com ele (scroll progressivo).
+	// Ao recuar aquém do limiar esquerdo (45px) e havendo distância percorrida, o mundo retrocede suavemente.
+	// Quando parado, o mundo estabiliza/pausa (scroll zero).
+	cameraForwardLimit := 135.0
+	cameraBackLimit := 45.0
+	worldScrollSpeed := 0.0
+
+	curX, _ := e.player.GetPosition()
+
 	if moveForward {
 		e.player.MoveForward(moveSpeed)
-	}
-	if moveBackward {
+		curX, _ = e.player.GetPosition()
+		if curX >= cameraForwardLimit {
+			excess := curX - cameraForwardLimit
+			e.player.SetPositionX(cameraForwardLimit)
+			worldScrollSpeed = (moveSpeed + excess) * SpeedMultipliers[e.speedIndex]
+		}
+	} else if moveBackward {
 		e.player.MoveBackward(moveSpeed)
-	}
-	if !moveForward && !moveBackward {
+		curX, _ = e.player.GetPosition()
+		if curX <= cameraBackLimit && e.stageDistance > 0 {
+			excess := cameraBackLimit - curX
+			e.player.SetPositionX(cameraBackLimit)
+			worldScrollSpeed = -(moveSpeed*0.75 + excess) * SpeedMultipliers[e.speedIndex]
+		}
+	} else {
 		e.player.StopRunning()
 	}
 
@@ -871,6 +899,7 @@ func (e *Engine) Update() error {
 	}
 
 	if jumpJustPressed {
+		e.currentPlatform = nil // Desprende da plataforma sólida para novo salto
 		wasSwinging := e.player.IsPlayerSwinging()
 		jumped, isDouble := e.player.Jump()
 		if jumped {
@@ -894,6 +923,23 @@ func (e *Engine) Update() error {
 	e.projectiles.Update(ScreenWidth)
 
 	playerX, playerY, playerW, playerH := e.player.GetBounds(GroundY)
+
+	// Lógica de Plataformas Sólidas estilo Pitfall (Pousar e subir no Paneiro de Açaí ou Dorso do Jacaré)
+	if e.currentPlatform != nil {
+		if !e.currentPlatform.IsPlayerOnTop(playerX, playerW) {
+			// O jogador caminhou para fora do obstáculo ou o obstáculo se moveu: queda suave
+			e.currentPlatform = nil
+			e.player.FallFromPlatform()
+		}
+	}
+	if e.currentPlatform == nil {
+		supported, platformOffset, obs := e.obstacles.CheckPlatformSupport(playerX, playerY, playerW, playerH, e.player.GetVelocityY(), GroundY)
+		if supported {
+			e.currentPlatform = obs
+			e.player.SetGroundOffset(platformOffset)
+			e.audio.PlayDuck()
+		}
+	}
 
 	// Colisão de Projéteis (Sementes da Baladeira / Rugido Sônico) contra Inimigos e Obstáculos
 	for _, proj := range e.projectiles.Projectiles {
@@ -930,19 +976,23 @@ func (e *Engine) Update() error {
 	}
 
 	stageTargetDist := StageTargetDistance
-	stageProgress := e.stageDistance / stageTargetDist
-	if stageProgress > 1.0 {
-		stageProgress = 1.0
+	// Atualiza distância e cenário apenas de acordo com a movimentação real do jogador
+	if worldScrollSpeed > 0 {
+		e.stageDistance += worldScrollSpeed * 0.30
+	} else if worldScrollSpeed < 0 {
+		e.stageDistance += worldScrollSpeed * 0.30
+		if e.stageDistance < 0 {
+			e.stageDistance = 0
+		}
 	}
-	currentSpeed := (BaseSpeed + float64(e.stage-1)*0.35 + (stageProgress * 0.6)) * SpeedMultipliers[e.speedIndex]
-	e.stageDistance += currentSpeed * 0.30
-	e.scenery.Update(currentSpeed)
-	e.relics.Update(currentSpeed)
+	e.scenery.Update(worldScrollSpeed)
+	e.relics.Update(worldScrollSpeed)
 
 	// Conclusão de fase baseada EXCLUSIVAMENTE em distância percorrida da corrida
 	if e.stageDistance >= stageTargetDist && !e.isStageComplete {
 		e.isStageComplete = true
 		e.stageDistance = 0
+		e.currentPlatform = nil
 		e.audio.PauseBGM()
 		e.audio.PlayStageUp()
 		return nil
@@ -957,16 +1007,17 @@ func (e *Engine) Update() error {
 		e.projectiles.AddScorePopup(r.X, r.Y-8, r.Value)
 	}
 
-	if passed := e.obstacles.Update(currentSpeed); passed > 0 {
+	if passed := e.obstacles.Update(worldScrollSpeed); passed > 0 && worldScrollSpeed > 0 {
 		e.score += passed * 10
 	}
-	// Pontuação por sobrevivência equilibrada: +1 ponto por segundo (60 ticks)
-	if e.ticks%60 == 0 {
+	// Pontuação por avanço ativo: a cada 60 ticks em deslocamento para frente
+	if worldScrollSpeed > 0 && e.ticks%60 == 0 {
 		e.score += 1
 	}
 
-	hit, hitType := e.obstacles.CheckCollision(playerX, playerY, playerW, playerH)
+	hit, hitType := e.obstacles.CheckCollision(playerX, playerY, playerW, playerH, e.player.GetVelocityY(), GroundY, e.currentPlatform)
 	if hit && e.invincibleTicks <= 0 {
+		e.currentPlatform = nil
 		e.mudSinkTimer = 0
 		e.hearts--
 		e.shakeTimer = 14
