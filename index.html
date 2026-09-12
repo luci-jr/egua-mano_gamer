@@ -512,9 +512,31 @@
         }
       } catch (e) {}
     }
-    window.addEventListener('load', lockLandscape);
-    document.addEventListener('touchstart', lockLandscape, { passive: true });
-    document.addEventListener('click', lockLandscape, { passive: true });
+
+    function enterFullScreen() {
+      try {
+        const doc = window.document;
+        const docEl = doc.documentElement;
+        const request = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+        if (!doc.fullscreenElement && !doc.webkitFullscreenElement && !doc.mozFullScreenElement && !doc.msFullscreenElement) {
+          if (request) {
+            request.call(docEl).catch(() => {});
+          }
+        }
+      } catch (e) {}
+    }
+
+    window.addEventListener('load', () => {
+      lockLandscape();
+    });
+    document.addEventListener('touchstart', () => {
+      lockLandscape();
+      enterFullScreen();
+    }, { passive: true });
+    document.addEventListener('click', () => {
+      lockLandscape();
+      enterFullScreen();
+    }, { passive: true });
 
     function setVirtual(key, state) {
       if (window._virtualKeys) {
