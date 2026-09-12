@@ -283,6 +283,515 @@ func drawTempleTorches(screen *ebiten.Image, ticks int) {
 	}
 }
 
+// drawArcadeGameLogo renderiza o logotipo principal em autêntico estilo Arcade/16-Bit:
+// tipografia gigante 3D em relevo de ouro "PAI D'EGUA", fita em relevo "RUNNER",
+// brasão ancestral de pedra com runas marajoaras, feixe de luz dinâmico (shimmer) e faíscas estelares (sparkles).
+func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64, ticks int, isCompact bool) {
+	if isCompact {
+		// Modo compacto para a tela de menu interativo
+		logoW := 294.0
+		logoH := 26.0
+		logoX := (screenWidth - logoW) / 2.0
+		logoY := topY
+
+		ebitenutil.DrawRect(screen, logoX+2, logoY+2, logoW, logoH, color.RGBA{R: 0, G: 0, B: 0, A: 160})
+		ebitenutil.DrawRect(screen, logoX, logoY, logoW, logoH, color.RGBA{R: 10, G: 16, B: 26, A: 245})
+		ebitenutil.DrawRect(screen, logoX, logoY, logoW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+		ebitenutil.DrawRect(screen, logoX, logoY+logoH-2, logoW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+		ebitenutil.DrawRect(screen, logoX, logoY, 2, logoH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+		ebitenutil.DrawRect(screen, logoX+logoW-2, logoY, 2, logoH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+
+		// Runas marajoaras compactas nas laterais
+		runeAlpha := uint8(140 + math.Sin(float64(ticks)*0.08)*70)
+		ebitenutil.DrawRect(screen, logoX+8, logoY+6, 3, 14, color.RGBA{R: 45, G: 215, B: 180, A: runeAlpha})
+		ebitenutil.DrawRect(screen, logoX+13, logoY+9, 2, 8, color.RGBA{R: 45, G: 215, B: 180, A: runeAlpha})
+		ebitenutil.DrawRect(screen, logoX+logoW-11, logoY+6, 3, 14, color.RGBA{R: 45, G: 215, B: 180, A: runeAlpha})
+		ebitenutil.DrawRect(screen, logoX+logoW-16, logoY+9, 2, 8, color.RGBA{R: 45, G: 215, B: 180, A: runeAlpha})
+
+		// Faixa central com destaque
+		ebitenutil.DrawRect(screen, logoX+36, logoY+4, logoW-72, 11, color.RGBA{R: 195, G: 25, B: 40, A: 240})
+		ebitenutil.DrawRect(screen, logoX+36, logoY+4, logoW-72, 1, color.RGBA{R: 255, G: 220, B: 75, A: 255})
+		ebitenutil.DrawRect(screen, logoX+36, logoY+14, logoW-72, 1, color.RGBA{R: 255, G: 220, B: 75, A: 255})
+
+		ebitenutil.DebugPrintAt(screen, "★ P A I D ' E G U A   R U N N E R ★", int(logoX)+44, int(logoY)+3)
+		ebitenutil.DebugPrintAt(screen, "AVENTURA AMAZONICA: RUINAS DE MARAJO", int(logoX)+34, int(logoY)+15)
+		return
+	}
+
+	// ==========================================
+	// MODO ARCADE COMPLETO (TELA DE ABERTURA)
+	// ==========================================
+	bgW := 298.0
+	bgH := 82.0
+	bgX := (screenWidth - bgW) / 2.0
+	bgY := topY
+
+	// 1. Sombra volumétrica 3D do brasão ancestral
+	ebitenutil.DrawRect(screen, bgX+3, bgY+3, bgW, bgH, color.RGBA{R: 0, G: 0, B: 0, A: 200})
+
+	// 2. Placa de pedra escura entalhada do templo
+	ebitenutil.DrawRect(screen, bgX, bgY, bgW, bgH, color.RGBA{R: 12, G: 16, B: 24, A: 250})
+
+	// 3. Cantos chanfrados em relevo de pedra (estilo altar maia/marajoara)
+	for c := 0; c < 5; c++ {
+		// Canto superior esquerdo
+		ebitenutil.DrawRect(screen, bgX, bgY+float64(c), float64(5-c), 1, color.RGBA{R: 8, G: 10, B: 18, A: 255})
+		// Canto superior direito
+		ebitenutil.DrawRect(screen, bgX+bgW-float64(5-c), bgY+float64(c), float64(5-c), 1, color.RGBA{R: 8, G: 10, B: 18, A: 255})
+		// Canto inferior esquerdo
+		ebitenutil.DrawRect(screen, bgX, bgY+bgH-1-float64(c), float64(5-c), 1, color.RGBA{R: 8, G: 10, B: 18, A: 255})
+		// Canto inferior direito
+		ebitenutil.DrawRect(screen, bgX+bgW-float64(5-c), bgY+bgH-1-float64(c), float64(5-c), 1, color.RGBA{R: 8, G: 10, B: 18, A: 255})
+	}
+
+	// 4. Moldura dupla em ouro asteca com chanfro
+	ebitenutil.DrawRect(screen, bgX+5, bgY, bgW-10, 2, color.RGBA{R: 250, G: 210, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, bgX+5, bgY+bgH-2, bgW-10, 2, color.RGBA{R: 250, G: 210, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, bgX, bgY+5, 2, bgH-10, color.RGBA{R: 250, G: 210, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, bgX+bgW-2, bgY+5, 2, bgH-10, color.RGBA{R: 250, G: 210, B: 55, A: 255})
+
+	// Moldura interna fina em âmbar
+	ebitenutil.DrawRect(screen, bgX+4, bgY+4, bgW-8, 1, color.RGBA{R: 175, G: 110, B: 20, A: 180})
+	ebitenutil.DrawRect(screen, bgX+4, bgY+bgH-5, bgW-8, 1, color.RGBA{R: 175, G: 110, B: 20, A: 180})
+	ebitenutil.DrawRect(screen, bgX+4, bgY+4, 1, bgH-8, color.RGBA{R: 175, G: 110, B: 20, A: 180})
+	ebitenutil.DrawRect(screen, bgX+bgW-5, bgY+4, 1, bgH-8, color.RGBA{R: 175, G: 110, B: 20, A: 180})
+
+	// 5. Runas Marajoaras Geométricas nas abas laterais (turquesa amazônica pulsante)
+	runePulse := uint8(140 + math.Sin(float64(ticks)*0.07)*75)
+	runeColor := color.RGBA{R: 40, G: 210, B: 175, A: runePulse}
+
+	// Padrão marajoara: triângulos escalonados e meandros labirínticos
+	for _, sideX := range []float64{bgX + 9, bgX + bgW - 27} {
+		// Triângulo escalonado superior
+		ebitenutil.DrawRect(screen, sideX+7, bgY+12, 4, 3, runeColor)
+		ebitenutil.DrawRect(screen, sideX+4, bgY+15, 10, 3, runeColor)
+		ebitenutil.DrawRect(screen, sideX+1, bgY+18, 16, 3, runeColor)
+		// Linha de quebra labiríntica
+		ebitenutil.DrawRect(screen, sideX+7, bgY+23, 4, 16, runeColor)
+		ebitenutil.DrawRect(screen, sideX+2, bgY+32, 14, 2, runeColor)
+		// Losango sagrado inferior
+		ebitenutil.DrawRect(screen, sideX+7, bgY+42, 4, 3, runeColor)
+		ebitenutil.DrawRect(screen, sideX+4, bgY+45, 10, 3, runeColor)
+		ebitenutil.DrawRect(screen, sideX+7, bgY+48, 4, 3, runeColor)
+	}
+
+	// 6. TIPOGRAFIA ARCADE GIGANTE 3D: "PAI D'EGUA"
+	// Matrizes de pixels de 14 linhas de altura em bloco 2x2
+	glyphs := []struct {
+		width  int
+		matrix []string
+	}{
+		// P (largura 8)
+		{8, []string{
+			"#######.",
+			"########",
+			"##....##",
+			"##....##",
+			"########",
+			"#######.",
+			"##......",
+			"##......",
+			"##......",
+			"##......",
+			"##......",
+			"##......",
+			"##......",
+			"##......",
+		}},
+		// A (largura 8)
+		{8, []string{
+			".######.",
+			"########",
+			"##....##",
+			"##....##",
+			"##....##",
+			"########",
+			"########",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+		}},
+		// I (largura 4)
+		{4, []string{
+			"####",
+			"####",
+			".##.",
+			".##.",
+			".##.",
+			".##.",
+			".##.",
+			".##.",
+			".##.",
+			".##.",
+			".##.",
+			".##.",
+			"####",
+			"####",
+		}},
+		// [Espaço entre PAI e D'EGUA] (largura 4)
+		{4, nil},
+		// D (largura 8)
+		{8, []string{
+			"#######.",
+			"########",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"########",
+			"#######.",
+		}},
+		// ' [Apóstrofo] (largura 3)
+		{3, []string{
+			"###",
+			"###",
+			".##",
+			".##",
+			"##.",
+			"#..",
+			"...",
+			"...",
+			"...",
+			"...",
+			"...",
+			"...",
+			"...",
+			"...",
+		}},
+		// E (largura 7)
+		{7, []string{
+			"#######",
+			"#######",
+			"##.....",
+			"##.....",
+			"##.....",
+			"######.",
+			"######.",
+			"##.....",
+			"##.....",
+			"##.....",
+			"##.....",
+			"##.....",
+			"#######",
+			"#######",
+		}},
+		// G (largura 8)
+		{8, []string{
+			".######.",
+			"########",
+			"##....##",
+			"##......",
+			"##......",
+			"##......",
+			"##..####",
+			"##..####",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"########",
+			".######.",
+		}},
+		// U (largura 8)
+		{8, []string{
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"########",
+			".######.",
+		}},
+		// A (largura 8)
+		{8, []string{
+			".######.",
+			"########",
+			"##....##",
+			"##....##",
+			"##....##",
+			"########",
+			"########",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+		}},
+	}
+
+	// Cálculo da largura total em colunas
+	totalCols := 0
+	for i, g := range glyphs {
+		totalCols += g.width
+		if i < len(glyphs)-1 && g.matrix != nil {
+			totalCols += 2 // Espaço entre letras
+		}
+	}
+
+	blockW := 2.0
+	blockH := 2.0
+	logoTextWidth := float64(totalCols) * blockW
+	lettersStartX := (screenWidth - logoTextWidth) / 2.0
+	lettersStartY := bgY + 8.0
+
+	// Feixe de luz dinâmico (Shimmer) que desliza a cada 180 ticks (~3 segundos)
+	shimmerTick := ticks % 180
+	shimmerPos := -50.0
+	if shimmerTick < 65 {
+		shimmerPos = float64(shimmerTick) * 4.8 - 40.0
+	}
+
+	// Renderização de cada letra em múltiplas camadas
+	curColX := lettersStartX
+	for _, g := range glyphs {
+		if g.matrix == nil {
+			curColX += float64(g.width) * blockW
+			continue
+		}
+
+		for row := 0; row < len(g.matrix); row++ {
+			line := g.matrix[row]
+			for col := 0; col < len(line); col++ {
+				if line[col] != '#' {
+					continue
+				}
+
+				px := curColX + float64(col)*blockW
+				py := lettersStartY + float64(row)*blockH
+
+				// Camada A: Sombra 3D profunda projetada
+				ebitenutil.DrawRect(screen, px+3, py+3, blockW, blockH, color.RGBA{R: 10, G: 5, B: 2, A: 220})
+				ebitenutil.DrawRect(screen, px+2, py+2, blockW, blockH, color.RGBA{R: 50, G: 20, B: 8, A: 240})
+
+				// Camada B: Contorno escuro (Outline)
+				ebitenutil.DrawRect(screen, px-1, py, blockW+2, blockH, color.RGBA{R: 16, G: 8, B: 4, A: 255})
+				ebitenutil.DrawRect(screen, px, py-1, blockW, blockH+2, color.RGBA{R: 16, G: 8, B: 4, A: 255})
+
+				// Camada C: Corpo com Gradiente de Ouro Puro
+				var bodyColor color.RGBA
+				switch {
+				case row == 0:
+					bodyColor = color.RGBA{R: 255, G: 255, B: 215, A: 255} // Luz de topo
+				case row <= 3:
+					bodyColor = color.RGBA{R: 255, G: 235, B: 65, A: 255} // Ouro radiante
+				case row <= 7:
+					bodyColor = color.RGBA{R: 250, G: 195, B: 25, A: 255} // Ouro imperial
+				case row <= 10:
+					bodyColor = color.RGBA{R: 230, G: 130, B: 15, A: 255} // Âmbar amazônico
+				default:
+					bodyColor = color.RGBA{R: 165, G: 65, B: 10, A: 255} // Bronze da base
+				}
+
+				// Efeito de Shimmer passando diagonalmente
+				diagDist := math.Abs((px - lettersStartX) + (py - lettersStartY)*0.75 - shimmerPos)
+				if diagDist < 9.0 {
+					glow := 1.0 - diagDist/9.0
+					bodyColor = color.RGBA{
+						R: uint8(math.Min(255, float64(bodyColor.R)+glow*60)),
+						G: uint8(math.Min(255, float64(bodyColor.G)+glow*50)),
+						B: uint8(math.Min(255, float64(bodyColor.B)+glow*120)),
+						A: 255,
+					}
+				}
+
+				ebitenutil.DrawRect(screen, px, py, blockW, blockH, bodyColor)
+
+				// Camada D: Bisel specular no topo esquerdo
+				if (row == 0 || col == 0) && row < 6 {
+					ebitenutil.DrawRect(screen, px, py, 1, 1, color.RGBA{R: 255, G: 255, B: 255, A: 230})
+				}
+			}
+		}
+
+		curColX += float64(g.width+2) * blockW
+	}
+
+	// 7. FAIXA "RUNNER" EM RELEVO VERMELHO RUBI E OURO
+	ribbonW := 158.0
+	ribbonH := 16.0
+	ribbonX := (screenWidth - ribbonW) / 2.0
+	ribbonY := lettersStartY + 23.0 // Sobrepõe suavemente os pés das letras
+
+	// Sombra da fita
+	ebitenutil.DrawRect(screen, ribbonX+2, ribbonY+2, ribbonW, ribbonH, color.RGBA{R: 0, G: 0, B: 0, A: 190})
+
+	// Abas chanfradas nas pontas esquerda e direita (estilo flâmula de vitória)
+	for d := 0; d < 8; d++ {
+		// Ponta esquerda com corte triangular
+		cutW := float64(d)
+		ebitenutil.DrawRect(screen, ribbonX+cutW, ribbonY+float64(d), 2, 1, color.RGBA{R: 120, G: 12, B: 22, A: 255})
+		ebitenutil.DrawRect(screen, ribbonX+cutW, ribbonY+ribbonH-1-float64(d), 2, 1, color.RGBA{R: 120, G: 12, B: 22, A: 255})
+		// Ponta direita com corte triangular
+		ebitenutil.DrawRect(screen, ribbonX+ribbonW-2-cutW, ribbonY+float64(d), 2, 1, color.RGBA{R: 120, G: 12, B: 22, A: 255})
+		ebitenutil.DrawRect(screen, ribbonX+ribbonW-2-cutW, ribbonY+ribbonH-1-float64(d), 2, 1, color.RGBA{R: 120, G: 12, B: 22, A: 255})
+	}
+
+	// Corpo central da fita com degradê carmim
+	ebitenutil.DrawRect(screen, ribbonX+8, ribbonY, ribbonW-16, ribbonH, color.RGBA{R: 195, G: 22, B: 38, A: 255})
+	ebitenutil.DrawRect(screen, ribbonX+8, ribbonY, ribbonW-16, 2, color.RGBA{R: 240, G: 60, B: 75, A: 255}) // Brilho superior
+	ebitenutil.DrawRect(screen, ribbonX+8, ribbonY+ribbonH-2, ribbonW-16, 2, color.RGBA{R: 110, G: 10, B: 20, A: 255}) // Sombra inferior
+
+	// Moldura dourada reluzente na fita
+	ebitenutil.DrawRect(screen, ribbonX+8, ribbonY, ribbonW-16, 1, color.RGBA{R: 250, G: 215, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, ribbonX+8, ribbonY+ribbonH-1, ribbonW-16, 1, color.RGBA{R: 250, G: 215, B: 55, A: 255})
+
+	// Tachas/rebites dourados nas extremidades
+	for _, pegX := range []float64{ribbonX + 11, ribbonX + ribbonW - 14} {
+		ebitenutil.DrawRect(screen, pegX, ribbonY+6, 3, 3, color.RGBA{R: 255, G: 225, B: 85, A: 255})
+		ebitenutil.DrawRect(screen, pegX+1, ribbonY+7, 1, 1, color.RGBA{R: 255, G: 255, B: 240, A: 255})
+	}
+
+	// Letras estilizadas de "RUNNER" em relevo branco puro e sombra
+	runnerGlyphs := []struct {
+		w int
+		m []string
+	}{
+		// R (largura 5)
+		{5, []string{
+			"####.",
+			"##.##",
+			"####.",
+			"###..",
+			"##.##",
+			"##.##",
+			"##.##",
+		}},
+		// U (largura 5)
+		{5, []string{
+			"##.##",
+			"##.##",
+			"##.##",
+			"##.##",
+			"##.##",
+			"#####",
+			".###.",
+		}},
+		// N (largura 6)
+		{6, []string{
+			"##..##",
+			"###.##",
+			"####.#",
+			"##.###",
+			"##..##",
+			"##..##",
+			"##..##",
+		}},
+		// N (largura 6)
+		{6, []string{
+			"##..##",
+			"###.##",
+			"####.#",
+			"##.###",
+			"##..##",
+			"##..##",
+			"##..##",
+		}},
+		// E (largura 5)
+		{5, []string{
+			"#####",
+			"##...",
+			"####.",
+			"##...",
+			"##...",
+			"#####",
+			"#####",
+		}},
+		// R (largura 5)
+		{5, []string{
+			"####.",
+			"##.##",
+			"####.",
+			"###..",
+			"##.##",
+			"##.##",
+			"##.##",
+		}},
+	}
+
+	totalRunnerW := 0
+	for idx, rg := range runnerGlyphs {
+		totalRunnerW += rg.w * 2
+		if idx < len(runnerGlyphs)-1 {
+			totalRunnerW += 6 // Espaço entre as letras de RUNNER
+		}
+	}
+
+	runStartX := ribbonX + (ribbonW-float64(totalRunnerW))/2.0
+	runStartY := ribbonY + 1.0
+
+	runCurX := runStartX
+	for _, rg := range runnerGlyphs {
+		for rRow := 0; rRow < len(rg.m); rRow++ {
+			line := rg.m[rRow]
+			for rCol := 0; rCol < len(line); rCol++ {
+				if line[rCol] != '#' {
+					continue
+				}
+				rx := runCurX + float64(rCol)*2.0
+				ry := runStartY + float64(rRow)*2.0
+
+				// Sombra 3D da letra
+				ebitenutil.DrawRect(screen, rx+1, ry+1, 2, 2, color.RGBA{R: 40, G: 5, B: 10, A: 230})
+				// Corpo em branco marfim
+				ebitenutil.DrawRect(screen, rx, ry, 2, 2, color.RGBA{R: 255, G: 250, B: 245, A: 255})
+			}
+		}
+		runCurX += float64(rg.w*2 + 6)
+	}
+
+	// 8. SUBTÍTULO CINZELADO NA PEDRA
+	ebitenutil.DrawRect(screen, bgX+28, bgY+54, bgW-56, 15, color.RGBA{R: 8, G: 12, B: 18, A: 210})
+	ebitenutil.DrawRect(screen, bgX+28, bgY+54, bgW-56, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
+	ebitenutil.DrawRect(screen, bgX+28, bgY+68, bgW-56, 1, color.RGBA{R: 195, G: 145, B: 30, A: 190})
+
+	ebitenutil.DebugPrintAt(screen, "★ AVENTURA AMAZONICA: RUINAS DE MARAJO ★", int(bgX)+34, int(bgY)+56)
+
+	// 9. ESTRELAS CINTILANTES (SPARKLES DE 4 PONTAS)
+	sparkleCoords := [][2]float64{
+		{lettersStartX - 2.0, lettersStartY + 1.0},
+		{lettersStartX + logoTextWidth - 6.0, lettersStartY + 3.0},
+		{ribbonX + 38.0, ribbonY - 2.0},
+		{ribbonX + ribbonW - 40.0, ribbonY + 12.0},
+	}
+
+	for spIdx, sp := range sparkleCoords {
+		spPhase := (ticks + spIdx*23) % 72
+		if spPhase < 20 {
+			spScale := float64(spPhase) / 10.0
+			if spPhase > 10 {
+				spScale = float64(20-spPhase) / 10.0
+			}
+			spSize := 2.0 + spScale*3.0
+
+			// Raio vertical
+			ebitenutil.DrawRect(screen, sp[0]-0.5, sp[1]-spSize, 1, spSize*2, color.RGBA{R: 255, G: 255, B: 255, A: 240})
+			// Raio horizontal
+			ebitenutil.DrawRect(screen, sp[0]-spSize, sp[1]-0.5, spSize*2, 1, color.RGBA{R: 255, G: 255, B: 255, A: 240})
+			// Núcleo dourado brilhante
+			ebitenutil.DrawRect(screen, sp[0]-1, sp[1]-1, 2, 2, color.RGBA{R: 255, G: 235, B: 110, A: 255})
+		}
+	}
+}
+
 // DrawTitleCoverScreen renderiza a tela de abertura oficial limpa (sem menu) estilo Pitfall / Super Metroid / Contra
 func DrawTitleCoverScreen(screen *ebiten.Image, screenWidth, screenHeight float64, ticks int, version string) {
 	// 1. Imagem de fundo 16-bit estilo Pitfall / Arcade (Templo Perdido e Floresta Amazônica ao Luar)
@@ -317,26 +826,13 @@ func DrawTitleCoverScreen(screen *ebiten.Image, screenWidth, screenHeight float6
 	ebitenutil.DebugPrintAt(screen, "1UP  00000", 12, 1)
 	ebitenutil.DebugPrintAt(screen, "HIGH 50000", int(screenWidth)-76, 1)
 
-	// 6. Placa de Título em Relevo de Pedra e Ouro (estilo Pitfall: The Mayan Adventure)
-	logoW := 304.0
-	logoH := 32.0
-	logoX := (screenWidth - logoW) / 2.0
-	logoY := 15.0
-
-	ebitenutil.DrawRect(screen, logoX+2, logoY+2, logoW, logoH, color.RGBA{R: 0, G: 0, B: 0, A: 190})
-	ebitenutil.DrawRect(screen, logoX, logoY, logoW, logoH, color.RGBA{R: 12, G: 18, B: 28, A: 245})
-	ebitenutil.DrawRect(screen, logoX, logoY, logoW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, logoX, logoY+logoH-2, logoW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, logoX, logoY, 2, logoH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, logoX+logoW-2, logoY, 2, logoH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-
-	ebitenutil.DebugPrintAt(screen, "★ P A I D ' E G U A   R U N N E R ★", int(logoX)+46, int(logoY)+6)
-	ebitenutil.DebugPrintAt(screen, "AVENTURA AMAZONICA: RUINAS DE MARAJO", int(logoX)+34, int(logoY)+18)
+	// 6. Logotipo Oficial Arcade: Tipografia 3D, Ouro Maciço, Fita RUNNER e Runas Marajoaras
+	drawArcadeGameLogo(screen, screenWidth, 15.0, ticks, false)
 
 	// 7. Chamada de ação pulsante estilo INSERT COIN / PRESS START BUTTON
 	startW := 250.0
 	startX := (screenWidth - startW) / 2.0
-	startY := 118.0
+	startY := 105.0
 
 	if (ticks/22)%2 == 0 {
 		ebitenutil.DrawRect(screen, startX, startY-2, startW, 18, color.RGBA{R: 8, G: 14, B: 24, A: 220})
@@ -391,21 +887,8 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 	// 4. Urubus e Garças voando pelo céu
 	drawBelemSkyBirds(screen, screenWidth, ticks)
 
-	// 5. Logo Principal do Jogo em relevo dourado
-	logoW := 294.0
-	logoH := 26.0
-	logoX := (screenWidth - logoW) / 2.0
-	logoY := 5.0
-
-	ebitenutil.DrawRect(screen, logoX+2, logoY+2, logoW, logoH, color.RGBA{R: 0, G: 0, B: 0, A: 160})
-	ebitenutil.DrawRect(screen, logoX, logoY, logoW, logoH, color.RGBA{R: 10, G: 18, B: 28, A: 245})
-	ebitenutil.DrawRect(screen, logoX, logoY, logoW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, logoX, logoY+logoH, logoW, 2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, logoX, logoY, 2, logoH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, logoX+logoW, logoY, 2, logoH+2, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-
-	ebitenutil.DebugPrintAt(screen, "★ P A I D ' E G U A   R U N N E R ★", int(logoX)+46, int(logoY)+3)
-	ebitenutil.DebugPrintAt(screen, "AVENTURA AMAZONICA: RUINAS DE MARAJO", int(logoX)+34, int(logoY)+14)
+	// 5. Logo Principal do Jogo em estilo Arcade
+	drawArcadeGameLogo(screen, screenWidth, 5.0, ticks, true)
 
 	// 5. Menu Principal Interativo centralizado
 	boxW := 236.0
