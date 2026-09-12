@@ -896,14 +896,9 @@ func DrawTitleIntro(screen *ebiten.Image, screenWidth, screenHeight float64, tic
 		soundStatus = "SOM: [ MUDO ]  "
 	}
 
-	heroShort := "GAROTO"
-	if strings.Contains(strings.ToUpper(heroName), "ONCA") {
-		heroShort = "ONCA"
-	}
-
 	options := []string{
 		"JOGAR",
-		fmt.Sprintf("SELECIONAR JOGADOR: [ %s ]", heroShort),
+		"SELECIONAR JOGADOR",
 		soundStatus,
 		fmt.Sprintf("VELOCIDADE: [ %s ]", speedLabel),
 		"CREDITOS",
@@ -1241,11 +1236,6 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 	ebitenutil.DebugPrintAt(screen, "★ PAUSA ★", bx+90, by+6)
 	ebitenutil.DrawRect(screen, boxX+10, boxY+19, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 140})
 
-	heroShort := "GAROTO"
-	if selectedHero == 1 {
-		heroShort = "ONCA"
-	}
-
 	soundStatus := "SOM: [ LIGADO ]"
 	if isMuted {
 		soundStatus = "SOM: [ MUDO ]  "
@@ -1253,7 +1243,7 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 
 	options := []string{
 		"CONTINUAR",
-		fmt.Sprintf("SELECIONAR JOGADOR: [ %s ]", heroShort),
+		"SELECIONAR JOGADOR",
 		"REINICIAR FASE",
 		"RESETAR JOGO (DO ZERO)",
 		soundStatus,
@@ -1273,7 +1263,7 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 		}
 	}
 
-	ebitenutil.DebugPrintAt(screen, "[W/S] Mover  [A/D/ENTER] Escolher  [ESC] Sair", bx+6, by+int(boxH)-12)
+	ebitenutil.DebugPrintAt(screen, "[W/S] Mover   [ENTER] Escolher   [ESC] Sair", bx+14, by+int(boxH)-12)
 }
 
 func DrawIndigenousWarrior(screen *ebiten.Image, x, y float64, ticks int) {
@@ -1507,16 +1497,16 @@ func DrawGameOverScreen(screen *ebiten.Image, screenWidth, screenHeight float64,
 		stgStr = "3. THEATRO"
 	}
 
-	heroShort := "GAROTO"
+	heroName := "GAROTO CURUMIM"
 	if selectedHero == 1 {
-		heroShort = "ONCA"
+		heroName = "ONCA-PINTADA"
 	}
 
 	ebitenutil.DebugPrintAt(screen, "★ GAME OVER ★", bx+78, by+6)
 	ebitenutil.DrawRect(screen, boxX+10, boxY+19, boxW-20, 1, color.RGBA{R: 240, G: 65, B: 65, A: 160})
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("SCORE: %05d  |  FASE: %s", finalScore, stgStr), bx+14, by+24)
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("SELECIONAR JOGADOR: < %s > [A/D]", heroShort), bx+14, by+38)
-	ebitenutil.DebugPrintAt(screen, "[J] Abrir Tela de Selecao", bx+14, by+52)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("JOGADOR ATUAL: %s", heroName), bx+14, by+38)
+	ebitenutil.DebugPrintAt(screen, "[J] Selecionar Jogador", bx+14, by+52)
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("[ENTER / R] Reiniciar Fase %d", stage), bx+14, by+66)
 	ebitenutil.DebugPrintAt(screen, "[N] Resetar Jogo (Do Zero)", bx+14, by+80)
 	ebitenutil.DebugPrintAt(screen, "[ESC] Voltar ao Menu Inicial", bx+14, by+94)
