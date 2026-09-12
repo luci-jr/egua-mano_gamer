@@ -19,6 +19,11 @@
 /dist/
 /build/
 /tmp/
+/android-twa/
+*.apk
+*.aab
+*.keystore
+!docs/egua-mano_gamer.apk
 
 # Arquivos de Log
 *.log
