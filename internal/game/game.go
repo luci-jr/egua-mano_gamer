@@ -245,7 +245,9 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeyC) ||
 			getVirtualKey("Escape") ||
 			getVirtualKey("Enter") ||
-			getVirtualKey("Space")
+			getVirtualKey("Space") ||
+			isGamepadConfirmJustPressed() ||
+			isGamepadCancelJustPressed()
 
 		if getVirtualKey("Escape") {
 			resetVirtualKey("Escape")
@@ -273,7 +275,7 @@ func (e *Engine) Update() error {
 			e.audio.PlayIntroBGM()
 		}
 
-		if inpututil.IsKeyJustPressed(ebiten.KeyC) {
+		if inpututil.IsKeyJustPressed(ebiten.KeyC) || isGamepadCreditsJustPressed() {
 			e.isShowingCredits = true
 			return nil
 		}
@@ -284,7 +286,8 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
 			getVirtualKey("Enter") ||
 			getVirtualKey("Space") ||
-			getVirtualKey("Start")
+			getVirtualKey("Start") ||
+			isGamepadConfirmJustPressed()
 
 		if getVirtualKey("Enter") {
 			resetVirtualKey("Enter")
@@ -315,7 +318,8 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
 			getVirtualKey("Enter") ||
-			getVirtualKey("Space")
+			getVirtualKey("Space") ||
+			isGamepadConfirmJustPressed()
 
 		if getVirtualKey("Enter") {
 			resetVirtualKey("Enter")
@@ -353,11 +357,11 @@ func (e *Engine) Update() error {
 			e.audio.PlayIntroBGM()
 		}
 
-		leftPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft")
+		leftPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft") || isGamepadLeftJustPressed()
 		if getVirtualKey("ArrowLeft") {
 			resetVirtualKey("ArrowLeft")
 		}
-		rightPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) || getVirtualKey("ArrowRight")
+		rightPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) || getVirtualKey("ArrowRight") || isGamepadRightJustPressed()
 		if getVirtualKey("ArrowRight") {
 			resetVirtualKey("ArrowRight")
 		}
@@ -431,7 +435,8 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
 			getVirtualKey("Enter") ||
 			getVirtualKey("Space") ||
-			getVirtualKey("Start")
+			getVirtualKey("Start") ||
+			isGamepadConfirmJustPressed()
 
 		if getVirtualKey("Enter") {
 			resetVirtualKey("Enter")
@@ -479,7 +484,7 @@ func (e *Engine) Update() error {
 			return nil
 		}
 
-		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") {
+		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") || isGamepadCancelJustPressed() {
 			resetVirtualKey("Escape")
 			e.isCharSelect = false
 			if e.charSelectSource == CharSelectSourcePause {
@@ -504,12 +509,12 @@ func (e *Engine) Update() error {
 			e.audio.PlayIntroBGM()
 		}
 
-		if inpututil.IsKeyJustPressed(ebiten.KeyC) {
+		if inpututil.IsKeyJustPressed(ebiten.KeyC) || isGamepadCreditsJustPressed() {
 			e.isShowingCredits = true
 			return nil
 		}
 
-		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") {
+		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") || isGamepadCancelJustPressed() {
 			resetVirtualKey("Escape")
 			e.isSaoBrasIntro = false
 			e.isTitleCover = true
@@ -517,24 +522,24 @@ func (e *Engine) Update() error {
 		}
 
 		// Navegação no Menu Principal (5 opções)
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) || getVirtualKey("ArrowUp") {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) || getVirtualKey("ArrowUp") || isGamepadUpJustPressed() {
 			resetVirtualKey("ArrowUp")
 			e.introMenuIndex = (e.introMenuIndex - 1 + 5) % 5
 		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) || getVirtualKey("ArrowDown") {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) || getVirtualKey("ArrowDown") || isGamepadDownJustPressed() {
 			resetVirtualKey("ArrowDown")
 			e.introMenuIndex = (e.introMenuIndex + 1) % 5
 		}
 
 		// Ajuste com Esquerda / Direita (apenas para SOM e VELOCIDADE)
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) || isGamepadLeftJustPressed() {
 			if e.introMenuIndex == 2 {
 				e.audio.ToggleMute()
 			} else if e.introMenuIndex == 3 {
 				e.speedIndex = (e.speedIndex - 1 + len(SpeedMultipliers)) % len(SpeedMultipliers)
 			}
 		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) || isGamepadRightJustPressed() {
 			if e.introMenuIndex == 2 {
 				e.audio.ToggleMute()
 			} else if e.introMenuIndex == 3 {
@@ -585,7 +590,8 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
 			getVirtualKey("Enter") ||
 			getVirtualKey("Space") ||
-			getVirtualKey("Start")
+			getVirtualKey("Start") ||
+			isGamepadConfirmJustPressed()
 
 		if getVirtualKey("Enter") {
 			resetVirtualKey("Enter")
@@ -622,7 +628,7 @@ func (e *Engine) Update() error {
 	}
 
 	if e.isTitleScreen {
-		if inpututil.IsKeyJustPressed(ebiten.KeyC) {
+		if inpututil.IsKeyJustPressed(ebiten.KeyC) || isGamepadCreditsJustPressed() {
 			e.isShowingCredits = true
 			return nil
 		}
@@ -634,7 +640,8 @@ func (e *Engine) Update() error {
 		startPressed := isPointerJustPressed() ||
 			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeySpace)
+			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
+			isGamepadConfirmJustPressed()
 
 		if startPressed {
 			e.isTitleScreen = false
@@ -650,16 +657,16 @@ func (e *Engine) Update() error {
 	}
 
 	if e.isPaused {
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) || getVirtualKey("ArrowUp") {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) || inpututil.IsKeyJustPressed(ebiten.KeyW) || getVirtualKey("ArrowUp") || isGamepadUpJustPressed() {
 			resetVirtualKey("ArrowUp")
 			e.pauseMenuIndex = (e.pauseMenuIndex - 1 + 5) % 5
 		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) || getVirtualKey("ArrowDown") {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) || getVirtualKey("ArrowDown") || isGamepadDownJustPressed() {
 			resetVirtualKey("ArrowDown")
 			e.pauseMenuIndex = (e.pauseMenuIndex + 1) % 5
 		}
 
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft") {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) || inpututil.IsKeyJustPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft") || isGamepadLeftJustPressed() {
 			resetVirtualKey("ArrowLeft")
 			if e.pauseMenuIndex == 2 {
 				e.audio.ToggleMute()
@@ -667,7 +674,7 @@ func (e *Engine) Update() error {
 				e.speedIndex = (e.speedIndex - 1 + len(SpeedMultipliers)) % len(SpeedMultipliers)
 			}
 		}
-		if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) || getVirtualKey("ArrowRight") {
+		if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) || inpututil.IsKeyJustPressed(ebiten.KeyD) || getVirtualKey("ArrowRight") || isGamepadRightJustPressed() {
 			resetVirtualKey("ArrowRight")
 			if e.pauseMenuIndex == 2 {
 				e.audio.ToggleMute()
@@ -676,7 +683,7 @@ func (e *Engine) Update() error {
 			}
 		}
 
-		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") {
+		if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || getVirtualKey("Escape") || isGamepadCancelJustPressed() {
 			resetVirtualKey("Escape")
 			e.applySelectedHero()
 			e.isPaused = false
@@ -692,7 +699,8 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
 			getVirtualKey("Enter") ||
 			getVirtualKey("Space") ||
-			getVirtualKey("Start")
+			getVirtualKey("Start") ||
+			isGamepadConfirmJustPressed()
 
 		if getVirtualKey("Enter") {
 			resetVirtualKey("Enter")
@@ -726,7 +734,7 @@ func (e *Engine) Update() error {
 	}
 
 	if e.isStageComplete {
-		exitPressed := inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyQ) || getVirtualKey("Escape")
+		exitPressed := inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyQ) || getVirtualKey("Escape") || isGamepadCancelJustPressed()
 		if exitPressed {
 			resetVirtualKey("Escape")
 			e.returnToTitle()
@@ -743,7 +751,8 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
 			getVirtualKey("Enter") ||
-			getVirtualKey("Space")
+			getVirtualKey("Space") ||
+			isGamepadConfirmJustPressed()
 
 		if getVirtualKey("Enter") {
 			resetVirtualKey("Enter")
@@ -814,7 +823,8 @@ func (e *Engine) Update() error {
 			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
 			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
 			getVirtualKey("Enter") ||
-			getVirtualKey("Space")
+			getVirtualKey("Space") ||
+			isGamepadConfirmJustPressed()
 
 		if getVirtualKey("Enter") {
 			resetVirtualKey("Enter")
@@ -830,13 +840,13 @@ func (e *Engine) Update() error {
 		return nil
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyC) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyC) || isGamepadCreditsJustPressed() {
 		e.isShowingCredits = true
 		e.audio.PauseBGM()
 		return nil
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyP) || getVirtualKey("Escape") || getVirtualKey("Start") || getVirtualKey("Pause") {
+	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) || inpututil.IsKeyJustPressed(ebiten.KeyP) || getVirtualKey("Escape") || getVirtualKey("Start") || getVirtualKey("Pause") || isGamepadPauseJustPressed() {
 		resetVirtualKey("Escape")
 		resetVirtualKey("Start")
 		resetVirtualKey("Pause")
@@ -959,22 +969,24 @@ func (e *Engine) Update() error {
 	if e.starPowerTimer > 0 {
 		moveSpeed *= 1.22 // Boost de agilidade e velocidade com o Guaraná Power
 	}
-	moveForward := ebiten.IsKeyPressed(ebiten.KeyArrowRight) || ebiten.IsKeyPressed(ebiten.KeyD) || getVirtualKey("ArrowRight")
-	moveBackward := ebiten.IsKeyPressed(ebiten.KeyArrowLeft) || ebiten.IsKeyPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft")
+	moveForward := ebiten.IsKeyPressed(ebiten.KeyArrowRight) || ebiten.IsKeyPressed(ebiten.KeyD) || getVirtualKey("ArrowRight") || isGamepadRightPressed()
+	moveBackward := ebiten.IsKeyPressed(ebiten.KeyArrowLeft) || ebiten.IsKeyPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft") || isGamepadLeftPressed()
 
-	duckKey := ebiten.IsKeyPressed(ebiten.KeyArrowDown) || ebiten.IsKeyPressed(ebiten.KeyS) || getVirtualKey("ArrowDown")
-	duckJustPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS)
+	duckKey := ebiten.IsKeyPressed(ebiten.KeyArrowDown) || ebiten.IsKeyPressed(ebiten.KeyS) || getVirtualKey("ArrowDown") || isGamepadDownPressed()
+	duckJustPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) || isGamepadDownJustPressed()
 
 	jumpJustPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) ||
 		inpututil.IsKeyJustPressed(ebiten.KeyW) ||
-		getVirtualKey("JustJump")
+		getVirtualKey("JustJump") ||
+		isGamepadJumpJustPressed()
 	if getVirtualKey("JustJump") {
 		resetVirtualKey("JustJump")
 	}
 
 	jumpHolding := ebiten.IsKeyPressed(ebiten.KeyArrowUp) ||
 		ebiten.IsKeyPressed(ebiten.KeyW) ||
-		getVirtualKey("Jump")
+		getVirtualKey("Jump") ||
+		isGamepadJumpHolding()
 
 	// Mapeamento de toques nativos direto na tela do celular
 	touches := ebiten.AppendTouchIDs(nil)
@@ -1002,7 +1014,7 @@ func (e *Engine) Update() error {
 		}
 	}
 
-	aimUp := (ebiten.IsKeyPressed(ebiten.KeyArrowUp) || ebiten.IsKeyPressed(ebiten.KeyW) || getVirtualKey("ArrowUp")) && !e.player.IsPlayerJumping()
+	aimUp := (ebiten.IsKeyPressed(ebiten.KeyArrowUp) || ebiten.IsKeyPressed(ebiten.KeyW) || getVirtualKey("ArrowUp") || isGamepadUpPressed()) && !e.player.IsPlayerJumping()
 	e.player.SetAimUp(aimUp)
 
 	if e.attackCooldown > 0 {
@@ -1012,7 +1024,8 @@ func (e *Engine) Update() error {
 	attackHeld := ebiten.IsKeyPressed(ebiten.KeySpace) ||
 		ebiten.IsKeyPressed(ebiten.KeyX) ||
 		ebiten.IsKeyPressed(ebiten.KeyJ) ||
-		getVirtualKey("Attack")
+		getVirtualKey("Attack") ||
+		isGamepadAttackHeld()
 
 	if attackHeld {
 		e.chargeTimer++
