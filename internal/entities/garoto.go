@@ -422,8 +422,13 @@ func (g *Garoto) Draw(screen *ebiten.Image, groundY float64, ticks int, invincib
 	cSandalDark := color.RGBA{R: 60, G: 32, B: 18, A: 255}     // Couro escuro da sandália
 	cSandalLight := color.RGBA{R: 175, G: 110, B: 55, A: 255}  // Tira de couro da sandália
 	cSandalSole := color.RGBA{R: 245, G: 240, B: 225, A: 255}  // Sola clara de alto contraste com o chão
-	cWood := color.RGBA{R: 145, G: 85, B: 40, A: 255}         // Madeira da baladeira
-	cRubber := color.RGBA{R: 230, G: 110, B: 50, A: 255}      // Elástico da baladeira
+	cWoodDark := color.RGBA{R: 105, G: 55, B: 25, A: 255}       // Casca rústica de madeira amazônica (sombra do galho)
+	cWood := color.RGBA{R: 155, G: 95, B: 45, A: 255}           // Corpo da forquilha de madeira talhada
+	cWoodLight := color.RGBA{R: 205, G: 145, B: 85, A: 255}     // Brilho do galho polido da baladeira
+	cRubber := color.RGBA{R: 245, G: 125, B: 25, A: 255}        // Liga de borracha elástica clássica (âmbar/alaranjada)
+	cLeatherPouch := color.RGBA{R: 75, G: 38, B: 15, A: 255}    // Malha / sapata de couro onde assenta o caroço
+	cAcaiBerry := color.RGBA{R: 60, G: 15, B: 68, A: 255}       // Caroço de açaí maduro
+	cAcaiGleam := color.RGBA{R: 135, G: 45, B: 145, A: 255}     // Brilho do açaí
 	cVine := color.RGBA{R: 85, G: 130, B: 45, A: 255}         // Rolo de cipó nas costas
 	cEye := color.RGBA{R: 20, G: 20, B: 20, A: 255}
 
@@ -467,8 +472,11 @@ func (g *Garoto) Draw(screen *ebiten.Image, groundY float64, ticks int, invincib
 		drawBox(4, 16, 9, 2, cBelt)
 		drawBox(8, 16, 2, 2, cBuckle)
 
-		// Baladeira na cintura
-		drawBox(2, 11, 3, 4, cWood)
+		// Baladeira Regional em Y presa no cinto
+		drawBox(1, 11, 2, 4, cWood)        // Cabo da forquilha preso no cós
+		drawBox(0, 14, 2, 3, cWoodDark)    // Haste esquerda do Y
+		drawBox(3, 14, 2, 3, cWoodLight)   // Haste direita do Y
+		drawBox(1, 15, 2, 2, cRubber)      // Ligas de borracha pendendo
 
 		// Pernas balançando no ar conforme o ângulo do cipó
 		legOffset := 0.0
@@ -513,9 +521,19 @@ func (g *Garoto) Draw(screen *ebiten.Image, groundY float64, ticks int, invincib
 		drawBox(7, crouchOffsetY+13, 6, 3, cSandalDark)
 		drawBox(7, crouchOffsetY+15, 6, 1, cSandalSole)
 
-		// Baladeira armada horizontalmente na frente
-		drawBox(13, crouchOffsetY+7, 4, 4, cWood)
-		drawBox(16, crouchOffsetY+8, 2, 2, cRubber)
+		// Braço e Baladeira Regional armada horizontalmente na frente do joelho
+		drawBox(8, crouchOffsetY+8, 4, 3, cSkin)
+		drawBox(12, crouchOffsetY+7, 2, 3, cSkinDark) // Mão segurando a empunhadura
+		// Forquilha em Y de madeira regional
+		drawBox(13, crouchOffsetY+7, 2, 4, cWood)      // Cabo da baladeira
+		drawBox(14, crouchOffsetY+5, 2, 2, cWoodDark)  // Bifurcação central
+		drawBox(13, crouchOffsetY+2, 2, 3, cWood)      // Haste superior do Y
+		drawBox(16, crouchOffsetY+2, 2, 3, cWoodLight) // Haste inferior/frontal do Y
+		// Ligas elásticas e semente de açaí
+		drawBox(12, crouchOffsetY+3, 1, 2, cRubber)
+		drawBox(15, crouchOffsetY+3, 1, 2, cRubber)
+		drawBox(11, crouchOffsetY+5, 2, 2, cLeatherPouch)
+		drawBox(11, crouchOffsetY+5, 1, 1, cAcaiBerry)
 		return
 	}
 
@@ -545,15 +563,54 @@ func (g *Garoto) Draw(screen *ebiten.Image, groundY float64, ticks int, invincib
 		drawBox(2, 17, 9, 2, cBelt)
 		drawBox(6, 17, 2, 2, cBuckle)
 
-		// Braços (Mirando para cima ou à frente)
+		// Braços e Baladeira Regional no Ar (Salto Acrobático)
 		if g.AimUp {
+			// Tiro vertical anti-aéreo para o alto
 			drawBox(7, 3, 3, 7, cSkin)
-			drawBox(6, -2, 4, 5, cWood)
-			drawBox(7, -3, 2, 2, cRubber)
+			drawBox(7, 0, 3, 3, cSkinDark)
+			// Forquilha em Y apontando para o céu
+			drawBox(7, -2, 3, 3, cWood)
+			drawBox(7, -4, 3, 2, cWoodDark)
+			drawBox(5, -7, 2, 3, cWood)
+			drawBox(10, -7, 2, 3, cWoodLight)
+			drawBox(5, -8, 2, 1, cWoodDark)
+			drawBox(10, -8, 2, 1, cWoodDark)
+			// Ligas elásticas e semente de açaí
+			drawBox(6, -6, 1, 3, cRubber)
+			drawBox(9, -6, 1, 3, cRubber)
+			drawBox(7, -4, 3, 2, cLeatherPouch)
+			drawBox(7, -4, 2, 2, cAcaiBerry)
+		} else if g.IsAttacking {
+			// Disparo no ar: pose ágil de tiro com baladeira esticada
+			drawBox(8, 10, 8, 3, cSkin)
+			drawBox(15, 9, 2, 4, cSkinDark)
+			// Forquilha em Y
+			drawBox(16, 9, 2, 4, cWood)
+			drawBox(16, 7, 2, 2, cWoodDark)
+			drawBox(15, 4, 2, 3, cWood)
+			drawBox(18, 4, 2, 3, cWoodLight)
+			drawBox(15, 3, 2, 1, cWoodDark)
+			drawBox(18, 3, 2, 1, cWoodDark)
+			// Borracha esticada até a mão traseira
+			drawBox(5, 9, 3, 3, cSkinDark)
+			drawBox(7, 6, 8, 1, cRubber)
+			drawBox(7, 8, 8, 1, cRubber)
+			drawBox(5, 7, 2, 2, cLeatherPouch)
+			drawBox(5, 7, 1, 1, cAcaiBerry)
 		} else {
-			drawBox(9, 11, 6, 3, cSkin)
-			drawBox(14, 9, 3, 5, cWood)
-			drawBox(15, 10, 2, 2, cRubber)
+			// Empunhando a baladeira em Y durante o salto
+			drawBox(9, 11, 5, 3, cSkin)
+			drawBox(13, 10, 2, 3, cSkinDark)
+			drawBox(14, 9, 2, 4, cWood)
+			drawBox(14, 7, 2, 2, cWoodDark)
+			drawBox(13, 4, 2, 3, cWood)
+			drawBox(16, 4, 2, 3, cWoodLight)
+			drawBox(13, 3, 2, 1, cWoodDark)
+			drawBox(16, 3, 2, 1, cWoodDark)
+			drawBox(12, 5, 2, 2, cRubber)
+			drawBox(15, 5, 2, 2, cRubber)
+			drawBox(11, 7, 2, 2, cLeatherPouch)
+			drawBox(11, 7, 1, 1, cAcaiBerry)
 		}
 
 		// Pernas abertas no ar em salto acrobático 16-bit com sandálias delineadas
@@ -608,19 +665,80 @@ func (g *Garoto) Draw(screen *ebiten.Image, groundY float64, ticks int, invincib
 	drawBox(3, 17+bobY, 9, 2, cBelt)
 	drawBox(7, 17+bobY, 2, 2, cBuckle)
 
-	// Braço dianteiro segurando a Baladeira (Estilingue)
+	// Braço dianteiro segurando a autêntica Baladeira Regional Paraense (Estilingue de Forquilha em Y)
 	if g.AimUp {
+		// Tiro Anti-Aéreo: Apontando a baladeira para o céu contra urubus e pássaros
 		drawBox(8, 3+bobY, 3, 7, cSkin)
-		drawBox(7, -2+bobY, 4, 5, cWood)
-		drawBox(8, -3+bobY, 2, 2, cRubber)
+		drawBox(8, 0+bobY, 3, 3, cSkinDark)
+		// Forquilha em Y voltada para o alto
+		drawBox(8, -2+bobY, 3, 3, cWood)
+		drawBox(8, -4+bobY, 3, 2, cWoodDark)
+		drawBox(6, -7+bobY, 2, 3, cWood)
+		drawBox(11, -7+bobY, 2, 3, cWoodLight)
+		drawBox(6, -8+bobY, 2, 1, cWoodDark)
+		drawBox(11, -8+bobY, 2, 1, cWoodDark)
+		// Ligas elásticas e caroço de açaí
+		drawBox(7, -6+bobY, 1, 3, cRubber)
+		drawBox(10, -6+bobY, 1, 3, cRubber)
+		drawBox(8, -3+bobY, 3, 2, cLeatherPouch)
+		drawBox(8, -3+bobY, 2, 2, cAcaiBerry)
+		drawBox(9, -3+bobY, 1, 1, cAcaiGleam)
+	} else if g.IsAttacking {
+		// ============================================================
+		// POSTURA OFICIAL DE ATIRADOR DE BALADEIRA (AÇAÍ RETRO ARCADE)
+		// ============================================================
+		// Braço dianteiro esticado à frente segurando a forquilha
+		drawBox(9, 10+bobY, 8, 3, cSkin)
+		drawBox(16, 9+bobY, 2, 4, cSkinDark)
+
+		// Forquilha em Y bem nítida e imponente
+		drawBox(17, 9+bobY, 2, 5, cWood)      // Cabo do galho
+		drawBox(17, 7+bobY, 2, 2, cWoodDark)  // Bifurcação
+		drawBox(16, 4+bobY, 2, 3, cWood)      // Haste superior
+		drawBox(19, 4+bobY, 2, 3, cWoodLight) // Haste frontal
+		drawBox(16, 3+bobY, 2, 1, cWoodDark)  // Amarração superior
+		drawBox(19, 3+bobY, 2, 1, cWoodDark)  // Amarração inferior
+
+		// Braço traseiro puxado até a bochecha esticando a borracha
+		drawBox(5, 9+bobY, 4, 3, cSkinDark)
+		drawBox(4, 8+bobY, 2, 3, cSkin) // Mão pinçando a sapata
+
+		// Tiras elásticas esticadas em linha reta tensa de disparo
+		drawBox(6, 6+bobY, 5, 1, cRubber)
+		drawBox(11, 5+bobY, 5, 1, cRubber)
+		drawBox(6, 8+bobY, 5, 1, cRubber)
+		drawBox(11, 7+bobY, 5, 1, cRubber)
+
+		// Malha de couro e caroço de açaí pronto para voar
+		drawBox(4, 7+bobY, 3, 2, cLeatherPouch)
+		drawBox(4, 7+bobY, 2, 2, cAcaiBerry)
+		drawBox(4, 7+bobY, 1, 1, cAcaiGleam)
+
+		// Flash estalo de disparo na ponta da forquilha
+		drawBox(20, 5+bobY, 2, 2, color.RGBA{R: 255, G: 245, B: 180, A: 230})
 	} else {
+		// Empunhadura de repouso / corrida: forquilha em Y sempre à mostra
 		drawBox(10, 11+bobY, 5, 3, cSkin)
-		drawBox(14, 9+bobY, 3, 5, cWood)
-		drawBox(15, 10+bobY, 2, 2, cRubber)
-		if g.IsAttacking {
-			drawBox(12, 10+bobY, 3, 1, cRubber)
-			drawBox(11, 10+bobY, 2, 2, color.RGBA{R: 70, G: 20, B: 75, A: 255}) // Semente de açaí
-		}
+		drawBox(14, 10+bobY, 2, 4, cSkinDark)
+
+		// Forquilha em Y de madeira regional
+		drawBox(15, 10+bobY, 2, 4, cWood)       // Cabo do galho
+		drawBox(15, 8+bobY, 2, 2, cWoodDark)    // Bifurcação
+		drawBox(14, 5+bobY, 2, 3, cWood)        // Haste esquerda do Y
+		drawBox(17, 5+bobY, 2, 3, cWoodLight)   // Haste direita do Y
+		drawBox(14, 4+bobY, 2, 1, cWoodDark)    // Amarração esquerda
+		drawBox(17, 4+bobY, 2, 1, cWoodDark)    // Amarração direita
+
+		// Ligas de borracha descendo até a malha de couro
+		drawBox(13, 6+bobY, 2, 1, cRubber)
+		drawBox(12, 7+bobY, 2, 1, cRubber)
+		drawBox(16, 6+bobY, 2, 1, cRubber)
+		drawBox(15, 7+bobY, 2, 1, cRubber)
+
+		// Sapata de couro segurando o caroço de açaí
+		drawBox(11, 8+bobY, 3, 2, cLeatherPouch)
+		drawBox(11, 8+bobY, 2, 2, cAcaiBerry)
+		drawBox(12, 8+bobY, 1, 1, cAcaiGleam)
 	}
 
 	// Pernas & Animação de Passadas Expressivas (estilo galope da onça com passada ampla)

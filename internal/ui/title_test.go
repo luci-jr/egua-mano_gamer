@@ -11,6 +11,8 @@ func TestRenderTitleCoverNoPanic(t *testing.T) {
 	DrawTitleCoverScreen(img, 320, 224, 60, "VER. 2.4.0")
 	DrawTitleIntro(img, 320, 224, 60, true, 0, false, "NORMAL", "Curumim", "VER. 2.4.0")
 	DrawPauseMenu(img, 320, 224, 0, false, "NORMAL")
+	DrawCharacterSelectScreen(img, 320, 224, 60, 0)
+	DrawCharacterSelectScreen(img, 320, 224, 60, 1)
 }
 
 func TestRenderHeroWaterFallNoPanic(t *testing.T) {
