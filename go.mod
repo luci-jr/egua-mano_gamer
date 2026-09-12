@@ -1,4 +1,4 @@
-module github.com/luci-jr/paidegua-runner
+module github.com/luci-jr/egua-mano_gamer
 
 go 1.26.4
 
