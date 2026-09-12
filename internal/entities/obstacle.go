@@ -24,7 +24,7 @@ type Obstacle struct {
 	Type        ObstacleType
 	screenWidth float64
 	groundY     float64
-	collided    bool
+	Collided    bool
 	Defeated    bool
 	DefeatTicks int
 }
@@ -35,7 +35,7 @@ func NewObstacle(screenWidth, groundY float64) *Obstacle {
 		Type:        TypeGround,
 		screenWidth: screenWidth,
 		groundY:     groundY,
-		collided:    false,
+		Collided:    false,
 		Defeated:    false,
 		DefeatTicks: 0,
 	}
@@ -158,7 +158,7 @@ func (obs *Obstacle) drawGround(screen *ebiten.Image, ticks int, stage int) {
 	ebitenutil.DrawRect(screen, obs.X-1, obsRealY+22, 2, 2, acaiLight)
 
 	// 3. Indicador de Energia Vital (quando ainda não foi colhido pelo herói)
-	if !obs.collided {
+	if !obs.Collided {
 		flicker := (ticks / 8) % 2
 		iconY := obsRealY - 10.0
 		if flicker == 0 {
@@ -478,7 +478,7 @@ func (m *ObstacleManager) Update(speed float64) int {
 				}
 				obs.X = furthestX + 140.0 + float64(rand.Intn(50))
 				obs.Type = validTypes[rand.Intn(len(validTypes))]
-				obs.collided = false
+				obs.Collided = false
 				obs.Defeated = false
 				obs.DefeatTicks = 0
 				passedCount++
@@ -511,7 +511,7 @@ func (m *ObstacleManager) Update(speed float64) int {
 			}
 			obs.X = furthestX + 140.0 + float64(rand.Intn(50))
 			obs.Type = validTypes[rand.Intn(len(validTypes))]
-			obs.collided = false
+			obs.Collided = false
 			obs.Defeated = false
 			obs.DefeatTicks = 0
 			passedCount++
@@ -549,11 +549,43 @@ func (m *ObstacleManager) CheckPlatformSupport(playerX, playerY, playerW, player
 	return false, 0, nil
 }
 
+// CheckStomp verifica se o jogador pulou em cima de um inimigo (Jacaré, Cobra ou Ave Aérea), derrotando-o instantaneamente e quicando no ar
+func (m *ObstacleManager) CheckStomp(playerX, playerY, playerW, playerH, playerVY, groundY float64) (bool, float64, float64, ObstacleType) {
+	if playerVY < -0.8 {
+		return false, 0, 0, TypeGround
+	}
+
+	playerBottom := groundY + playerY
+
+	for _, obs := range m.Obstacles {
+		if obs.Defeated || obs.Collided {
+			continue
+		}
+		// Apenas alvos inimigos podem ser pisados: Jacaré, Cobra e Ave Aérea
+		if obs.Type != TypeJacare && obs.Type != TypeSnake && obs.Type != TypeAir {
+			continue
+		}
+
+		ox, oy, ow, oh := obs.GetBounds()
+		obsTop := oy
+
+		overlapX := playerX+playerW > ox+2.0 && playerX < ox+ow-2.0
+		isFallingOnTop := playerBottom >= obsTop-8.0 && playerBottom <= obsTop+oh*0.75
+
+		if overlapX && isFallingOnTop {
+			obs.Defeated = true
+			obs.DefeatTicks = 26
+			return true, ox + ow/2.0, oy + oh/2.0, obs.Type
+		}
+	}
+	return false, 0, 0, TypeGround
+}
+
 // CheckCollision realiza checagem de dano ignorando plataformas seguras (Banco de Praça e Paneiro de Açaí)
 func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH, playerVY, groundY float64, currentPlatform *Obstacle) (bool, ObstacleType) {
 	playerBottom := groundY + playerY
 	for _, obs := range m.Obstacles {
-		if obs.collided || obs.Defeated {
+		if obs.Collided || obs.Defeated {
 			continue
 		}
 		// Se o jogador está apoiado neste obstáculo, não recebe dano
@@ -576,7 +608,7 @@ func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH, pla
 		}
 
 		if obs.CheckCollision(playerX, playerY, playerW, playerH) {
-			obs.collided = true
+			obs.Collided = true
 			return true, obs.Type
 		}
 	}
@@ -586,11 +618,11 @@ func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH, pla
 // CheckEnergyCollection verifica se o jogador tocou ou passou pelo Paneiro de Açaí para absorver energia vital
 func (m *ObstacleManager) CheckEnergyCollection(playerX, playerY, playerW, playerH float64) (bool, *Obstacle) {
 	for _, obs := range m.Obstacles {
-		if obs.collided || obs.Defeated || obs.Type != TypeGround {
+		if obs.Collided || obs.Defeated || obs.Type != TypeGround {
 			continue
 		}
 		if obs.CheckCollision(playerX, playerY, playerW, playerH) {
-			obs.collided = true // Marcado como consumido para não pontuar/curar continuamente
+			obs.Collided = true // Marcado como consumido para não pontuar/curar continuamente
 			return true, obs
 		}
 	}
@@ -631,7 +663,7 @@ func (m *ObstacleManager) Reset() {
 	for i, obs := range m.Obstacles {
 		obs.X = m.screenWidth + 25.0 + float64(i)*spacing
 		obs.Type = types[i%len(types)]
-		obs.collided = false
+		obs.Collided = false
 		obs.Defeated = false
 		obs.DefeatTicks = 0
 	}

@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"image/color"
+	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -50,6 +51,7 @@ type Engine struct {
 	chargeTimer       int
 	isCharged         bool
 	invincibleTicks   int
+	starPowerTimer    int
 	shakeTimer        int
 	hitDelayTimer     int
 	mudSinkTimer      int
@@ -117,6 +119,7 @@ func NewEngine() *Engine {
 		chargeTimer:       0,
 		isCharged:         false,
 		invincibleTicks:   0,
+		starPowerTimer:    0,
 		shakeTimer:        0,
 		hitDelayTimer:     0,
 		mudSinkTimer:      0,
@@ -175,6 +178,7 @@ func (e *Engine) restartStage() {
 	e.stageBannerTimer = 120
 	e.stageFadeTimer = 20
 	e.invincibleTicks = 60
+	e.starPowerTimer = 0
 	e.shakeTimer = 0
 	e.speechBubbleTimer = 0
 	e.speechBubbleText = ""
@@ -837,12 +841,8 @@ func (e *Engine) Update() error {
 				e.waterFallSplashTimer = 45
 				e.audio.PlaySplash()
 				e.shakeTimer = 10
-				if e.selectedHero == entities.HeroOnca {
-					e.speechBubbleText = "TCHIBUM! ONCA NO GUAJARA!"
-				} else {
-					e.speechBubbleText = "TCHIBUM NA BAIA DO GUAJARA!"
-				}
-				e.speechBubbleTimer = 55
+				e.speechBubbleText = "Egua do pitiu. Essa agua ta podre!"
+				e.speechBubbleTimer = 85
 			}
 		} else {
 			if e.waterFallSplashTimer > 0 {
@@ -856,11 +856,7 @@ func (e *Engine) Update() error {
 				e.lives = 0
 				e.hearts = 0
 				e.isGameOver = true
-				if e.selectedHero == entities.HeroOnca {
-					e.speechBubbleText = "Arrgh! A floresta me chama..."
-				} else {
-					e.speechBubbleText = "Levei o farelo mano, mancada!"
-				}
+				e.speechBubbleText = "Egua do pitiu. Essa agua ta podre!"
 				e.speechBubbleTimer = 999999
 				e.audio.PauseBGM()
 				e.audio.PlayGameOver()
@@ -926,6 +922,23 @@ func (e *Engine) Update() error {
 		e.invincibleTicks--
 	}
 
+	if e.starPowerTimer > 0 {
+		e.starPowerTimer--
+		// Spawna faíscas estelares coloridas atrás do herói em movimento estilo Starman
+		if e.ticks%3 == 0 {
+			starColors := []color.RGBA{
+				{R: 255, G: 235, B: 60, A: 255},
+				{R: 60, G: 240, B: 255, A: 255},
+				{R: 255, G: 90, B: 220, A: 255},
+				{R: 255, G: 255, B: 255, A: 255},
+			}
+			sCol := starColors[(e.ticks/3)%len(starColors)]
+			pBoundsX, pBoundsY, pBoundsW, pBoundsH := e.player.GetBounds(GroundY)
+			e.projectiles.SpawnHitBurst(pBoundsX+pBoundsW/2.0, pBoundsY+pBoundsH/2.0, sCol, 2)
+		}
+	}
+	e.player.SetStarPower(e.starPowerTimer)
+
 	if e.shakeTimer > 0 {
 		e.shakeTimer--
 	}
@@ -938,6 +951,9 @@ func (e *Engine) Update() error {
 	moveSpeed := 2.2
 	if e.selectedHero == entities.HeroOnca {
 		moveSpeed = 2.4 // Onça tem reflexos e velocidade felina ligeiramente superiores
+	}
+	if e.starPowerTimer > 0 {
+		moveSpeed *= 1.22 // Boost de agilidade e velocidade com o Guaraná Power
 	}
 	moveForward := ebiten.IsKeyPressed(ebiten.KeyArrowRight) || ebiten.IsKeyPressed(ebiten.KeyD) || getVirtualKey("ArrowRight")
 	moveBackward := ebiten.IsKeyPressed(ebiten.KeyArrowLeft) || ebiten.IsKeyPressed(ebiten.KeyA) || getVirtualKey("ArrowLeft")
@@ -1222,16 +1238,32 @@ func (e *Engine) Update() error {
 	}
 
 	// Coleta de Relíquias e Tesouros Amazônicos (incluindo Cuia de Tacacá que recupera 1 coração!)
+	// Coleta de Relíquias e Tesouros Amazônicos (Muiraquitã, Urna, Ouro, Açaí e Guaraná Power!)
 	if collected, r := e.relics.CheckCollection(playerX, playerY, playerW, playerH); collected {
 		e.relicsCount++
-		if r.Type == entities.RelicAcaiBowl {
+		if r.Type == entities.RelicGuarana {
+			// 🌟 Fruto do Guaraná da Amazônia: Super Invencibilidade Estilo Mario!
+			e.starPowerTimer = 420 // ~7 segundos de invencibilidade estelar
+			e.score += r.Value
+			e.audio.PlayEguaMano()
+			e.projectiles.AddTextPopup(r.X-22, r.Y-20, "GUARANA POWER!", color.RGBA{R: 255, G: 220, B: 50, A: 255})
+			e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 255, G: 215, B: 40, A: 255}, 18)
+			if e.selectedHero == entities.HeroOnca {
+				e.speechBubbleText = "RROAAR! NINGUEM ME SEGURA!"
+			} else {
+				e.speechBubbleText = "EGUA MANO! TO INVENCIVEL!"
+			}
+			e.speechBubbleTimer = 75
+		} else if r.Type == entities.RelicAcaiBowl {
+			// 🥣 Cuia de Tacacá / Tigela de Açaí: item raro de cura
 			if e.hearts < 3 {
 				e.hearts++
 				e.projectiles.AddTextPopup(r.X-20, r.Y-14, "+1 ENERGIA!", color.RGBA{R: 215, G: 65, B: 245, A: 255})
 				e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 190, G: 45, B: 230, A: 255}, 16)
 			} else {
-				e.score += r.Value
-				e.projectiles.AddScorePopup(r.X, r.Y-8, r.Value)
+				bonus := 200
+				e.score += bonus
+				e.projectiles.AddScorePopup(r.X, r.Y-8, bonus)
 				e.projectiles.AddTextPopup(r.X-20, r.Y-24, "ACAI POWER!", color.RGBA{R: 215, G: 65, B: 245, A: 255})
 				e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 45, G: 10, B: 58, A: 255}, 14)
 			}
@@ -1252,28 +1284,72 @@ func (e *Engine) Update() error {
 		e.score += 1
 	}
 
-	// Coleta de energia nutritiva do Paneiro de Açaí no solo (o açaí nunca machuca, ele dá energia!)
+	// Coleta do Paneiro de Açaí no solo: não vem coração toda hora (apenas 15% de chance de cura se ferido)
 	if collected, obs := e.obstacles.CheckEnergyCollection(playerX, playerY, playerW, playerH); collected {
 		ox, oy, ow, _ := obs.GetBounds()
 		centerX := ox + ow/2.0
 		centerY := oy + 4.0
 
-		if e.hearts < 3 {
+		giveHeart := e.hearts < 3 && rand.Intn(100) < 15
+		if giveHeart {
 			e.hearts++
 			e.projectiles.AddTextPopup(centerX-24, centerY-14, "+1 ENERGIA!", color.RGBA{R: 215, G: 65, B: 245, A: 255})
 			e.projectiles.SpawnHitBurst(centerX, centerY, color.RGBA{R: 190, G: 45, B: 230, A: 255}, 16)
+			e.audio.PlayTreasure()
 		} else {
-			bonus := 100
+			bonus := 50
 			e.score += bonus
 			e.projectiles.AddScorePopup(centerX-12, centerY-14, bonus)
-			e.projectiles.AddTextPopup(centerX-20, centerY-26, "ACAI POWER!", color.RGBA{R: 215, G: 65, B: 245, A: 255})
-			e.projectiles.SpawnHitBurst(centerX, centerY, color.RGBA{R: 45, G: 10, B: 58, A: 255}, 14)
+			e.projectiles.AddTextPopup(centerX-20, centerY-26, "ACAI PURO!", color.RGBA{R: 180, G: 55, B: 220, A: 255})
+			e.projectiles.SpawnHitBurst(centerX, centerY, color.RGBA{R: 45, G: 10, B: 58, A: 255}, 10)
 		}
-		e.audio.PlayTreasure()
 	}
 
+	// 1. Efeito do Guaraná Power: Destrói instantaneamente qualquer inimigo que encostar (Super Mario Starman)
+	if e.starPowerTimer > 0 {
+		for _, obs := range e.obstacles.Obstacles {
+			if obs.Defeated || obs.Collided || obs.Type == entities.TypeBench || obs.Type == entities.TypeGround {
+				continue
+			}
+			if obs.CheckCollision(playerX, playerY, playerW, playerH) {
+				obs.Defeated = true
+				obs.DefeatTicks = 26
+				e.audio.PlayDefeat()
+				scoreBonus := 150
+				e.score += scoreBonus
+				ox, oy, ow, oh := obs.GetBounds()
+				e.projectiles.SpawnHitBurst(ox+ow/2.0, oy+oh/2.0, color.RGBA{R: 255, G: 225, B: 55, A: 255}, 16)
+				e.projectiles.AddTextPopup(ox-8, oy-14, "SMASH! +150", color.RGBA{R: 255, G: 240, B: 80, A: 255})
+			}
+		}
+	}
+
+	// 2. Mecânica de Pisão na Cabeça (Stomp): Pular em cima do Jacaré, Cobra ou Garça/Ave mata o inimigo e quica no ar!
+	stompHit, stompX, stompY, stompType := e.obstacles.CheckStomp(playerX, playerY, playerW, playerH, e.player.GetVelocityY(), GroundY)
+	if stompHit {
+		e.player.Bounce(-6.2) // Herói quica no ar estilo Mario
+		e.audio.PlayDefeat()
+		stompBonus := 100
+		burstCol := color.RGBA{R: 255, G: 220, B: 60, A: 255}
+		switch stompType {
+		case entities.TypeAir:
+			stompBonus = 80
+			burstCol = color.RGBA{R: 245, G: 245, B: 255, A: 255}
+		case entities.TypeJacare:
+			stompBonus = 120
+			burstCol = color.RGBA{R: 45, G: 180, B: 65, A: 255}
+		case entities.TypeSnake:
+			stompBonus = 90
+			burstCol = color.RGBA{R: 245, G: 190, B: 40, A: 255}
+		}
+		e.score += stompBonus
+		e.projectiles.SpawnHitBurst(stompX, stompY, burstCol, 14)
+		e.projectiles.AddTextPopup(stompX-16, stompY-16, fmt.Sprintf("PISAO! +%d", stompBonus), color.RGBA{R: 255, G: 235, B: 70, A: 255})
+	}
+
+	// 3. Colisão de Dano Normal (se não estiver invencível pelo Guaraná Power nem por dano recente)
 	hit, hitType := e.obstacles.CheckCollision(playerX, playerY, playerW, playerH, e.player.GetVelocityY(), GroundY, e.currentPlatform)
-	if hit && e.invincibleTicks <= 0 {
+	if hit && e.invincibleTicks <= 0 && e.starPowerTimer <= 0 {
 		e.currentPlatform = nil
 		e.mudSinkTimer = 0
 		e.hearts--
@@ -1294,28 +1370,30 @@ func (e *Engine) Update() error {
 			e.waterFallSplashTimer = 0
 			e.hitDelayTimer = 0
 			e.invincibleTicks = 0
+			e.speechBubbleText = "Egua do pitiu. Essa agua ta podre!"
+			e.speechBubbleTimer = 90
 		} else {
-				if hitType == entities.TypeJacare {
-					if e.selectedHero == entities.HeroOnca {
-						e.speechBubbleText = "EGUA DO JACARE FOFOQUEIRO!"
-					} else {
-						e.speechBubbleText = "EGUA DO JACARE!..."
-					}
-				} else if hitType == entities.TypeSnake {
-					if e.selectedHero == entities.HeroOnca {
-						e.speechBubbleText = "SAI PRA LA, COBRA TRAIDORA!"
-					} else {
-						e.speechBubbleText = "VALHA-ME! UMA COBRA!"
-					}
+			if hitType == entities.TypeJacare {
+				if e.selectedHero == entities.HeroOnca {
+					e.speechBubbleText = "EGUA DO JACARE FOFOQUEIRO!"
 				} else {
-					e.speechBubbleText = "EGUA MANO!..."
+					e.speechBubbleText = "EGUA DO JACARE!..."
 				}
-				e.speechBubbleTimer = 65
-				e.hitDelayTimer = 22
-				e.invincibleTicks = 75
-				e.audio.PlayHit()
+			} else if hitType == entities.TypeSnake {
+				if e.selectedHero == entities.HeroOnca {
+					e.speechBubbleText = "SAI PRA LA, COBRA TRAIDORA!"
+				} else {
+					e.speechBubbleText = "VALHA-ME! UMA COBRA!"
+				}
+			} else {
+				e.speechBubbleText = "EGUA MANO!..."
 			}
+			e.speechBubbleTimer = 65
+			e.hitDelayTimer = 22
+			e.invincibleTicks = 75
+			e.audio.PlayHit()
 		}
+	}
 
 	return nil
 }
@@ -1404,7 +1482,7 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 	}
 
 	isDoubleJump := e.player.GetJumpCount() == 2
-	ui.DrawHUD(screen, e.lives, e.hearts, e.score, e.stage, isDoubleJump, e.stageBannerTimer, e.audio.IsMuted(), e.ticks, e.relicsCount, heroName, e.stageDistance)
+	ui.DrawHUD(screen, e.lives, e.hearts, e.score, e.stage, isDoubleJump, e.stageBannerTimer, e.audio.IsMuted(), e.ticks, e.relicsCount, heroName, e.stageDistance, e.starPowerTimer)
 
 	if e.isShowingCredits {
 		ui.DrawCreditsScreen(screen, ScreenWidth, ScreenHeight)
