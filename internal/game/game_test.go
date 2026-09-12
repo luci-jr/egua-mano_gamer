@@ -129,3 +129,56 @@ func TestReturnToTitle(t *testing.T) {
 		t.Fatalf("Esperado pauseMenuIndex ser 0")
 	}
 }
+
+func TestCharSelectSourceTransitions(t *testing.T) {
+	e := NewEngine()
+
+	// 1. Transição a partir da Pausa
+	e.isPaused = true
+	e.charSelectSource = CharSelectSourcePause
+	e.isCharSelect = true
+	e.selectedHero = entities.HeroOnca
+
+	// Simula confirmação na tela de seleção
+	if e.selectedHero == entities.HeroGaroto {
+		e.player = e.garoto
+	} else {
+		e.player = e.onca
+	}
+	e.isCharSelect = false
+	if e.charSelectSource == CharSelectSourcePause {
+		e.applySelectedHero()
+		e.isPaused = false
+	}
+
+	if e.isPaused {
+		t.Fatalf("Esperado isPaused ser false após confirmar seleção vinda da pausa")
+	}
+	if e.player != e.onca {
+		t.Fatalf("Esperado player ser onca após seleção")
+	}
+
+	// 2. Transição a partir do Game Over
+	e.isGameOver = true
+	e.charSelectSource = CharSelectSourceGameOver
+	e.isCharSelect = true
+	e.selectedHero = entities.HeroGaroto
+	if e.selectedHero == entities.HeroGaroto {
+		e.player = e.garoto
+	} else {
+		e.player = e.onca
+	}
+	e.isCharSelect = false
+	if e.charSelectSource == CharSelectSourceGameOver {
+		e.applySelectedHero()
+		e.isGameOver = true
+	}
+
+	if !e.isGameOver {
+		t.Fatalf("Esperado isGameOver continuar true após confirmar seleção vinda do game over")
+	}
+	if e.player != e.garoto {
+		t.Fatalf("Esperado player ser garoto após seleção")
+	}
+}
+
