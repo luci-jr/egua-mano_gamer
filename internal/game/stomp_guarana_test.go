@@ -41,11 +41,46 @@ func TestCheckStompMechanics(t *testing.T) {
 		t.Fatalf("Esperado Jacaré marcado como Defeated após stomp")
 	}
 
-	// 2. Se estiver subindo rápido (pulo ascendente VY < -0.8), não deve dar stomp
-	playerVY = -2.0
-	hit2, _, _, _ := mgr.CheckStomp(204.0, playerY, playerW, playerH, playerVY, GroundY)
+	// 2. Se o jogador estiver no chão correndo (sem pular), não deve acionar stomp
+	playerGroundY := 0.0
+	playerGroundVY := 0.0
+	hit2, _, _, _ := mgr.CheckStomp(204.0, playerGroundY, playerW, playerH, playerGroundVY, GroundY)
 	if hit2 {
-		t.Fatalf("Não deve acionar stomp durante pulo ascendente (VY < -0.8)")
+		t.Fatalf("Não deve acionar stomp se o jogador estiver no chão correndo")
+	}
+
+	// 3. Teste com coordenadas de tela de GetBounds (ex: playerY = 131.0 para Y no solo, ou 115.0 no pulo)
+	// Garante que o cálculo com coordenadas absolutas de tela funcione de forma idêntica
+	mgr.Obstacles[2].Collided = false
+	mgr.Obstacles[2].Defeated = false
+	// Ave aérea: X=300, Y=GroundY-34=121.0, W=28, H=16 -> topo 121, base 137
+	hit3, _, _, obsType3 := mgr.CheckStomp(304.0, 115.0, playerW, playerH, 1.0, GroundY)
+	if !hit3 {
+		t.Fatalf("Esperado acerto de stomp na Ave Aérea usando coordenadas de tela")
+	}
+	if obsType3 != entities.TypeAir {
+		t.Fatalf("Esperado TypeAir, obtido %v", obsType3)
+	}
+
+	// 4. Teste de Salvaguarda de Pulo em CheckCollision:
+	// Ao saltar sobre a cobra (TypeSnake), o herói NUNCA toma dano; a cobra é derrotada!
+	mgr.Obstacles[1].Collided = false
+	mgr.Obstacles[1].Defeated = false
+	collisionHit, _ := mgr.CheckCollision(204.0, -12.0, playerW, playerH, 1.0, GroundY, nil)
+	if collisionHit {
+		t.Fatalf("Pulo sobre o bicho NUNCA deve causar dano ao herói!")
+	}
+	if !mgr.Obstacles[1].Defeated {
+		t.Fatalf("A cobra deveria ser derrotada ao ser pisada/saltada por cima!")
+	}
+
+	// 5. Teste de Colisão Frontal no Chão:
+	// Se o jogador estiver correndo no chão (playerBottom == GroundY), ele toma dano frontal
+	mgr.Obstacles[1].Collided = false
+	mgr.Obstacles[1].Defeated = false
+	groundCollision, _ := mgr.CheckCollision(204.0, 0.0, playerW, playerH, 0.0, GroundY, nil)
+	if !groundCollision {
+		t.Fatalf("Correr de frente no bicho pelo chão deve causar colisão com dano!")
 	}
 }
 

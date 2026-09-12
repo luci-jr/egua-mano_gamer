@@ -889,8 +889,6 @@ func (e *Engine) Update() error {
 				e.player.SetPositionX(45.0)
 				e.player.SetGroundOffset(0)
 				e.invincibleTicks = 100 // Proteção temporária após respawn
-				e.speechBubbleText = fmt.Sprintf("AGORA VAI! RESTAM %d VIDAS", e.lives)
-				e.speechBubbleTimer = 75
 			}
 		}
 		return nil
@@ -913,32 +911,6 @@ func (e *Engine) Update() error {
 
 	if e.speechBubbleTimer > 0 {
 		e.speechBubbleTimer--
-	} else {
-		// A cada ~14 a 20 segundos correndo pela cidade de Belém, o herói solta um brado de aventura regional
-		e.heatSpeechTimer++
-		if e.heatSpeechTimer >= 850 {
-			if e.hitDelayTimer == 0 {
-				e.heatSpeechTimer = 0
-				if e.selectedHero == entities.HeroOnca {
-					oncaPhrases := []string{
-						"RRRAUW! Ninguem segura a onca!",
-						"A cidade e as matas me pertencem!",
-						"Sentiram o poder do rugido?!",
-						"Bote certeiro, mano!",
-					}
-					e.speechBubbleText = oncaPhrases[(e.ticks/60)%len(oncaPhrases)]
-				} else {
-					garotoPhrases := []string{
-						"Bora voando, maninho!",
-						"O carimbo de Belem ta paidegua!",
-						"Vou passar o rodo nesses bichos!",
-						"Acai na tigela da forca!",
-					}
-					e.speechBubbleText = garotoPhrases[(e.ticks/60)%len(garotoPhrases)]
-				}
-				e.speechBubbleTimer = 165
-			}
-		}
 	}
 
 	if e.invincibleTicks > 0 {
@@ -1271,12 +1243,6 @@ func (e *Engine) Update() error {
 			e.audio.PlayEguaMano()
 			e.projectiles.AddTextPopup(r.X-22, r.Y-20, "GUARANA POWER!", color.RGBA{R: 255, G: 220, B: 50, A: 255})
 			e.projectiles.SpawnHitBurst(r.X+8, r.Y+8, color.RGBA{R: 255, G: 215, B: 40, A: 255}, 18)
-			if e.selectedHero == entities.HeroOnca {
-				e.speechBubbleText = "RROAAR! NINGUEM ME SEGURA!"
-			} else {
-				e.speechBubbleText = "EGUA MANO! TO INVENCIVEL!"
-			}
-			e.speechBubbleTimer = 75
 		} else if r.Type == entities.RelicAcaiBowl {
 			// 🥣 Cuia de Tacacá / Tigela de Açaí: item raro de cura
 			if e.hearts < 3 {
@@ -1371,7 +1337,7 @@ func (e *Engine) Update() error {
 	}
 
 	// 3. Colisão de Dano Normal (se não estiver invencível pelo Guaraná Power nem por dano recente)
-	hit, hitType := e.obstacles.CheckCollision(playerX, playerY, playerW, playerH, e.player.GetVelocityY(), GroundY, e.currentPlatform)
+	hit, _ := e.obstacles.CheckCollision(playerX, playerY, playerW, playerH, e.player.GetVelocityY(), GroundY, e.currentPlatform)
 	if hit && e.invincibleTicks <= 0 && e.starPowerTimer <= 0 {
 		e.currentPlatform = nil
 		e.mudSinkTimer = 0
@@ -1396,22 +1362,6 @@ func (e *Engine) Update() error {
 			e.speechBubbleText = "Egua do pitiu. Essa agua ta podre!"
 			e.speechBubbleTimer = 90
 		} else {
-			if hitType == entities.TypeJacare {
-				if e.selectedHero == entities.HeroOnca {
-					e.speechBubbleText = "EGUA DO JACARE FOFOQUEIRO!"
-				} else {
-					e.speechBubbleText = "EGUA DO JACARE!..."
-				}
-			} else if hitType == entities.TypeSnake {
-				if e.selectedHero == entities.HeroOnca {
-					e.speechBubbleText = "SAI PRA LA, COBRA TRAIDORA!"
-				} else {
-					e.speechBubbleText = "VALHA-ME! UMA COBRA!"
-				}
-			} else {
-				e.speechBubbleText = "EGUA MANO!..."
-			}
-			e.speechBubbleTimer = 65
 			e.hitDelayTimer = 22
 			e.invincibleTicks = 75
 			e.audio.PlayHit()

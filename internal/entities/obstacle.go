@@ -522,17 +522,22 @@ func (m *ObstacleManager) Update(speed float64) int {
 	return passedCount
 }
 
-// CheckPlatformSupport verifica se o jogador está aterrissando ou em pé sobre o topo de um obstáculo sólido (Paneiro, Dorso do Jacaré ou Banco de Praça)
+// CheckPlatformSupport verifica se o jogador está aterrissando ou em pé sobre o topo de um obstáculo sólido (Paneiro de Açaí ou Banco de Praça)
 func (m *ObstacleManager) CheckPlatformSupport(playerX, playerY, playerW, playerH, playerVY, groundY float64) (bool, float64, *Obstacle) {
-	playerBottom := groundY + playerY
+	var playerBottom float64
+	if playerY > 50.0 {
+		playerBottom = playerY + playerH
+	} else {
+		playerBottom = groundY + playerY
+	}
 	playerCenterX := playerX + playerW/2.0
 
 	for _, obs := range m.Obstacles {
 		if obs.Defeated {
 			continue
 		}
-		// Apenas TypeGround (paneiro), TypeJacare (dorso do jacaré) e TypeBench (banco de praça) funcionam como plataformas sólidas
-		if obs.Type != TypeGround && obs.Type != TypeJacare && obs.Type != TypeBench {
+		// Apenas TypeGround (paneiro) e TypeBench (banco de praça) funcionam como plataformas sólidas
+		if obs.Type != TypeGround && obs.Type != TypeBench {
 			continue
 		}
 
@@ -551,11 +556,12 @@ func (m *ObstacleManager) CheckPlatformSupport(playerX, playerY, playerW, player
 
 // CheckStomp verifica se o jogador pulou em cima de um inimigo (Jacaré, Cobra ou Ave Aérea), derrotando-o instantaneamente e quicando no ar
 func (m *ObstacleManager) CheckStomp(playerX, playerY, playerW, playerH, playerVY, groundY float64) (bool, float64, float64, ObstacleType) {
-	if playerVY < -0.8 {
-		return false, 0, 0, TypeGround
+	var playerBottom float64
+	if playerY > 50.0 {
+		playerBottom = playerY + playerH
+	} else {
+		playerBottom = groundY + playerY
 	}
-
-	playerBottom := groundY + playerY
 
 	for _, obs := range m.Obstacles {
 		if obs.Defeated || obs.Collided {
@@ -568,11 +574,16 @@ func (m *ObstacleManager) CheckStomp(playerX, playerY, playerW, playerH, playerV
 
 		ox, oy, ow, oh := obs.GetBounds()
 		obsTop := oy
+		obsBottom := oy + oh
 
-		overlapX := playerX+playerW > ox+2.0 && playerX < ox+ow-2.0
-		isFallingOnTop := playerBottom >= obsTop-8.0 && playerBottom <= obsTop+oh*0.75
+		// Sobreposição horizontal com margem confortável para gameplay fluida
+		overlapX := playerX+playerW > ox-3.0 && playerX < ox+ow+3.0
 
-		if overlapX && isFallingOnTop {
+		// O jogador está no ar (saltando) e seus pés tocam/estão no corpo do inimigo vindo de cima
+		isJumping := playerBottom < groundY-1.0 || playerVY != 0
+		isAboveBase := playerBottom <= obsBottom+4.0 && playerBottom >= obsTop-16.0
+
+		if overlapX && isJumping && isAboveBase {
 			obs.Defeated = true
 			obs.DefeatTicks = 26
 			return true, ox + ow/2.0, oy + oh/2.0, obs.Type
@@ -583,7 +594,15 @@ func (m *ObstacleManager) CheckStomp(playerX, playerY, playerW, playerH, playerV
 
 // CheckCollision realiza checagem de dano ignorando plataformas seguras (Banco de Praça e Paneiro de Açaí)
 func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH, playerVY, groundY float64, currentPlatform *Obstacle) (bool, ObstacleType) {
-	playerBottom := groundY + playerY
+	var playerBottom, playerTop float64
+	if playerY > 50.0 {
+		playerTop = playerY
+		playerBottom = playerY + playerH
+	} else {
+		playerBottom = groundY + playerY
+		playerTop = playerBottom - playerH
+	}
+
 	for _, obs := range m.Obstacles {
 		if obs.Collided || obs.Defeated {
 			continue
@@ -599,15 +618,29 @@ func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH, pla
 			continue
 		}
 
-		_, obsY, _, _ := obs.GetBounds()
-		obsTop := obsY
+		ox, oy, ow, oh := obs.GetBounds()
+		obsTop := oy
+		obsBottom := oy + oh
 
-		// Se for obstáculo escalável e o herói colide vindo de cima em movimento descendente, evita dano e prioriza aterrissagem
-		if (obs.Type == TypeGround || obs.Type == TypeJacare || obs.Type == TypeBench) && playerBottom <= obsTop+5.0 && playerVY >= -0.5 {
+		// SALVAGUARDA ABSOLUTA DE PULO:
+		// Se for bicho inimigo (Jacaré, Cobra, Ave aérea) e o herói estiver saltando no ar com sobreposição,
+		// ele NUNCA deve tomar dano ou perder vida; se atingir o bicho no pulo, o bicho é derrotado!
+		if obs.Type == TypeJacare || obs.Type == TypeSnake || obs.Type == TypeAir {
+			overlapX := playerX+playerW > ox-3.0 && playerX < ox+ow+3.0
+			isJumping := playerBottom < groundY-1.0 || playerVY != 0
+			if overlapX && isJumping && playerBottom <= obsBottom+4.0 {
+				obs.Defeated = true
+				obs.DefeatTicks = 26
+				continue
+			}
+		}
+
+		// Se for obstáculo no chão e o herói colide vindo de cima em movimento descendente, evita dano
+		if playerBottom <= obsTop+5.0 && playerVY >= -0.5 {
 			continue
 		}
 
-		if obs.CheckCollision(playerX, playerY, playerW, playerH) {
+		if obs.CheckCollision(playerX, playerTop, playerW, playerH) {
 			obs.Collided = true
 			return true, obs.Type
 		}
@@ -617,11 +650,15 @@ func (m *ObstacleManager) CheckCollision(playerX, playerY, playerW, playerH, pla
 
 // CheckEnergyCollection verifica se o jogador tocou ou passou pelo Paneiro de Açaí para absorver energia vital
 func (m *ObstacleManager) CheckEnergyCollection(playerX, playerY, playerW, playerH float64) (bool, *Obstacle) {
+	realPlayerY := playerY
+	if playerY <= 50.0 {
+		realPlayerY = m.groundY + playerY - playerH
+	}
 	for _, obs := range m.Obstacles {
 		if obs.Collided || obs.Defeated || obs.Type != TypeGround {
 			continue
 		}
-		if obs.CheckCollision(playerX, playerY, playerW, playerH) {
+		if obs.CheckCollision(playerX, realPlayerY, playerW, playerH) {
 			obs.Collided = true // Marcado como consumido para não pontuar/curar continuamente
 			return true, obs
 		}
