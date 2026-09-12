@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/luci-jr/paidegua-game/internal/game"
+	"github.com/luci-jr/paidegua-runner/internal/game"
 )
 
 func main() {
