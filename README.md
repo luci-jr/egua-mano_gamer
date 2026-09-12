@@ -1,4 +1,4 @@
-# 🏹 PaiD'Egua Runner: Uma Aventura em Belém do Pará
+# 🏹 Égua Mano! Gamer: Uma Aventura em Belém do Pará
 
 <p align="center">
   <a href="https://github.com/luci-jr">
@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/title_screen.jpg" alt="PaiD'Egua Runner: Uma Aventura em Belém do Pará" width="680" style="max-width: 100%; image-rendering: pixelated; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);" />
+  <img src="assets/title_screen.jpg" alt="Égua Mano! Gamer: Uma Aventura em Belém do Pará" width="680" style="max-width: 100%; image-rendering: pixelated; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);" />
 </p>
 
 > Um jogo de ação e aventura arcade retrô 16-bit construído 100% em **Go** com a engine **Ebitengine (v2)**, ambientado nos cartões-postais históricos, na rica culinária e na cultura vibrante de **Belém do Pará**.
@@ -28,7 +28,7 @@
 
 ## 🌟 Sobre o Projeto
 
-**PaiD'Egua Runner: Uma Aventura em Belém do Pará** foi concebido e desenvolvido pelo desenvolvedor [**Lucivaldo Junior**](https://github.com/luci-jr).
+**Égua Mano! Gamer: Uma Aventura em Belém do Pará** foi concebido e desenvolvido pelo desenvolvedor [**Lucivaldo Junior**](https://github.com/luci-jr).
 
 O projeto une rigor de engenharia de software em Go às melhores práticas arquiteturais do **Standard Go Project Layout** (`cmd/` e `internal/`), integrando:
 * **Física de Plataforma Customizada:** Colisão AABB, salto com altura variável, pulo duplo (*double jump*), queda rápida (*fast drop*), aterrissagem no dorso de animais (*Pitfall ledge landing*) e refúgio em bancos de praça coloniais.
@@ -55,7 +55,7 @@ A apresentação do jogo traz a autêntica nostalgia dos clássicos fliperamas d
 
 1. **Vista Aérea 8-Bit do Ver-o-Peso:** A tela inicial exibe uma panorâmica em pixel art do emblemático **Mercado do Ver-o-Peso**, destacando as 4 torres de ferro inglesas, o cais de cantaria histórica, as barracas azuis dos feirantes e os barcos atracados na **Baía do Guajará**.
 2. **Revoada em Tempo Real:** Urubus negros e garças brancas amazônicas sobrevoam continuamente o céu de Belém com animação de asas.
-3. **Logotipo Arcade 3D em Ouro Maciço:** Letras garrafais em relevo de ouro imperial com extrusão 3D, bisel specular, feixe de luz dinâmico (*shimmer*), fita vermelha "RUNNER" chanfrada e grafismos geométricos da cerâmica marajoara.
+3. **Logotipo Arcade 3D em Ouro Maciço:** Letras garrafais em relevo de ouro imperial com extrusão 3D, bisel specular, feixe de luz dinâmico (*shimmer*), fita vermelha "GAMER" chanfrada e grafismos geométricos da cerâmica marajoara.
 4. **Menu de Opções Compacto:** Sem poluição visual e com proporções harmoniosas:
    * **JOGAR:** Inicia a jornada por Belém.
    * **HERÓI: [ GAROTO / ONÇA ]:** Alterna o personagem jogável.

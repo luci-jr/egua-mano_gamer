@@ -284,7 +284,7 @@ func drawTempleTorches(screen *ebiten.Image, ticks int) {
 }
 
 // drawArcadeGameLogo renderiza o logotipo principal em autêntico estilo Arcade/16-Bit:
-// tipografia gigante 3D em relevo de ouro "PAI D'EGUA", fita em relevo "RUNNER",
+// tipografia gigante 3D em relevo de ouro "EGUA MANO!", fita em relevo "GAMER",
 // brasão ancestral de pedra com runas marajoaras, feixe de luz dinâmico (shimmer) e faíscas estelares (sparkles).
 func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64, ticks int, isCompact bool) {
 	if isCompact {
@@ -313,7 +313,7 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 		ebitenutil.DrawRect(screen, logoX+36, logoY+4, logoW-72, 1, color.RGBA{R: 255, G: 220, B: 75, A: 255})
 		ebitenutil.DrawRect(screen, logoX+36, logoY+14, logoW-72, 1, color.RGBA{R: 255, G: 220, B: 75, A: 255})
 
-		ebitenutil.DebugPrintAt(screen, "★ P A I D ' E G U A   R U N N E R ★", int(logoX)+44, int(logoY)+3)
+		ebitenutil.DebugPrintAt(screen, "★ E G U A   M A N O !   G A M E R ★", int(logoX)+42, int(logoY)+3)
 		ebitenutil.DebugPrintAt(screen, "★ UMA AVENTURA EM BELEM DO PARA ★", int(logoX)+45, int(logoY)+15)
 		return
 	}
@@ -375,99 +375,12 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 		ebitenutil.DrawRect(screen, sideX+7, bgY+48, 4, 3, runeColor)
 	}
 
-	// 6. TIPOGRAFIA ARCADE GIGANTE 3D: "PAI D'EGUA"
+	// 6. TIPOGRAFIA ARCADE GIGANTE 3D: "EGUA MANO!"
 	// Matrizes de pixels de 14 linhas de altura em bloco 2x2
 	glyphs := []struct {
 		width  int
 		matrix []string
 	}{
-		// P (largura 8)
-		{8, []string{
-			"#######.",
-			"########",
-			"##....##",
-			"##....##",
-			"########",
-			"#######.",
-			"##......",
-			"##......",
-			"##......",
-			"##......",
-			"##......",
-			"##......",
-			"##......",
-			"##......",
-		}},
-		// A (largura 8)
-		{8, []string{
-			".######.",
-			"########",
-			"##....##",
-			"##....##",
-			"##....##",
-			"########",
-			"########",
-			"##....##",
-			"##....##",
-			"##....##",
-			"##....##",
-			"##....##",
-			"##....##",
-			"##....##",
-		}},
-		// I (largura 4)
-		{4, []string{
-			"####",
-			"####",
-			".##.",
-			".##.",
-			".##.",
-			".##.",
-			".##.",
-			".##.",
-			".##.",
-			".##.",
-			".##.",
-			".##.",
-			"####",
-			"####",
-		}},
-		// [Espaço entre PAI e D'EGUA] (largura 4)
-		{4, nil},
-		// D (largura 8)
-		{8, []string{
-			"#######.",
-			"########",
-			"##....##",
-			"##....##",
-			"##....##",
-			"##....##",
-			"##....##",
-			"##....##",
-			"##....##",
-			"##....##",
-			"##....##",
-			"##....##",
-			"########",
-			"#######.",
-		}},
-		// ' [Apóstrofo] (largura 3)
-		{3, []string{
-			"###",
-			"###",
-			".##",
-			".##",
-			"##.",
-			"#..",
-			"...",
-			"...",
-			"...",
-			"...",
-			"...",
-			"...",
-			"...",
-			"...",
-		}},
 		// E (largura 7)
 		{7, []string{
 			"#######",
@@ -492,9 +405,9 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 			"##....##",
 			"##......",
 			"##......",
-			"##......",
 			"##..####",
 			"##..####",
+			"##....##",
 			"##....##",
 			"##....##",
 			"##....##",
@@ -535,6 +448,93 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 			"##....##",
 			"##....##",
 			"##....##",
+		}},
+		// [Espaço entre EGUA e MANO!] (largura 5)
+		{5, nil},
+		// M (largura 9)
+		{9, []string{
+			"##.....##",
+			"###...###",
+			"####.####",
+			"#########",
+			"##.###.##",
+			"##..#..##",
+			"##.....##",
+			"##.....##",
+			"##.....##",
+			"##.....##",
+			"##.....##",
+			"##.....##",
+			"##.....##",
+			"##.....##",
+		}},
+		// A (largura 8)
+		{8, []string{
+			".######.",
+			"########",
+			"##....##",
+			"##....##",
+			"##....##",
+			"########",
+			"########",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+		}},
+		// N (largura 8)
+		{8, []string{
+			"##....##",
+			"###...##",
+			"####..##",
+			"##.##.##",
+			"##..####",
+			"##...###",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+		}},
+		// O (largura 8)
+		{8, []string{
+			".######.",
+			"########",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"##....##",
+			"########",
+			".######.",
+		}},
+		// ! [Exclamação] (largura 3)
+		{3, []string{
+			"###",
+			"###",
+			"###",
+			"###",
+			"###",
+			"###",
+			"###",
+			"###",
+			"...",
+			"...",
+			"###",
+			"###",
+			"###",
+			"###",
 		}},
 	}
 
@@ -660,46 +660,36 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 		ebitenutil.DrawRect(screen, pegX+1, ribbonY+7, 1, 1, color.RGBA{R: 255, G: 255, B: 240, A: 255})
 	}
 
-	// Letras estilizadas de "RUNNER" em relevo branco puro e sombra
+	// Letras estilizadas de "GAMER" em relevo branco puro e sombra
 	runnerGlyphs := []struct {
 		w int
 		m []string
 	}{
-		// R (largura 5)
+		// G (largura 5)
 		{5, []string{
-			"####.",
+			".####",
+			"##...",
 			"##.##",
-			"####.",
-			"###..",
-			"##.##",
-			"##.##",
-			"##.##",
-		}},
-		// U (largura 5)
-		{5, []string{
-			"##.##",
-			"##.##",
-			"##.##",
-			"##.##",
+			"##..#",
 			"##.##",
 			"#####",
 			".###.",
 		}},
-		// N (largura 6)
-		{6, []string{
-			"##..##",
-			"###.##",
-			"####.#",
-			"##.###",
-			"##..##",
-			"##..##",
-			"##..##",
+		// A (largura 5)
+		{5, []string{
+			".###.",
+			"##.##",
+			"#####",
+			"##.##",
+			"##.##",
+			"##.##",
+			"##.##",
 		}},
-		// N (largura 6)
+		// M (largura 6)
 		{6, []string{
 			"##..##",
-			"###.##",
-			"####.#",
+			"######",
+			"######",
 			"##.###",
 			"##..##",
 			"##..##",
@@ -731,7 +721,7 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 	for idx, rg := range runnerGlyphs {
 		totalRunnerW += rg.w * 2
 		if idx < len(runnerGlyphs)-1 {
-			totalRunnerW += 6 // Espaço entre as letras de RUNNER
+			totalRunnerW += 8 // Espaço entre as letras de GAMER
 		}
 	}
 
@@ -755,7 +745,7 @@ func drawArcadeGameLogo(screen *ebiten.Image, screenWidth float64, topY float64,
 				ebitenutil.DrawRect(screen, rx, ry, 2, 2, color.RGBA{R: 255, G: 250, B: 245, A: 255})
 			}
 		}
-		runCurX += float64(rg.w*2 + 6)
+		runCurX += float64(rg.w*2 + 8)
 	}
 
 	// 8. SUBTÍTULO CINZELADO NA PEDRA
@@ -1151,10 +1141,10 @@ func DrawTitleScreen(screen *ebiten.Image, screenWidth, screenHeight float64, ti
 	bx := int(boxX)
 	by := int(boxY)
 
-	ebitenutil.DebugPrintAt(screen, "★ PAIDEGUA GAME ★", bx+45, by+8)
+	ebitenutil.DebugPrintAt(screen, "★ EGUA MANO! GAMER ★", bx+34, by+8)
 	ebitenutil.DrawRect(screen, boxX+10, boxY+22, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
 
-	ebitenutil.DebugPrintAt(screen, "Dev: Luci Junior & Nexus AI", bx+14, by+26)
+	ebitenutil.DebugPrintAt(screen, "Dev: Lucivaldo Junior", bx+24, by+26)
 	ebitenutil.DebugPrintAt(screen, "Mover: A/D ou Setas | Pulo: W/Cima", bx+8, by+41)
 	ebitenutil.DebugPrintAt(screen, "Ataque: Espaco/X | Baixo: S", bx+10, by+54)
 
@@ -1184,11 +1174,11 @@ func DrawCreditsScreen(screen *ebiten.Image, screenWidth, screenHeight float64) 
 	bx := int(boxX)
 	by := int(boxY)
 
-	ebitenutil.DebugPrintAt(screen, "★ CREDITOS - PAID'EGUA RUNNER ★", bx+12, by+8)
+	ebitenutil.DebugPrintAt(screen, "★ CREDITOS - EGUA MANO! GAMER ★", bx+10, by+8)
 	ebitenutil.DrawRect(screen, boxX+10, boxY+21, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 160})
 
-	ebitenutil.DebugPrintAt(screen, "Desenvolvedor: Lucivaldo Junior", bx+14, by+26)
-	ebitenutil.DebugPrintAt(screen, "Co-criacao IA: Nexus AI (Lucy)", bx+14, by+38)
+	ebitenutil.DebugPrintAt(screen, "Autor / Dev:   Lucivaldo Junior", bx+14, by+26)
+	ebitenutil.DebugPrintAt(screen, "GitHub:        github.com/luci-jr", bx+14, by+38)
 	ebitenutil.DebugPrintAt(screen, "Linguagem:     Go (Golang)", bx+14, by+50)
 	ebitenutil.DebugPrintAt(screen, "Game Engine:   Ebitengine v2", bx+14, by+62)
 	ebitenutil.DebugPrintAt(screen, "Trilha Sonora: Carimbo 8-Bit Chiptune", bx+14, by+74)
@@ -1437,11 +1427,11 @@ func DrawStageCompleteScreen(screen *ebiten.Image, screenWidth, screenHeight flo
 
 		ebitenutil.DebugPrintAt(screen, "TUXAUA DA AMAZONIA:", contentX+8, int(balloonY)+5)
 		ebitenutil.DebugPrintAt(screen, "\"TRIUNFO TOTAL! Voce e a lenda viva!\"", contentX+8, int(balloonY)+18)
-		ebitenutil.DebugPrintAt(screen, "\"A Onca Paidegua reina em Belem!\"", contentX+8, int(balloonY)+30)
+		ebitenutil.DebugPrintAt(screen, "\"Egua Mano! Voce reina em Belem!\"", contentX+8, int(balloonY)+30)
 
 		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Pontuacao Maxima: %05d pts", score), contentX+6, int(boxY)+78)
 		ebitenutil.DebugPrintAt(screen, "Desenvolvedor: Lucivaldo Junior (Luci)", contentX+6, int(boxY)+92)
-		ebitenutil.DebugPrintAt(screen, "Co-criacao IA: Nexus Squad (AI Team)", contentX+6, int(boxY)+106)
+		ebitenutil.DebugPrintAt(screen, "GitHub:        github.com/luci-jr", contentX+6, int(boxY)+106)
 		ebitenutil.DebugPrintAt(screen, "Localizacao:   Belem do Para - Brasil", contentX+6, int(boxY)+120)
 
 		if (ticks/25)%2 == 0 {

@@ -1373,7 +1373,7 @@ func (e *Engine) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 func Start() error {
 	ebiten.SetWindowSize(680, 420)
-	ebiten.SetWindowTitle("PaiD'egua Runner - Uma Aventura em Belém do Pará")
+	ebiten.SetWindowTitle("Égua Mano! Gamer - Uma Aventura em Belém do Pará")
 	ebiten.SetRunnableOnUnfocused(false)
 
 	engine := NewEngine()
