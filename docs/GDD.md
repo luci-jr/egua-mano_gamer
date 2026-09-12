@@ -1,4 +1,4 @@
-# 📜 Game Design Document (GDD) — PaiD'Egua Runner
+# 📜 Game Design Document (GDD) — Égua Mano! Gamer
 
 > **Versão do Documento:** 1.0.0  
 > **Status:** Vivo / Produção (VER. 2.4.0)  
@@ -17,7 +17,7 @@
 ### 1.2. Ficha Técnica
 | Atributo | Especificação |
 | :--- | :--- |
-| **Título Oficial** | **PaiD'Egua Runner: Uma Aventura em Belém do Pará** |
+| **Título Oficial** | **Égua Mano! Gamer: Uma Aventura em Belém do Pará** |
 | **Gênero** | Plataforma de Ação / Runner Arcade 2D |
 | **Público-Alvo** | Jovens, adultos e entusiastas de jogos retro anos 90 (*SNES / Arcade / Mega Drive*) |
 | **Classificação Indicativa**| Livre (E - Everyone) |
@@ -124,7 +124,7 @@ O jogo suporta simultaneamente **Teclado (PC)**, **Controles Virtuais Touch (Mob
   * O herói pisca em transparência durante 60 frames com invulnerabilidade total a novos impactos.
 
 ### 6.2. Câmera & Scroll Direcional Não-Automático
-Diferente de runners automáticos convencionais, a câmera do *PaiD'Egua Runner* prioriza o controle do jogador:
+Diferente de runners automáticos convencionais, a câmera do *Égua Mano! Gamer* prioriza o controle do jogador:
 * **Parado (`Idle`):** O scroll da câmera é nulo ($v = 0$). O herói não é empurrado para a morte pelo canto da tela.
 * **Avançando:** Ao ultrapassar o limiar de avanço (`cameraForwardLimit = 135px`), a câmera acompanha progressivamente a velocidade do herói, rolando o parallax do cenário e acumulando a distância da fase.
 * **Recuando:** Ao aproximar-se do limiar traseiro (`cameraBackLimit = 45px`), a câmera retrocede suavemente o cenário.
