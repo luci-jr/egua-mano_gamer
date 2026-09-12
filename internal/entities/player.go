@@ -12,6 +12,12 @@ type PlayerCharacter interface {
 	MoveForward(speed float64)
 	MoveBackward(speed float64)
 	StopRunning()
+	SetPositionX(x float64)
+	GetPosition() (x, y float64)
+	SetGroundOffset(offset float64)
+	GetGroundOffset() float64
+	GetVelocityY() float64
+	FallFromPlatform()
 	SetAimUp(aim bool)
 	TriggerAttack()
 	GetShootOrigin(groundY float64) (x, y, vx, vy float64)

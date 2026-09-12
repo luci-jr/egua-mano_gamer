@@ -53,6 +53,8 @@ func (b *Background) Update(speed float64) {
 	// Reseta apenas em múltiplos gigantescos para evitar qualquer salto visível nos diferentes períodos de parallax
 	if b.scrollOffset >= 1000000.0 {
 		b.scrollOffset -= 1000000.0
+	} else if b.scrollOffset < 0 {
+		b.scrollOffset += 1000000.0
 	}
 }
 

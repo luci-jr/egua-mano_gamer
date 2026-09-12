@@ -19,16 +19,17 @@ const (
 )
 
 type Garoto struct {
-	X           float64
-	Y           float64 // Offset vertical do pulo (Y <= 0 quando no ar)
-	VelocityY   float64
-	IsJumping   bool
-	IsCrouching bool
-	IsRunning   bool
-	FacingRight bool
-	AimUp       bool
-	IsAttacking bool
-	AttackTimer int
+	X            float64
+	Y            float64 // Offset vertical do pulo (Y <= 0 quando no ar ou em plataforma)
+	GroundOffset float64 // Offset de chão sólido (0 para piso da rua; negativo para plataformas elevadas)
+	VelocityY    float64
+	IsJumping    bool
+	IsCrouching  bool
+	IsRunning    bool
+	FacingRight  bool
+	AimUp        bool
+	IsAttacking  bool
+	AttackTimer  int
 
 	JumpCount   int
 	JumpHolding bool
@@ -45,6 +46,7 @@ func NewGaroto() *Garoto {
 	return &Garoto{
 		X:            45.0,
 		Y:            0,
+		GroundOffset: 0,
 		VelocityY:    0,
 		IsJumping:    false,
 		IsCrouching:  false,
@@ -60,6 +62,42 @@ func NewGaroto() *Garoto {
 		IsSwinging:   false,
 		SwingingVine: nil,
 		Particles:    make([]*Particle, 0),
+	}
+}
+
+func (g *Garoto) SetPositionX(x float64) {
+	g.X = x
+}
+
+func (g *Garoto) GetPosition() (x, y float64) {
+	return g.X, g.Y
+}
+
+func (g *Garoto) SetGroundOffset(offset float64) {
+	g.GroundOffset = offset
+	g.Y = offset
+	g.VelocityY = 0
+	g.IsJumping = false
+	g.JumpCount = 0
+}
+
+func (g *Garoto) GetGroundOffset() float64 {
+	return g.GroundOffset
+}
+
+func (g *Garoto) GetVelocityY() float64 {
+	return g.VelocityY
+}
+
+func (g *Garoto) FallFromPlatform() {
+	if g.GroundOffset != 0 {
+		g.GroundOffset = 0
+		if g.Y < 0 {
+			g.IsJumping = true
+			if g.VelocityY < 0 {
+				g.VelocityY = 0
+			}
+		}
 	}
 }
 
@@ -129,13 +167,14 @@ func (g *Garoto) Jump() (jumped bool, isDouble bool) {
 		return true, false
 	}
 	if !g.IsJumping || g.CoyoteTimer > 0 {
+		g.GroundOffset = 0 // Pulo liberta da plataforma atual
 		g.IsJumping = true
 		g.IsCrouching = false
 		g.JumpCount = 1
 		g.VelocityY = -6.8
 		g.JumpHolding = true
 		g.CoyoteTimer = 0
-		g.spawnDust(g.X+6, 0, 6)
+		g.spawnDust(g.X+6, g.Y, 6)
 		return true, false
 	} else if g.JumpCount == 1 {
 		g.JumpCount = 2
@@ -182,7 +221,7 @@ func (g *Garoto) ReleaseJump() {
 
 func (g *Garoto) SetCrouch(crouch bool) {
 	if !g.IsCrouching && crouch && !g.IsJumping && !g.IsSwinging {
-		g.spawnDust(g.X+10, 0, 4)
+		g.spawnDust(g.X+10, g.Y, 4)
 	}
 	g.IsCrouching = crouch
 	if crouch {
@@ -200,7 +239,7 @@ func (g *Garoto) Update() {
 	if g.IsRunning && !g.IsSwinging {
 		g.RunTicks++
 		if g.RunTicks%10 == 0 && !g.IsJumping {
-			g.spawnDust(g.X+4, 0, 2)
+			g.spawnDust(g.X+4, g.Y, 2)
 		}
 	} else {
 		g.RunTicks = 0
@@ -234,14 +273,18 @@ func (g *Garoto) Update() {
 		g.Y += g.VelocityY
 		g.VelocityY += gravity
 
-		if g.Y >= 0 {
-			g.Y = 0
+		targetY := g.GroundOffset
+		if g.Y >= targetY {
+			g.Y = targetY
 			g.IsJumping = false
 			g.JumpCount = 0
 			g.VelocityY = 0
-			g.spawnDust(g.X+6, 0, 8)
+			g.spawnDust(g.X+6, targetY, 8)
 		}
 	} else {
+		if g.Y < g.GroundOffset {
+			g.IsJumping = true
+		}
 		g.CoyoteTimer = 6
 	}
 
@@ -301,6 +344,7 @@ func (g *Garoto) spawnJumpBurst(x, y float64) {
 func (g *Garoto) Reset() {
 	g.X = 45.0
 	g.Y = 0
+	g.GroundOffset = 0
 	g.VelocityY = 0
 	g.IsJumping = false
 	g.IsCrouching = false
