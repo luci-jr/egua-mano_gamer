@@ -111,17 +111,37 @@ Entre cada fase, o jogador navega pelas águas da Baía do Guajará a bordo do t
 
 ---
 
-## 📸 Galeria de Cenários Oficiais do Jogo
+## 📸 Galeria de Cenários & Modos de Jogo (PC e Celular)
 
-| Tela Inicial Oficial (Ver-o-Peso Aéreo) | Fase 1: Mercado do Ver-o-Peso |
+### 💻 1. Execução no Navegador Web (PC / Desktop)
+| Tela Inicial Oficial Arcade | Gameplay PC (Garoto Curumim) |
 | :---: | :---: |
-| ![Tela Inicial](assets/title_screen.jpg) | ![Fase 1: Ver-o-Peso](assets/bg_fase1_8bit.png) |
-| *Vista aérea em 8-bit com torres de ferro inglesas e baía* | *Cais de cantaria histórica, barcos e Mercado de Ferro* |
+| ![Navegador PC Tela Inicial](assets/screenshot_pc_title.png) | ![Gameplay PC Curumim](assets/pc_gameplay_curumim.png) |
+| *Logotipo 3D Ouro Maciço, subtítulo e Ver-o-Peso Aéreo* | *Corrida no cais do Ver-o-Peso com disparo de açaí* |
 
-| Fase 2: Estação das Docas | Fase 3: Theatro da Paz |
+---
+
+### 📱 2. Execução no Celular Android (Smartphone Mobile)
+| Android Horizontal (Landscape) | Android Vertical (Portrait) |
 | :---: | :---: |
-| ![Fase 2: Estação das Docas](assets/bg_fase2_8bit.png) | ![Fase 3: Theatro da Paz](assets/bg_fase3_8bit.png) |
-| *Galpões ingleses vermelhos, deck e guindaste amarelo* | *Fachada neoclássica, mangueiras e pedras portuguesas* |
+| ![Android Horizontal](assets/mobile_real_landscape.jpg) | ![Android Vertical](assets/mobile_real_portrait.jpg) |
+| *Controles Virtuais D-Pad e Botões NES em Tela Cheia* | *Modo Retrô Vertical com layout fluido e trivia paraense* |
+
+---
+
+### 🎨 3. Elementos Visuais & UI Retrô Ajustada
+| Favicon Personalizado Arcade | Cenário 8-Bit (Estação das Docas) |
+| :---: | :---: |
+| ![Favicon 16-Bit](assets/favicon.png) | ![Fase 2 Estação das Docas](assets/bg_fase2_8bit.png) |
+| *Ícone em Pixel Art com Curumim, Onça, Açaí e Ouro Marajoara* | *Galpões ingleses vermelhos, guindaste e pedras portuguesas* |
+
+---
+
+## 🎨 Ajustes Finais de Interface & Menu Retrô
+
+* **Alinhamento do Subtítulo:** A linha inferior do brasão foi posicionada levemente abaixo do texto `UMA AVENTURA EM BELEM DO PARA` (`subY+17`), garantindo leitura limpa sem cortar as letras.
+* **Menu de Escolha de Personagens:** Atributos dos cards do **Garoto Curumim** e da **Onça-Pintada** formatados com delimitação estrita para evitar sobreposição textual entre colunas.
+* **Favicon Oficial do Projeto:** Adicionado ícone personalizado em pixel art nas dimensões 1:1 (`assets/favicon.png` / `favicon.ico`).
 
 ---
 
