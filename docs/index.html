@@ -480,6 +480,117 @@
   </div>
 
   <script>
+    // =========================================================================
+    // OBJETO GLOBAL DE TECLAS VIRTUAIS & ESTADO
+    // Lido nativamente pelo Go (WebAssembly) para controles e ciclo de vida
+    // =========================================================================
+    window._virtualKeys = {
+      ArrowLeft: false,
+      ArrowRight: false,
+      Jump: false,
+      JustJump: false,
+      ArrowDown: false,
+      JustDuck: false,
+      Enter: false,
+      Escape: false,
+      ArrowUp: false,
+      Attack: false,
+      PageHidden: false,
+      JustUnfocused: false
+    };
+
+    function setVirtual(key, state) {
+      if (window._virtualKeys) {
+        window._virtualKeys[key] = state;
+        if (key === 'Jump' && state) {
+          window._virtualKeys['JustJump'] = true;
+        }
+        if (key === 'ArrowDown' && state) {
+          window._virtualKeys['JustDuck'] = true;
+        }
+      }
+    }
+
+    // =========================================================================
+    // GERENCIADOR INTELIGENTE DE ÁUDIO E FOCO (SEGUNDO PLANO / TROCA DE APP)
+    // Silencia instantaneamente o jogo quando o usuário sai da aba ou minimiza
+    // (ex: abrir WhatsApp, responder mensagem no celular, alternar de app ou aba).
+    // =========================================================================
+    const activeAudioContexts = [];
+    const OrigAudioContext = window.AudioContext || window.webkitAudioContext;
+    if (OrigAudioContext) {
+      try {
+        const AudioCtxProxy = new Proxy(OrigAudioContext, {
+          construct(target, args) {
+            const ctx = new target(...args);
+            activeAudioContexts.push(ctx);
+            return ctx;
+          }
+        });
+        window.AudioContext = AudioCtxProxy;
+        if (window.webkitAudioContext) {
+          window.webkitAudioContext = AudioCtxProxy;
+        }
+      } catch (e) {
+        console.warn("AudioContext proxying:", e);
+      }
+    }
+
+    let isAppInForeground = true;
+
+    function suspendAppAudio() {
+      if (!isAppInForeground) return;
+      isAppInForeground = false;
+      if (window._virtualKeys) {
+        window._virtualKeys.PageHidden = true;
+        window._virtualKeys.JustUnfocused = true;
+      }
+      activeAudioContexts.forEach(ctx => {
+        try {
+          if (ctx && ctx.state === 'running') {
+            ctx.suspend();
+          }
+        } catch (err) {}
+      });
+    }
+
+    function resumeAppAudio() {
+      if (document.hidden) return;
+      if (isAppInForeground) return;
+      isAppInForeground = true;
+      if (window._virtualKeys) {
+        window._virtualKeys.PageHidden = false;
+      }
+      activeAudioContexts.forEach(ctx => {
+        try {
+          if (ctx && ctx.state === 'suspended') {
+            ctx.resume();
+          }
+        } catch (err) {}
+      });
+    }
+
+    // Eventos de visibilidade (Troca de aba no navegador ou alternar de app no celular)
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        suspendAppAudio();
+      } else {
+        resumeAppAudio();
+      }
+    });
+
+    // Ciclo de vida da página em navegadores móveis (Safari iOS, Chrome Android)
+    window.addEventListener('pagehide', suspendAppAudio);
+    window.addEventListener('pageshow', () => {
+      if (!document.hidden) resumeAppAudio();
+    });
+
+    // Perda de foco de janela (Trocar de aplicativo, abrir notificações, minimizar janela)
+    window.addEventListener('blur', suspendAppAudio);
+    window.addEventListener('focus', () => {
+      if (!document.hidden) resumeAppAudio();
+    });
+
     const go = new Go();
     const loadingElem = document.getElementById('loading');
 
@@ -500,32 +611,6 @@
         loadingElem.innerHTML = "<p style='color: #ef4444; font-weight: bold;'>Erro ao carregar o jogo: " + err + "</p>";
       }
     });
-
-    // Objeto global de chaves virtuais lido nativamente pelo Go (WASM)
-    window._virtualKeys = {
-      ArrowLeft: false,
-      ArrowRight: false,
-      Jump: false,
-      JustJump: false,
-      ArrowDown: false,
-      JustDuck: false,
-      Enter: false,
-      Escape: false,
-      ArrowUp: false,
-      Attack: false
-    };
-
-    function setVirtual(key, state) {
-      if (window._virtualKeys) {
-        window._virtualKeys[key] = state;
-        if (key === 'Jump' && state) {
-          window._virtualKeys['JustJump'] = true;
-        }
-        if (key === 'ArrowDown' && state) {
-          window._virtualKeys['JustDuck'] = true;
-        }
-      }
-    }
 
     // Helper para despachar teclas do teclado a partir de eventos touch
     function triggerKey(code, key, keyCode, type) {
