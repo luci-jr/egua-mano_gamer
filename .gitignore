@@ -15,6 +15,9 @@
 *.test
 *.out
 
+# Executáveis WebAssembly temporários na raiz (manter docs/game.wasm rastreado)
+/game.wasm
+
 # Arquivos e diretórios temporários de build
 /dist/
 /build/
@@ -48,4 +51,5 @@ Thumbs.db
 
 # Arquivos locais / privados
 GUIA_APRENDIZADO.md
+MANUAL_CONSTRUCAO_DO_ZERO.pdf
 *.pdf
