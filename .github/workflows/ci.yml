@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      # A Ebitengine precisa de bibliotecas gráficas e de áudio para compilar
+      # no Linux, e de um display (virtual) para rodar os testes.
+      - name: Dependências do sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libasound2-dev libgl1-mesa-dev libxcursor-dev libxi-dev \
+            libxinerama-dev libxrandr-dev libxxf86vm-dev xvfb
+
+      - name: Formatação (só os pacotes novos)
+        run: test -z "$(gofmt -l internal/level internal/save)"
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Testes
+        run: xvfb-run -a go test -count=1 ./...
+
+      - name: Build WebAssembly
+        run: GOOS=js GOARCH=wasm go build -o /tmp/game.wasm .
