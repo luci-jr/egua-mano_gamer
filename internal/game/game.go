@@ -10,6 +10,8 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/luci-jr/egua-mano_gamer/internal/audio"
 	"github.com/luci-jr/egua-mano_gamer/internal/entities"
+	"github.com/luci-jr/egua-mano_gamer/internal/level"
+	"github.com/luci-jr/egua-mano_gamer/internal/save"
 	"github.com/luci-jr/egua-mano_gamer/internal/scenery"
 	"github.com/luci-jr/egua-mano_gamer/internal/ui"
 )
@@ -92,6 +94,15 @@ type Engine struct {
 	isGameOver        bool
 	isStageComplete   bool
 	wasFocused        bool
+
+	// Fases em dados (internal/level) e a regra de obstáculos em vigor
+	fases     []level.Fase
+	regraFase int
+	regraAte  float64
+
+	// Recorde salvo entre partidas (internal/save)
+	recorde     int
+	novoRecorde bool
 }
 
 func NewEngine() *Engine {
@@ -101,7 +112,7 @@ func NewEngine() *Engine {
 	g := entities.NewGaroto()
 	o := entities.NewOnca()
 
-	return &Engine{
+	e := &Engine{
 		player:            g,
 		garoto:            g,
 		onca:              o,
@@ -144,7 +155,14 @@ func NewEngine() *Engine {
 		isGameOver:        false,
 		isStageComplete:   false,
 		wasFocused:        true,
+		fases:             carregarFases(),
+		recorde:           save.Recorde(),
 	}
+	if len(e.fases) > 0 {
+		e.aplicarRegraDaFase(0, true)
+		e.obstacles.Reset()
+	}
+	return e
 }
 
 func (e *Engine) applySelectedHero() {
@@ -172,10 +190,12 @@ func (e *Engine) restartStage() {
 	e.chargeTimer = 0
 	e.isCharged = false
 	e.projectiles.Reset()
+	e.aplicarRegraDaFase(0, true)
 	e.obstacles.Reset()
 	e.vines.Reset()
 	e.relics.Reset()
 	e.stageDistance = 0
+	e.novoRecorde = false
 	e.mudSinkTimer = 0
 	e.lives = 3
 	e.hearts = 3
@@ -280,23 +300,9 @@ func (e *Engine) Update() error {
 			return nil
 		}
 
-		startTriggered := isPointerJustPressed() ||
-			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
-			getVirtualKey("Enter") ||
-			getVirtualKey("Space") ||
-			getVirtualKey("Start") ||
-			isGamepadConfirmJustPressed()
-
-		if getVirtualKey("Enter") {
-			resetVirtualKey("Enter")
-		}
-		if getVirtualKey("Space") {
-			resetVirtualKey("Space")
-		}
-		if getVirtualKey("Start") {
-			resetVirtualKey("Start")
+		startTriggered := confirmJustPressed(true)
+		if isPointerJustPressed() {
+			startTriggered = true
 		}
 
 		if startTriggered {
@@ -313,19 +319,9 @@ func (e *Engine) Update() error {
 		e.ticks++
 		e.loadingTimer--
 
-		skipLoading := isPointerJustPressed() ||
-			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
-			getVirtualKey("Enter") ||
-			getVirtualKey("Space") ||
-			isGamepadConfirmJustPressed()
-
-		if getVirtualKey("Enter") {
-			resetVirtualKey("Enter")
-		}
-		if getVirtualKey("Space") {
-			resetVirtualKey("Space")
+		skipLoading := confirmJustPressed(false)
+		if isPointerJustPressed() {
+			skipLoading = true
 		}
 
 		if skipLoading || e.loadingTimer <= 0 {
@@ -340,6 +336,7 @@ func (e *Engine) Update() error {
 			e.chargeTimer = 0
 			e.isCharged = false
 			e.projectiles.Reset()
+			e.aplicarRegraDaFase(0, true)
 			e.obstacles.Reset()
 			e.relics.Reset()
 			if !e.audio.IsMuted() {
@@ -429,23 +426,9 @@ func (e *Engine) Update() error {
 			}
 		}
 
-		confirmPressed := cardClicked ||
-			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
-			getVirtualKey("Enter") ||
-			getVirtualKey("Space") ||
-			getVirtualKey("Start") ||
-			isGamepadConfirmJustPressed()
-
-		if getVirtualKey("Enter") {
-			resetVirtualKey("Enter")
-		}
-		if getVirtualKey("Space") {
-			resetVirtualKey("Space")
-		}
-		if getVirtualKey("Start") {
-			resetVirtualKey("Start")
+		confirmPressed := confirmJustPressed(true)
+		if cardClicked {
+			confirmPressed = true
 		}
 
 		if confirmPressed {
@@ -584,23 +567,9 @@ func (e *Engine) Update() error {
 			}
 		}
 
-		selectTriggered := mouseTriggered ||
-			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
-			getVirtualKey("Enter") ||
-			getVirtualKey("Space") ||
-			getVirtualKey("Start") ||
-			isGamepadConfirmJustPressed()
-
-		if getVirtualKey("Enter") {
-			resetVirtualKey("Enter")
-		}
-		if getVirtualKey("Space") {
-			resetVirtualKey("Space")
-		}
-		if getVirtualKey("Start") {
-			resetVirtualKey("Start")
+		selectTriggered := confirmJustPressed(true)
+		if mouseTriggered {
+			selectTriggered = true
 		}
 
 		if selectTriggered {
@@ -693,23 +662,9 @@ func (e *Engine) Update() error {
 			return nil
 		}
 
-		selectPressed := isPointerJustPressed() ||
-			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
-			getVirtualKey("Enter") ||
-			getVirtualKey("Space") ||
-			getVirtualKey("Start") ||
-			isGamepadConfirmJustPressed()
-
-		if getVirtualKey("Enter") {
-			resetVirtualKey("Enter")
-		}
-		if getVirtualKey("Space") {
-			resetVirtualKey("Space")
-		}
-		if getVirtualKey("Start") {
-			resetVirtualKey("Start")
+		selectPressed := confirmJustPressed(true)
+		if isPointerJustPressed() {
+			selectPressed = true
 		}
 
 		if selectPressed {
@@ -746,19 +701,9 @@ func (e *Engine) Update() error {
 			return nil
 		}
 
-		continuePressed := isPointerJustPressed() ||
-			inpututil.IsKeyJustPressed(ebiten.KeyEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeyNumpadEnter) ||
-			inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
-			getVirtualKey("Enter") ||
-			getVirtualKey("Space") ||
-			isGamepadConfirmJustPressed()
-
-		if getVirtualKey("Enter") {
-			resetVirtualKey("Enter")
-		}
-		if getVirtualKey("Space") {
-			resetVirtualKey("Space")
+		continuePressed := confirmJustPressed(false)
+		if isPointerJustPressed() {
+			continuePressed = true
 		}
 
 		if continuePressed {
@@ -898,6 +843,7 @@ func (e *Engine) Update() error {
 				e.lives = 0
 				e.hearts = 0
 				e.isGameOver = true
+				e.registrarRecorde()
 				e.speechBubbleText = "Egua do pitiu. Essa agua ta podre!"
 				e.speechBubbleTimer = 999999
 				e.audio.PauseBGM()
@@ -1249,6 +1195,9 @@ func (e *Engine) Update() error {
 		e.isStageComplete = true
 		e.stageDistance = 0
 		e.currentPlatform = nil
+		if e.stage >= 3 {
+			e.registrarRecorde() // zerou o jogo: o placar final concorre ao recorde
+		}
 		e.audio.PauseBGM()
 		e.audio.PlayStageUp()
 		return nil
@@ -1287,6 +1236,7 @@ func (e *Engine) Update() error {
 		}
 	}
 
+	e.aplicarRegraDaFase(e.stageDistance, false)
 	if passed := e.obstacles.Update(worldScrollSpeed); passed > 0 && worldScrollSpeed > 0 {
 		e.score += passed * 10
 	}
@@ -1494,6 +1444,11 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 
 	if e.isGameOver {
 		ui.DrawGameOverScreen(screen, ScreenWidth, ScreenHeight, e.score, e.stage, e.selectedHero)
+		textoRecorde := fmt.Sprintf("RECORDE: %05d", e.recorde)
+		if e.novoRecorde {
+			textoRecorde = fmt.Sprintf("NOVO RECORDE: %05d!", e.recorde)
+		}
+		ebitenutil.DebugPrintAt(screen, textoRecorde, int(ScreenWidth)/2-len(textoRecorde)*3, 130)
 	}
 }
 

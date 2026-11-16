@@ -351,16 +351,99 @@ func (obs *Obstacle) drawSnake(screen *ebiten.Image, ticks int, stage int) {
 }
 
 // ObstacleManager gerencia múltiplos obstáculos simultâneos na tela com espaçamento justo e seguro
+// SpawnRule descreve como os obstáculos reaparecem num trecho da fase: quais
+// tipos podem surgir (com pesos), a distância entre eles e a velocidade
+// própria dos inimigos. As regras de cada fase ficam em internal/level.
+type SpawnRule struct {
+	Types      []ObstacleType
+	Weights    []int   // mesmo tamanho de Types; vazio = pesos iguais
+	GapMin     float64 // distância mínima até o obstáculo mais à frente
+	GapMax     float64 // distância máxima
+	EnemySpeed float64 // multiplicador da velocidade própria (1 = original)
+}
+
+// DefaultSpawnRule reproduz o comportamento original: os cinco tipos com a
+// mesma chance, espaçamento de 140 a 190 e velocidade normal.
+func DefaultSpawnRule() SpawnRule {
+	return SpawnRule{
+		Types:      []ObstacleType{TypeGround, TypeJacare, TypeBench, TypeSnake, TypeAir},
+		GapMin:     140,
+		GapMax:     190,
+		EnemySpeed: 1,
+	}
+}
+
 type ObstacleManager struct {
 	Obstacles   []*Obstacle
 	screenWidth float64
 	groundY     float64
+	rule        SpawnRule
+	rng         *rand.Rand
+}
+
+// SetSpawnRule troca a regra usada nos próximos reaparecimentos. Regras
+// inválidas (sem tipos ou com espaçamento invertido) são ignoradas.
+func (m *ObstacleManager) SetSpawnRule(r SpawnRule) {
+	if len(r.Types) == 0 || r.GapMin <= 0 || r.GapMax < r.GapMin {
+		return
+	}
+	if len(r.Weights) != len(r.Types) {
+		r.Weights = nil
+	}
+	if r.EnemySpeed <= 0 {
+		r.EnemySpeed = 1
+	}
+	m.rule = r
+}
+
+// SetSeed fixa a semente do sorteio. Com a mesma semente e as mesmas entradas
+// a sequência de obstáculos é a mesma, o que permite testar e reproduzir
+// partidas.
+func (m *ObstacleManager) SetSeed(seed int64) {
+	m.rng = rand.New(rand.NewSource(seed))
+}
+
+func (m *ObstacleManager) nextGap() float64 {
+	span := m.rule.GapMax - m.rule.GapMin
+	if span <= 0 {
+		return m.rule.GapMin
+	}
+	return m.rule.GapMin + m.rng.Float64()*span
+}
+
+func (m *ObstacleManager) nextType() ObstacleType {
+	types := m.rule.Types
+	if len(m.rule.Weights) == 0 {
+		return types[m.rng.Intn(len(types))]
+	}
+	total := 0
+	for _, w := range m.rule.Weights {
+		if w > 0 {
+			total += w
+		}
+	}
+	if total == 0 {
+		return types[m.rng.Intn(len(types))]
+	}
+	n := m.rng.Intn(total)
+	for i, w := range m.rule.Weights {
+		if w <= 0 {
+			continue
+		}
+		if n < w {
+			return types[i]
+		}
+		n -= w
+	}
+	return types[len(types)-1]
 }
 
 func NewObstacleManager(screenWidth, groundY float64) *ObstacleManager {
 	m := &ObstacleManager{
 		screenWidth: screenWidth,
 		groundY:     groundY,
+		rule:        DefaultSpawnRule(),
+		rng:         rand.New(rand.NewSource(rand.Int63())),
 		Obstacles: []*Obstacle{
 			{X: screenWidth + 30, Type: TypeGround, screenWidth: screenWidth, groundY: groundY},
 			{X: screenWidth + 185, Type: TypeAir, screenWidth: screenWidth, groundY: groundY},
@@ -445,7 +528,6 @@ func (obs *Obstacle) drawBench(screen *ebiten.Image, ticks int, stage int) {
 
 func (m *ObstacleManager) Update(speed float64) int {
 	passedCount := 0
-	validTypes := []ObstacleType{TypeGround, TypeJacare, TypeBench, TypeSnake, TypeAir}
 
 	for _, obs := range m.Obstacles {
 		if obs.Defeated {
@@ -458,8 +540,8 @@ func (m *ObstacleManager) Update(speed float64) int {
 						furthestX = other.X
 					}
 				}
-				obs.X = furthestX + 140.0 + float64(rand.Intn(50))
-				obs.Type = validTypes[rand.Intn(len(validTypes))]
+				obs.X = furthestX + m.nextGap()
+				obs.Type = m.nextType()
 				obs.Collided = false
 				obs.Defeated = false
 				obs.DefeatTicks = 0
@@ -475,13 +557,13 @@ func (m *ObstacleManager) Update(speed float64) int {
 		switch obs.Type {
 		case TypeJacare:
 			// Jacaré-Açu rasteja sutilmente para a frente no chão
-			obs.X -= 0.35
+			obs.X -= 0.35 * m.rule.EnemySpeed
 		case TypeSnake:
 			// Cobra-Coral serpenteia com agilidade natural
-			obs.X -= 0.50
+			obs.X -= 0.50 * m.rule.EnemySpeed
 		case TypeAir:
 			// Urubu / ave sobrevoa os céus
-			obs.X -= 0.70
+			obs.X -= 0.70 * m.rule.EnemySpeed
 		}
 
 		if obs.X < -40 {
@@ -491,8 +573,8 @@ func (m *ObstacleManager) Update(speed float64) int {
 					furthestX = other.X
 				}
 			}
-			obs.X = furthestX + 140.0 + float64(rand.Intn(50))
-			obs.Type = validTypes[rand.Intn(len(validTypes))]
+			obs.X = furthestX + m.nextGap()
+			obs.Type = m.nextType()
 			obs.Collided = false
 			obs.Defeated = false
 			obs.DefeatTicks = 0
@@ -669,7 +751,9 @@ func (m *ObstacleManager) Draw(screen *ebiten.Image, ticks int, stage int) {
 
 func (m *ObstacleManager) Reset() {
 	spacing := 165.0
-	types := []ObstacleType{TypeGround, TypeJacare, TypeBench, TypeSnake, TypeAir}
+	// Os primeiros obstáculos seguem os tipos da regra em vigor. Com a regra
+	// padrão a ordem é a original: paneiro, jacaré, banco, cobra, urubu.
+	types := m.rule.Types
 	for i, obs := range m.Obstacles {
 		obs.X = m.screenWidth + 25.0 + float64(i)*spacing
 		obs.Type = types[i%len(types)]
