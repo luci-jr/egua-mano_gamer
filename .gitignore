@@ -15,9 +15,11 @@
 *.test
 *.out
 
-# Executáveis WebAssembly (rastrear apenas game.dat = WASM compactado com gzip)
+# Executáveis WebAssembly
 /game.wasm
 docs/game.wasm
+game.dat
+docs/game.dat
 
 # Arquivos e diretórios temporários de build
 /dist/
