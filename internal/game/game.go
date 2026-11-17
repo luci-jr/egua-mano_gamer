@@ -929,7 +929,10 @@ func (e *Engine) Update() error {
 	duckKey := ebiten.IsKeyPressed(ebiten.KeyArrowDown) || ebiten.IsKeyPressed(ebiten.KeyS) || getVirtualKey("ArrowDown") || isGamepadDownPressed()
 	duckJustPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) || inpututil.IsKeyJustPressed(ebiten.KeyS) || isGamepadDownJustPressed()
 
-	jumpJustPressed := inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) ||
+	jumpJustPressed := inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyK) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyC) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) ||
 		inpututil.IsKeyJustPressed(ebiten.KeyW) ||
 		getVirtualKey("JustJump") ||
 		isGamepadJumpJustPressed()
@@ -937,7 +940,10 @@ func (e *Engine) Update() error {
 		resetVirtualKey("JustJump")
 	}
 
-	jumpHolding := ebiten.IsKeyPressed(ebiten.KeyArrowUp) ||
+	jumpHolding := ebiten.IsKeyPressed(ebiten.KeySpace) ||
+		ebiten.IsKeyPressed(ebiten.KeyK) ||
+		ebiten.IsKeyPressed(ebiten.KeyC) ||
+		ebiten.IsKeyPressed(ebiten.KeyArrowUp) ||
 		ebiten.IsKeyPressed(ebiten.KeyW) ||
 		getVirtualKey("Jump") ||
 		isGamepadJumpHolding()
@@ -982,7 +988,10 @@ func (e *Engine) Update() error {
 
 	aimDirY := 0.0
 	if keyUp && !keyDown {
-		aimDirY = -1.0
+		// Se estiver saltando e se movendo na horizontal, preserva a mira reta para frente
+		if !e.player.IsPlayerJumping() || aimDirX == 0 {
+			aimDirY = -1.0
+		}
 	} else if keyDown && !keyUp {
 		aimDirY = 1.0
 	}
@@ -993,9 +1002,10 @@ func (e *Engine) Update() error {
 		e.attackCooldown--
 	}
 
-	attackHeld := ebiten.IsKeyPressed(ebiten.KeySpace) ||
-		ebiten.IsKeyPressed(ebiten.KeyX) ||
+	attackHeld := ebiten.IsKeyPressed(ebiten.KeyX) ||
 		ebiten.IsKeyPressed(ebiten.KeyJ) ||
+		ebiten.IsKeyPressed(ebiten.KeyV) ||
+		ebiten.IsKeyPressed(ebiten.KeyF) ||
 		getVirtualKey("Attack") ||
 		isGamepadAttackHeld()
 
