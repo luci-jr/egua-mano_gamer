@@ -174,74 +174,61 @@ func (o *Onca) GetShootOrigin(groundY float64) (x, y, vx, vy float64) {
 		dir = -1.0
 	}
 
-	// 1. Tiro vertical puro para cima
+	inAir := o.IsJumping || o.Y < -2.0
+
+	// 1. Vertical cima
 	if o.AimUp || (o.AimDirY < -0.1 && math.Abs(o.AimDirX) < 0.1) {
-		x = o.X + 22.0
-		y = groundY - 24.0 + o.Y
-		vx = 0.0
-		vy = -speed
-		return x, y, vx, vy
+		return o.X + 22.0, groundY - 24.0 + o.Y, 0.0, -speed
 	}
 
-	// 2. Tiro vertical puro para baixo (quando no ar ou caindo)
-	if o.AimDirY > 0.1 && math.Abs(o.AimDirX) < 0.1 {
-		x = o.X + 22.0
-		y = groundY - 2.0 + o.Y
-		vx = 0.0
-		vy = speed
-		return x, y, vx, vy
-	}
-
-	// 3. Tiro diagonal para cima
-	if o.AimDirY < -0.1 {
-		if dir > 0 {
-			x = o.X + 34.0
-		} else {
+	// 2. Diagonal cima
+	if o.AimDirY < -0.1 && math.Abs(o.AimDirX) > 0.1 {
+		x = o.X + 34.0
+		if dir < 0 {
 			x = o.X - 2.0
 		}
+		y = groundY - 20.0 + o.Y
 		if o.IsCrouching {
 			y = groundY - 12.0 + o.Y
-		} else {
-			y = groundY - 20.0 + o.Y
 		}
-		vx = dir * speed * diag
-		vy = -speed * diag
-		return x, y, vx, vy
+		return x, y, dir * speed * diag, -speed * diag
 	}
 
-	// 4. Tiro diagonal para baixo
-	if o.AimDirY > 0.1 {
-		if dir > 0 {
+	// 3. No ar apontando para baixo (pulo + baixo)
+	if inAir && o.AimDirY > 0.1 {
+		if math.Abs(o.AimDirX) > 0.1 {
 			x = o.X + 34.0
-		} else {
+			if dir < 0 {
+				x = o.X - 2.0
+			}
+			return x, groundY - 8.0 + o.Y, dir * speed * diag, speed * diag
+		}
+		return o.X + 22.0, groundY + o.Y + 12.0, 0.0, speed
+	}
+
+	// 4. Diagonal baixo no chão
+	if o.AimDirY > 0.1 && math.Abs(o.AimDirX) > 0.1 {
+		x = o.X + 34.0
+		if dir < 0 {
 			x = o.X - 2.0
 		}
+		y = groundY - 8.0 + o.Y
 		if o.IsCrouching {
 			y = groundY - 6.0 + o.Y
-		} else {
-			y = groundY - 8.0 + o.Y
 		}
-		vx = dir * speed * diag
-		vy = speed * diag
-		return x, y, vx, vy
+		return x, y, dir * speed * diag, speed * diag
 	}
 
-	// 5. Tiro horizontal tradicional
-	if dir > 0 {
-		x = o.X + 36.0
-	} else {
+	// 5. Horizontal / Acocado
+	x = o.X + 36.0
+	if dir < 0 {
 		x = o.X - 4.0
 	}
-
-	if o.IsCrouching {
+	y = groundY - 14.0 + o.Y
+	if o.IsCrouching || (o.AimDirY > 0.1 && !inAir) {
 		y = groundY - 8.0 + o.Y
-	} else {
-		y = groundY - 14.0 + o.Y
 	}
-
-	vx = dir * speed
-	vy = 0.0
-	return x, y, vx, vy
+	return x, y, dir * speed, 0.0
 }
 
 func (o *Onca) Jump() (jumped bool, isDouble bool) {
@@ -250,18 +237,18 @@ func (o *Onca) Jump() (jumped bool, isDouble bool) {
 		return true, false
 	}
 	if !o.IsJumping || o.CoyoteTimer > 0 {
-		o.GroundOffset = 0 // Pulo liberta da plataforma atual
+		o.GroundOffset = 0
 		o.IsJumping = true
 		o.IsCrouching = false
 		o.JumpCount = 1
-		o.VelocityY = -7.0 // Salto ágil felino
+		o.VelocityY = -5.7
 		o.JumpHolding = true
 		o.CoyoteTimer = 0
 		o.spawnDust(o.X+10, o.Y, 6)
 		return true, false
 	} else if o.JumpCount == 1 {
 		o.JumpCount = 2
-		o.VelocityY = -6.4
+		o.VelocityY = -5.0
 		o.JumpHolding = true
 		o.spawnJumpBurst(o.X+16, o.Y+18)
 		return true, true
@@ -313,9 +300,7 @@ func (o *Onca) SetCrouch(crouch bool) {
 }
 
 func (o *Onca) FastDrop() {
-	if o.IsJumping && !o.IsSwinging {
-		o.VelocityY += 0.9
-	}
+	// Desativado: preserva a trajetória parabólica natural e ágil do salto mesmo ao mirar para baixo
 }
 
 func (o *Onca) Update() {
@@ -350,9 +335,9 @@ func (o *Onca) Update() {
 			o.VelocityY = 1.0
 		}
 	} else if o.IsJumping {
-		gravity := 0.36
+		gravity := 0.24
 		if !o.JumpHolding && o.VelocityY < 0 {
-			gravity = 0.55
+			gravity = 0.40
 		}
 		o.Y += o.VelocityY
 		o.VelocityY += gravity

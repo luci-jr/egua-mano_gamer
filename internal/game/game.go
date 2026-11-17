@@ -1102,9 +1102,7 @@ func (e *Engine) Update() error {
 	}
 
 	if duckKey {
-		if e.player.IsPlayerJumping() {
-			e.player.FastDrop()
-		} else {
+		if !e.player.IsPlayerJumping() {
 			e.player.SetCrouch(true)
 		}
 	} else {
@@ -1269,7 +1267,7 @@ func (e *Engine) Update() error {
 		centerX := ox + ow/2.0
 		centerY := oy + 4.0
 
-		giveHeart := e.hearts < 3 && rand.Intn(100) < 15
+		giveHeart := e.hearts < 3 && rand.Intn(100) < 5
 		if giveHeart {
 			e.hearts++
 			e.projectiles.AddTextPopup(centerX-24, centerY-14, "+1 ENERGIA!", color.RGBA{R: 215, G: 65, B: 245, A: 255})

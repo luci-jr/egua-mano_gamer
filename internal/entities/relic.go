@@ -271,14 +271,14 @@ func (rm *RelicManager) Update(speed float64) {
 		roll := rand.Intn(100)
 		var rType RelicType
 		switch {
-		case roll < 40:
-			rType = RelicMuiraquita // 40% Sapinho Muiraquitã de Jade (+100 pts)
-		case roll < 78:
-			rType = RelicOuro       // 38% Pepita de Ouro do Tapajós (+50 pts)
-		case roll < 90:
-			rType = RelicGuarana    // 12% Fruto do Guaraná da Amazônia (Star Power)
+		case roll < 45:
+			rType = RelicMuiraquita // 45% Sapinho Muiraquitã de Jade (+100 pts)
+		case roll < 85:
+			rType = RelicOuro       // 40% Pepita de Ouro do Tapajós (+50 pts)
+		case roll < 95:
+			rType = RelicGuarana    // 10% Fruto do Guaraná da Amazônia (Star Power)
 		default:
-			rType = RelicAcaiBowl   // 10% Cuia de Tacacá / Tigela de Açaí
+			rType = RelicAcaiBowl   // 5% Cuia de Tacacá / Tigela de Açaí Nutritiva (Raro)
 		}
 		spawnY := rm.groundY - 32.0 - float64(rand.Intn(20))
 		rm.SpawnRelic(rm.screenWidth+40.0, spawnY, rType)

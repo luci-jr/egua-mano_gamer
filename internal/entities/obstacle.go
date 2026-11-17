@@ -445,9 +445,9 @@ func NewObstacleManager(screenWidth, groundY float64) *ObstacleManager {
 		rule:        DefaultSpawnRule(),
 		rng:         rand.New(rand.NewSource(rand.Int63())),
 		Obstacles: []*Obstacle{
-			{X: screenWidth + 30, Type: TypeGround, screenWidth: screenWidth, groundY: groundY},
-			{X: screenWidth + 185, Type: TypeAir, screenWidth: screenWidth, groundY: groundY},
-			{X: screenWidth + 340, Type: TypeJacare, screenWidth: screenWidth, groundY: groundY},
+			{X: screenWidth + 80, Type: TypeBench, screenWidth: screenWidth, groundY: groundY},
+			{X: screenWidth + 230, Type: TypeAir, screenWidth: screenWidth, groundY: groundY},
+			{X: screenWidth + 380, Type: TypeJacare, screenWidth: screenWidth, groundY: groundY},
 		},
 	}
 	return m

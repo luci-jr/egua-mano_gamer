@@ -102,11 +102,15 @@ func TestPlayerAimDirections(t *testing.T) {
 			t.Errorf("%s: tiro vertical cima falhou: vx=%f, vy=%f", p.GetName(), vx, vy)
 		}
 
-		// 7. Tiro vertical puro para baixo
+		// 7. Apontando puro para baixo (acocado / agachado): tiro frontal horizontal na altura agachada
+		p.MoveForward(1.0) // Garante FacingRight
 		p.SetAimDirection(0, 1.0)
-		_, _, vx, vy = p.GetShootOrigin(155.0)
-		if vx != 0 || vy <= 0 {
-			t.Errorf("%s: tiro vertical baixo falhou: vx=%f, vy=%f", p.GetName(), vx, vy)
+		_, shootY, vx, vy := p.GetShootOrigin(155.0)
+		if vx <= 0 || vy != 0 {
+			t.Errorf("%s: tiro acocado deve sair horizontal para a frente, obteve vx=%f, vy=%f", p.GetName(), vx, vy)
+		}
+		if shootY != 155.0-8.0 {
+			t.Errorf("%s: tiro acocado deve sair na altura de agachamento (y=147), obteve y=%f", p.GetName(), shootY)
 		}
 	}
 }

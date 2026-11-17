@@ -160,7 +160,7 @@ func (g *Garoto) TriggerAttack() {
 
 func (g *Garoto) GetShootOrigin(groundY float64) (x, y, vx, vy float64) {
 	speed := 7.5
-	const diag = 0.7071067811865475 // 1 / sqrt(2)
+	const diag = 0.7071067811865475
 
 	dir := 1.0
 	if !g.FacingRight {
@@ -172,74 +172,61 @@ func (g *Garoto) GetShootOrigin(groundY float64) (x, y, vx, vy float64) {
 		dir = -1.0
 	}
 
-	// 1. Tiro vertical puro para cima
+	inAir := g.IsJumping || g.Y < -2.0
+
+	// 1. Vertical cima
 	if g.AimUp || (g.AimDirY < -0.1 && math.Abs(g.AimDirX) < 0.1) {
-		x = g.X + 8.0
-		y = groundY - 32.0 + g.Y
-		vx = 0.0
-		vy = -speed
-		return x, y, vx, vy
+		return g.X + 8.0, groundY - 32.0 + g.Y, 0.0, -speed
 	}
 
-	// 2. Tiro vertical puro para baixo (quando no ar ou caindo)
-	if g.AimDirY > 0.1 && math.Abs(g.AimDirX) < 0.1 {
-		x = g.X + 8.0
-		y = groundY - 2.0 + g.Y
-		vx = 0.0
-		vy = speed
-		return x, y, vx, vy
-	}
-
-	// 3. Tiro diagonal para cima (ArrowUp + ArrowRight/Left ou W + D/A)
-	if g.AimDirY < -0.1 {
-		if dir > 0 {
-			x = g.X + 17.0
-		} else {
+	// 2. Diagonal cima
+	if g.AimDirY < -0.1 && math.Abs(g.AimDirX) > 0.1 {
+		x = g.X + 17.0
+		if dir < 0 {
 			x = g.X - 3.0
 		}
+		y = groundY - 24.0 + g.Y
 		if g.IsCrouching {
 			y = groundY - 14.0 + g.Y
-		} else {
-			y = groundY - 24.0 + g.Y
 		}
-		vx = dir * speed * diag
-		vy = -speed * diag
-		return x, y, vx, vy
+		return x, y, dir * speed * diag, -speed * diag
 	}
 
-	// 4. Tiro diagonal para baixo (ArrowDown + ArrowRight/Left ou S + D/A)
-	if g.AimDirY > 0.1 {
-		if dir > 0 {
+	// 3. No ar apontando para baixo (pulo + baixo)
+	if inAir && g.AimDirY > 0.1 {
+		if math.Abs(g.AimDirX) > 0.1 {
 			x = g.X + 17.0
-		} else {
+			if dir < 0 {
+				x = g.X - 3.0
+			}
+			return x, groundY - 10.0 + g.Y, dir * speed * diag, speed * diag
+		}
+		return g.X + 8.0, groundY + g.Y + 10.0, 0.0, speed
+	}
+
+	// 4. Diagonal baixo no chão
+	if g.AimDirY > 0.1 && math.Abs(g.AimDirX) > 0.1 {
+		x = g.X + 17.0
+		if dir < 0 {
 			x = g.X - 3.0
 		}
+		y = groundY - 10.0 + g.Y
 		if g.IsCrouching {
 			y = groundY - 6.0 + g.Y
-		} else {
-			y = groundY - 10.0 + g.Y
 		}
-		vx = dir * speed * diag
-		vy = speed * diag
-		return x, y, vx, vy
+		return x, y, dir * speed * diag, speed * diag
 	}
 
-	// 5. Tiro horizontal tradicional
-	if dir > 0 {
-		x = g.X + 18.0
-	} else {
+	// 5. Horizontal (chão ou ar) / Acocado
+	x = g.X + 18.0
+	if dir < 0 {
 		x = g.X - 4.0
 	}
-
-	if g.IsCrouching {
+	y = groundY - 17.0 + g.Y
+	if g.IsCrouching || (g.AimDirY > 0.1 && !inAir) {
 		y = groundY - 8.0 + g.Y
-	} else {
-		y = groundY - 17.0 + g.Y
 	}
-
-	vx = dir * speed
-	vy = 0.0
-	return x, y, vx, vy
+	return x, y, dir * speed, 0.0
 }
 
 func (g *Garoto) Jump() (jumped bool, isDouble bool) {
@@ -248,18 +235,18 @@ func (g *Garoto) Jump() (jumped bool, isDouble bool) {
 		return true, false
 	}
 	if !g.IsJumping || g.CoyoteTimer > 0 {
-		g.GroundOffset = 0 // Pulo liberta da plataforma atual
+		g.GroundOffset = 0
 		g.IsJumping = true
 		g.IsCrouching = false
 		g.JumpCount = 1
-		g.VelocityY = -6.8
+		g.VelocityY = -5.4
 		g.JumpHolding = true
 		g.CoyoteTimer = 0
 		g.spawnDust(g.X+6, g.Y, 6)
 		return true, false
 	} else if g.JumpCount == 1 {
 		g.JumpCount = 2
-		g.VelocityY = -6.2
+		g.VelocityY = -4.8
 		g.JumpHolding = true
 		g.spawnJumpBurst(g.X+7, g.Y+20)
 		return true, true
@@ -311,9 +298,7 @@ func (g *Garoto) SetCrouch(crouch bool) {
 }
 
 func (g *Garoto) FastDrop() {
-	if g.IsJumping && !g.IsSwinging {
-		g.VelocityY += 0.9
-	}
+	// Desativado: preserva a trajetória parabólica natural e suave do pulo mesmo ao mirar para baixo
 }
 
 func (g *Garoto) Update() {
@@ -347,9 +332,9 @@ func (g *Garoto) Update() {
 			g.VelocityY = 1.0
 		}
 	} else if g.IsJumping {
-		gravity := 0.36
+		gravity := 0.22
 		if !g.JumpHolding && g.VelocityY < 0 {
-			gravity = 0.55
+			gravity = 0.38
 		}
 		g.Y += g.VelocityY
 		g.VelocityY += gravity

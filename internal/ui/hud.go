@@ -1207,29 +1207,11 @@ func DrawCreditsScreen(screen *ebiten.Image, screenWidth, screenHeight float64) 
 }
 
 func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, selectedIndex int, isMuted bool, speedLabel string, selectedHero int) {
-	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 10, G: 12, B: 20, A: 140})
-
-	boxW := 226.0
-	boxH := 142.0
-	boxX := (screenWidth - boxW) / 2.0
-	boxY := (screenHeight - boxH) / 2.0
-
-	ebitenutil.DrawRect(screen, boxX+2, boxY+2, boxW, boxH, color.RGBA{R: 0, G: 0, B: 0, A: 160})
-	ebitenutil.DrawRect(screen, boxX, boxY, boxW, boxH, color.RGBA{R: 14, G: 20, B: 34, A: 245})
-	ebitenutil.DrawRect(screen, boxX, boxY, boxW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, boxX, boxY+boxH, boxW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, boxX, boxY, 1, boxH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-	ebitenutil.DrawRect(screen, boxX+boxW, boxY, 1, boxH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
-
-	bx := int(boxX)
-	by := int(boxY)
-
-	ebitenutil.DebugPrintAt(screen, "★ PAUSA ★", bx+90, by+6)
-	ebitenutil.DrawRect(screen, boxX+10, boxY+19, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 140})
+	ebitenutil.DrawRect(screen, 0, 0, screenWidth, screenHeight, color.RGBA{R: 10, G: 12, B: 20, A: 160})
 
 	soundStatus := "SOM: [ LIGADO ]"
 	if isMuted {
-		soundStatus = "SOM: [ MUDO ]  "
+		soundStatus = "SOM: [ MUDO ]"
 	}
 
 	options := []string{
@@ -1240,19 +1222,59 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 		"MENU INICIAL",
 	}
 
-	startY := by + 23
+	// Layout e proporção calculados dinamicamente
+	itemH := 14
+	itemsCount := len(options)
+	headerH := 20
+	footerH := 18
+	paddingY := 8
+
+	boxW := 216.0
+	boxH := float64(headerH + (itemsCount * itemH) + footerH + paddingY)
+	boxX := (screenWidth - boxW) / 2.0
+	boxY := (screenHeight - boxH) / 2.0
+
+	// Sombra projetada
+	ebitenutil.DrawRect(screen, boxX+3, boxY+3, boxW, boxH, color.RGBA{R: 0, G: 0, B: 0, A: 160})
+	// Fundo sólido escuro
+	ebitenutil.DrawRect(screen, boxX, boxY, boxW, boxH, color.RGBA{R: 14, G: 20, B: 34, A: 250})
+	// Moldura dourada nítida
+	ebitenutil.DrawRect(screen, boxX, boxY, boxW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, boxX, boxY+boxH-1, boxW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, boxX, boxY, 1, boxH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+	ebitenutil.DrawRect(screen, boxX+boxW-1, boxY, 1, boxH, color.RGBA{R: 250, G: 205, B: 55, A: 255})
+
+	bx := int(boxX)
+	by := int(boxY)
+
+	// Título centralizado
+	title := "PAUSA"
+	titleX := bx + int((boxW-float64(len(title)*6))/2.0)
+	ebitenutil.DebugPrintAt(screen, title, titleX, by+5)
+	// Linha divisória superior
+	ebitenutil.DrawRect(screen, boxX+10, boxY+float64(headerH)-2, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 140})
+
+	// Itens do Menu com espaçamento uniforme
+	startY := by + headerH + 2
 	for i, opt := range options {
-		itemY := startY + i*14
+		itemY := startY + i*itemH
 		if i == selectedIndex {
-			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), boxW-12, 13, color.RGBA{R: 245, G: 185, B: 45, A: 75})
-			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), 2, 13, color.RGBA{R: 250, G: 210, B: 50, A: 255})
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+8, itemY)
+			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), boxW-12, float64(itemH-1), color.RGBA{R: 245, G: 185, B: 45, A: 75})
+			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), 2, float64(itemH-1), color.RGBA{R: 250, G: 210, B: 50, A: 255})
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+10, itemY)
 		} else {
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+8, itemY)
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+10, itemY)
 		}
 	}
 
-	ebitenutil.DebugPrintAt(screen, "[W/S] Mover   [ENTER] Escolher   [ESC] Sair", bx+14, by+int(boxH)-12)
+	// Linha divisória inferior
+	footerDivY := boxY + float64(headerH+(itemsCount*itemH)+4)
+	ebitenutil.DrawRect(screen, boxX+10, footerDivY, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 90})
+
+	// Rodapé informativo perfeitamente contido e centralizado
+	footerText := "[W/S] Mover  [ENTER] Escolher  [ESC] Sair"
+	footerX := bx + int((boxW-float64(len(footerText)*6))/2.0)
+	ebitenutil.DebugPrintAt(screen, footerText, footerX, int(footerDivY)+4)
 }
 
 func DrawIndigenousWarrior(screen *ebiten.Image, x, y float64, ticks int) {

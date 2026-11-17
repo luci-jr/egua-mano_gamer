@@ -5,18 +5,18 @@
       "nome": "Ver-o-Peso",
       "meta_metros": 2800,
       "trechos": [
-        { "ate_metros": 700,  "tipos": { "paneiro": 4, "banco": 3, "urubu": 1 },                          "espaco_min": 170, "espaco_max": 220, "vel_inimigos": 0.8 },
-        { "ate_metros": 1800, "tipos": { "paneiro": 3, "banco": 2, "urubu": 2, "cobra": 2 },              "espaco_min": 150, "espaco_max": 200, "vel_inimigos": 0.9 },
-        { "ate_metros": 2800, "tipos": { "paneiro": 2, "banco": 2, "urubu": 2, "cobra": 2, "jacare": 2 }, "espaco_min": 140, "espaco_max": 190, "vel_inimigos": 1.0 }
+        { "ate_metros": 700,  "tipos": { "paneiro": 1, "banco": 2, "urubu": 3, "cobra": 2 },               "espaco_min": 170, "espaco_max": 220, "vel_inimigos": 0.8 },
+        { "ate_metros": 1800, "tipos": { "paneiro": 1, "banco": 2, "urubu": 3, "cobra": 3, "jacare": 2 }, "espaco_min": 150, "espaco_max": 200, "vel_inimigos": 0.9 },
+        { "ate_metros": 2800, "tipos": { "paneiro": 1, "banco": 1, "urubu": 3, "cobra": 3, "jacare": 3 }, "espaco_min": 140, "espaco_max": 190, "vel_inimigos": 1.0 }
       ]
     },
     {
       "nome": "Estação das Docas",
       "meta_metros": 2800,
       "trechos": [
-        { "ate_metros": 900,  "tipos": { "paneiro": 2, "banco": 2, "urubu": 3, "cobra": 2, "jacare": 2 }, "espaco_min": 140, "espaco_max": 185, "vel_inimigos": 1.1 },
-        { "ate_metros": 2000, "tipos": { "paneiro": 2, "banco": 1, "urubu": 3, "cobra": 3, "jacare": 2 }, "espaco_min": 135, "espaco_max": 175, "vel_inimigos": 1.2 },
-        { "ate_metros": 2800, "tipos": { "paneiro": 1, "banco": 1, "urubu": 3, "cobra": 3, "jacare": 3 }, "espaco_min": 130, "espaco_max": 170, "vel_inimigos": 1.3 }
+        { "ate_metros": 900,  "tipos": { "paneiro": 1, "banco": 2, "urubu": 3, "cobra": 3, "jacare": 2 }, "espaco_min": 140, "espaco_max": 185, "vel_inimigos": 1.1 },
+        { "ate_metros": 2000, "tipos": { "paneiro": 1, "banco": 1, "urubu": 3, "cobra": 3, "jacare": 3 }, "espaco_min": 135, "espaco_max": 175, "vel_inimigos": 1.2 },
+        { "ate_metros": 2800, "tipos": { "paneiro": 0, "banco": 1, "urubu": 4, "cobra": 3, "jacare": 3 }, "espaco_min": 130, "espaco_max": 170, "vel_inimigos": 1.3 }
       ]
     },
     {
@@ -24,8 +24,8 @@
       "meta_metros": 2800,
       "trechos": [
         { "ate_metros": 900,  "tipos": { "paneiro": 1, "banco": 1, "urubu": 3, "cobra": 3, "jacare": 3 }, "espaco_min": 130, "espaco_max": 170, "vel_inimigos": 1.3 },
-        { "ate_metros": 2000, "tipos": { "paneiro": 1, "banco": 1, "urubu": 3, "cobra": 3, "jacare": 4 }, "espaco_min": 125, "espaco_max": 160, "vel_inimigos": 1.4 },
-        { "ate_metros": 2800, "tipos": { "paneiro": 1, "urubu": 4, "cobra": 3, "jacare": 4 },             "espaco_min": 120, "espaco_max": 155, "vel_inimigos": 1.5 }
+        { "ate_metros": 2000, "tipos": { "paneiro": 0, "banco": 1, "urubu": 4, "cobra": 3, "jacare": 4 }, "espaco_min": 125, "espaco_max": 160, "vel_inimigos": 1.4 },
+        { "ate_metros": 2800, "tipos": { "paneiro": 0, "banco": 0, "urubu": 4, "cobra": 4, "jacare": 4 }, "espaco_min": 120, "espaco_max": 155, "vel_inimigos": 1.5 }
       ]
     }
   ]
