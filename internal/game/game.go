@@ -30,7 +30,7 @@ const (
 )
 
 var (
-	SpeedMultipliers = []float64{0.65, 0.85, 1.15}
+	SpeedMultipliers = []float64{0.55, 0.72, 0.95}
 	SpeedLabels      = []string{"LENTO", "NORMAL", "RAPIDO"}
 )
 
@@ -908,9 +908,9 @@ func (e *Engine) Update() error {
 	}
 
 	// Movimentação horizontal do herói (Adiantar e Recuar com Teclado, Botões Virtuais ou Toque no Canvas)
-	moveSpeed := 2.2
+	moveSpeed := 1.70
 	if e.selectedHero == entities.HeroOnca {
-		moveSpeed = 2.4 // Onça tem reflexos e velocidade felina ligeiramente superiores
+		moveSpeed = 1.90 // Onça tem reflexos e velocidade felina ligeiramente superiores
 	}
 	if e.starPowerTimer > 0 {
 		moveSpeed *= 1.22 // Boost de agilidade e velocidade com o Guaraná Power
@@ -960,8 +960,26 @@ func (e *Engine) Update() error {
 		}
 	}
 
-	aimUp := (ebiten.IsKeyPressed(ebiten.KeyArrowUp) || ebiten.IsKeyPressed(ebiten.KeyW) || getVirtualKey("ArrowUp") || isGamepadUpPressed()) && !e.player.IsPlayerJumping()
-	e.player.SetAimUp(aimUp)
+	keyUp := ebiten.IsKeyPressed(ebiten.KeyArrowUp) || ebiten.IsKeyPressed(ebiten.KeyW) || getVirtualKey("ArrowUp") || isGamepadUpPressed()
+	keyDown := duckKey
+	keyRight := moveForward
+	keyLeft := moveBackward
+
+	aimDirX := 0.0
+	if keyRight && !keyLeft {
+		aimDirX = 1.0
+	} else if keyLeft && !keyRight {
+		aimDirX = -1.0
+	}
+
+	aimDirY := 0.0
+	if keyUp && !keyDown {
+		aimDirY = -1.0
+	} else if keyDown && !keyUp {
+		aimDirY = 1.0
+	}
+
+	e.player.SetAimDirection(aimDirX, aimDirY)
 
 	if e.attackCooldown > 0 {
 		e.attackCooldown--

@@ -30,6 +30,8 @@ type Onca struct {
 	IsRunning    bool
 	FacingRight  bool
 	AimUp        bool
+	AimDirX      float64
+	AimDirY      float64
 	IsAttacking  bool
 	AttackTimer  int
 
@@ -130,6 +132,27 @@ func (o *Onca) StopRunning() {
 
 func (o *Onca) SetAimUp(aim bool) {
 	o.AimUp = aim
+	if aim {
+		o.AimDirX = 0
+		o.AimDirY = -1
+	} else if o.AimDirY == -1 && math.Abs(o.AimDirX) < 0.1 {
+		o.AimDirY = 0
+	}
+}
+
+func (o *Onca) SetAimDirection(dirX, dirY float64) {
+	o.AimDirX = dirX
+	o.AimDirY = dirY
+	if dirY < -0.1 && math.Abs(dirX) < 0.1 {
+		o.AimUp = true
+	} else {
+		o.AimUp = false
+	}
+	if dirX > 0.1 {
+		o.FacingRight = true
+	} else if dirX < -0.1 {
+		o.FacingRight = false
+	}
 }
 
 func (o *Onca) TriggerAttack() {
@@ -139,7 +162,20 @@ func (o *Onca) TriggerAttack() {
 
 func (o *Onca) GetShootOrigin(groundY float64) (x, y, vx, vy float64) {
 	speed := 8.0
-	if o.AimUp {
+	const diag = 0.7071067811865475 // 1 / sqrt(2)
+
+	dir := 1.0
+	if !o.FacingRight {
+		dir = -1.0
+	}
+	if o.AimDirX > 0.1 {
+		dir = 1.0
+	} else if o.AimDirX < -0.1 {
+		dir = -1.0
+	}
+
+	// 1. Tiro vertical puro para cima
+	if o.AimUp || (o.AimDirY < -0.1 && math.Abs(o.AimDirX) < 0.1) {
 		x = o.X + 22.0
 		y = groundY - 24.0 + o.Y
 		vx = 0.0
@@ -147,10 +183,53 @@ func (o *Onca) GetShootOrigin(groundY float64) (x, y, vx, vy float64) {
 		return x, y, vx, vy
 	}
 
-	dir := 1.0
-	x = o.X + 36.0
-	if !o.FacingRight {
-		dir = -1.0
+	// 2. Tiro vertical puro para baixo (quando no ar ou caindo)
+	if o.AimDirY > 0.1 && math.Abs(o.AimDirX) < 0.1 {
+		x = o.X + 22.0
+		y = groundY - 2.0 + o.Y
+		vx = 0.0
+		vy = speed
+		return x, y, vx, vy
+	}
+
+	// 3. Tiro diagonal para cima
+	if o.AimDirY < -0.1 {
+		if dir > 0 {
+			x = o.X + 34.0
+		} else {
+			x = o.X - 2.0
+		}
+		if o.IsCrouching {
+			y = groundY - 12.0 + o.Y
+		} else {
+			y = groundY - 20.0 + o.Y
+		}
+		vx = dir * speed * diag
+		vy = -speed * diag
+		return x, y, vx, vy
+	}
+
+	// 4. Tiro diagonal para baixo
+	if o.AimDirY > 0.1 {
+		if dir > 0 {
+			x = o.X + 34.0
+		} else {
+			x = o.X - 2.0
+		}
+		if o.IsCrouching {
+			y = groundY - 6.0 + o.Y
+		} else {
+			y = groundY - 8.0 + o.Y
+		}
+		vx = dir * speed * diag
+		vy = speed * diag
+		return x, y, vx, vy
+	}
+
+	// 5. Tiro horizontal tradicional
+	if dir > 0 {
+		x = o.X + 36.0
+	} else {
 		x = o.X - 4.0
 	}
 
@@ -352,6 +431,8 @@ func (o *Onca) Reset() {
 	o.IsRunning = false
 	o.FacingRight = true
 	o.AimUp = false
+	o.AimDirX = 0
+	o.AimDirY = 0
 	o.IsAttacking = false
 	o.AttackTimer = 0
 	o.JumpCount = 0

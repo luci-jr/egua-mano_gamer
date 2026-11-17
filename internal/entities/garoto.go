@@ -28,6 +28,8 @@ type Garoto struct {
 	IsRunning    bool
 	FacingRight  bool
 	AimUp        bool
+	AimDirX      float64
+	AimDirY      float64
 	IsAttacking  bool
 	AttackTimer  int
 
@@ -128,6 +130,27 @@ func (g *Garoto) StopRunning() {
 
 func (g *Garoto) SetAimUp(aim bool) {
 	g.AimUp = aim
+	if aim {
+		g.AimDirX = 0
+		g.AimDirY = -1
+	} else if g.AimDirY == -1 && math.Abs(g.AimDirX) < 0.1 {
+		g.AimDirY = 0
+	}
+}
+
+func (g *Garoto) SetAimDirection(dirX, dirY float64) {
+	g.AimDirX = dirX
+	g.AimDirY = dirY
+	if dirY < -0.1 && math.Abs(dirX) < 0.1 {
+		g.AimUp = true
+	} else {
+		g.AimUp = false
+	}
+	if dirX > 0.1 {
+		g.FacingRight = true
+	} else if dirX < -0.1 {
+		g.FacingRight = false
+	}
 }
 
 func (g *Garoto) TriggerAttack() {
@@ -137,8 +160,20 @@ func (g *Garoto) TriggerAttack() {
 
 func (g *Garoto) GetShootOrigin(groundY float64) (x, y, vx, vy float64) {
 	speed := 7.5
-	if g.AimUp {
-		// Tiro vertical para o alto (anti-aéreo contra urubus e pássaros)
+	const diag = 0.7071067811865475 // 1 / sqrt(2)
+
+	dir := 1.0
+	if !g.FacingRight {
+		dir = -1.0
+	}
+	if g.AimDirX > 0.1 {
+		dir = 1.0
+	} else if g.AimDirX < -0.1 {
+		dir = -1.0
+	}
+
+	// 1. Tiro vertical puro para cima
+	if g.AimUp || (g.AimDirY < -0.1 && math.Abs(g.AimDirX) < 0.1) {
 		x = g.X + 8.0
 		y = groundY - 32.0 + g.Y
 		vx = 0.0
@@ -146,10 +181,53 @@ func (g *Garoto) GetShootOrigin(groundY float64) (x, y, vx, vy float64) {
 		return x, y, vx, vy
 	}
 
-	dir := 1.0
-	x = g.X + 18.0
-	if !g.FacingRight {
-		dir = -1.0
+	// 2. Tiro vertical puro para baixo (quando no ar ou caindo)
+	if g.AimDirY > 0.1 && math.Abs(g.AimDirX) < 0.1 {
+		x = g.X + 8.0
+		y = groundY - 2.0 + g.Y
+		vx = 0.0
+		vy = speed
+		return x, y, vx, vy
+	}
+
+	// 3. Tiro diagonal para cima (ArrowUp + ArrowRight/Left ou W + D/A)
+	if g.AimDirY < -0.1 {
+		if dir > 0 {
+			x = g.X + 17.0
+		} else {
+			x = g.X - 3.0
+		}
+		if g.IsCrouching {
+			y = groundY - 14.0 + g.Y
+		} else {
+			y = groundY - 24.0 + g.Y
+		}
+		vx = dir * speed * diag
+		vy = -speed * diag
+		return x, y, vx, vy
+	}
+
+	// 4. Tiro diagonal para baixo (ArrowDown + ArrowRight/Left ou S + D/A)
+	if g.AimDirY > 0.1 {
+		if dir > 0 {
+			x = g.X + 17.0
+		} else {
+			x = g.X - 3.0
+		}
+		if g.IsCrouching {
+			y = groundY - 6.0 + g.Y
+		} else {
+			y = groundY - 10.0 + g.Y
+		}
+		vx = dir * speed * diag
+		vy = speed * diag
+		return x, y, vx, vy
+	}
+
+	// 5. Tiro horizontal tradicional
+	if dir > 0 {
+		x = g.X + 18.0
+	} else {
 		x = g.X - 4.0
 	}
 
@@ -354,6 +432,8 @@ func (g *Garoto) Reset() {
 	g.IsRunning = false
 	g.FacingRight = true
 	g.AimUp = false
+	g.AimDirX = 0
+	g.AimDirY = 0
 	g.IsAttacking = false
 	g.AttackTimer = 0
 	g.JumpCount = 0

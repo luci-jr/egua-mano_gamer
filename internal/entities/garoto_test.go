@@ -55,3 +55,58 @@ func TestGarotoBaladeiraDrawNoPanic(t *testing.T) {
 	g.GrabVine(vine)
 	g.Draw(img, 155.0, 60, 0)
 }
+
+func TestPlayerAimDirections(t *testing.T) {
+	heroes := []PlayerCharacter{NewGaroto(), NewOnca()}
+
+	for _, p := range heroes {
+		// 1. Tiro horizontal padrão (Facing Right)
+		p.SetAimDirection(0, 0)
+		_, _, vx, vy := p.GetShootOrigin(155.0)
+		if vx <= 0 || vy != 0 {
+			t.Errorf("%s: esperava vx > 0 e vy == 0, obteve vx=%f, vy=%f", p.GetName(), vx, vy)
+		}
+
+		// 2. Tiro diagonal cima-direita
+		p.SetAimDirection(1.0, -1.0)
+		_, _, vx, vy = p.GetShootOrigin(155.0)
+		if vx <= 0 || vy >= 0 {
+			t.Errorf("%s: tiro diagonal cima-direita falhou: vx=%f, vy=%f", p.GetName(), vx, vy)
+		}
+
+		// 3. Tiro diagonal cima-esquerda
+		p.SetAimDirection(-1.0, -1.0)
+		_, _, vx, vy = p.GetShootOrigin(155.0)
+		if vx >= 0 || vy >= 0 {
+			t.Errorf("%s: tiro diagonal cima-esquerda falhou: vx=%f, vy=%f", p.GetName(), vx, vy)
+		}
+
+		// 4. Tiro diagonal baixo-direita
+		p.SetAimDirection(1.0, 1.0)
+		_, _, vx, vy = p.GetShootOrigin(155.0)
+		if vx <= 0 || vy <= 0 {
+			t.Errorf("%s: tiro diagonal baixo-direita falhou: vx=%f, vy=%f", p.GetName(), vx, vy)
+		}
+
+		// 5. Tiro diagonal baixo-esquerda
+		p.SetAimDirection(-1.0, 1.0)
+		_, _, vx, vy = p.GetShootOrigin(155.0)
+		if vx >= 0 || vy <= 0 {
+			t.Errorf("%s: tiro diagonal baixo-esquerda falhou: vx=%f, vy=%f", p.GetName(), vx, vy)
+		}
+
+		// 6. Tiro vertical puro para cima
+		p.SetAimDirection(0, -1.0)
+		_, _, vx, vy = p.GetShootOrigin(155.0)
+		if vx != 0 || vy >= 0 {
+			t.Errorf("%s: tiro vertical cima falhou: vx=%f, vy=%f", p.GetName(), vx, vy)
+		}
+
+		// 7. Tiro vertical puro para baixo
+		p.SetAimDirection(0, 1.0)
+		_, _, vx, vy = p.GetShootOrigin(155.0)
+		if vx != 0 || vy <= 0 {
+			t.Errorf("%s: tiro vertical baixo falhou: vx=%f, vy=%f", p.GetName(), vx, vy)
+		}
+	}
+}

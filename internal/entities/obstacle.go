@@ -556,14 +556,14 @@ func (m *ObstacleManager) Update(speed float64) int {
 		// 2. Movimentação autônoma suave dos predadores no chão/ar em direção ao herói
 		switch obs.Type {
 		case TypeJacare:
-			// Jacaré-Açu rasteja sutilmente para a frente no chão
-			obs.X -= 0.35 * m.rule.EnemySpeed
+			// Jacaré-Açu rasteja de forma cadenciada no chão
+			obs.X -= 0.22 * m.rule.EnemySpeed
 		case TypeSnake:
-			// Cobra-Coral serpenteia com agilidade natural
-			obs.X -= 0.50 * m.rule.EnemySpeed
+			// Cobra-Coral serpenteia com velocidade controlada
+			obs.X -= 0.32 * m.rule.EnemySpeed
 		case TypeAir:
-			// Urubu / ave sobrevoa os céus
-			obs.X -= 0.70 * m.rule.EnemySpeed
+			// Urubu / ave sobrevoa os céus de forma mais suave
+			obs.X -= 0.45 * m.rule.EnemySpeed
 		}
 
 		if obs.X < -40 {

@@ -19,6 +19,7 @@ type PlayerCharacter interface {
 	GetVelocityY() float64
 	FallFromPlatform()
 	SetAimUp(aim bool)
+	SetAimDirection(dirX, dirY float64)
 	TriggerAttack()
 	GetShootOrigin(groundY float64) (x, y, vx, vy float64)
 	Jump() (jumped bool, isDouble bool)

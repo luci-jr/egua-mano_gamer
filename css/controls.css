@@ -1,0 +1,68 @@
+/* ==========================================================================
+   Égua Mano! Gamer - Controles Desktop & Barra de Curiosidades
+   Clean Architecture: Componentes Informativos de UI
+   ========================================================================== */
+
+/* Barra de atalhos para Desktop */
+#controls-bar {
+  position: fixed;
+  bottom: 8px;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  border-radius: 20px;
+  padding: 6px 18px;
+  color: #cbd5e1;
+  font-size: 12px;
+  z-index: 50;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+#controls-bar kbd {
+  background: #334155;
+  color: #facc15;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: bold;
+  font-family: monospace;
+}
+
+/* Barra de Curiosidades Culturais de Belém do Pará */
+#trivia-bar {
+  position: fixed;
+  bottom: 44px;
+  background: rgba(15, 23, 42, 0.94);
+  border: 1px solid rgba(250, 204, 21, 0.4);
+  border-radius: 20px;
+  padding: 4px 16px;
+  color: #e2e8f0;
+  font-size: 12px;
+  z-index: 50;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 90vw;
+  pointer-events: none;
+}
+
+.trivia-badge {
+  background: #ca8a04;
+  color: #0f172a;
+  font-weight: bold;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+#trivia-text {
+  color: #fef08a;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 620px;
+  transition: opacity 0.3s ease;
+}
+

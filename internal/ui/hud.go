@@ -144,15 +144,6 @@ func DrawHUD(screen *ebiten.Image, lives int, hearts int, score int, stage int, 
 	ebitenutil.DrawRect(screen, 9, 24, 5, 5, color.RGBA{R: 45, G: 195, B: 95, A: 255})
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("RELIQUIAS: %d", relicsCount), 18, 22)
 
-	// Medidor de distância da corrida para a chegada da fase
-	targetDist := 2800
-	currDist := int(stageDistance)
-	if currDist > targetDist {
-		currDist = targetDist
-	}
-	distText := fmt.Sprintf("DIST: %dm/%dm", currDist, targetDist)
-	ebitenutil.DebugPrintAt(screen, distText, 115, 22)
-
 	if starPowerTimer > 0 {
 		secs := (starPowerTimer + 59) / 60
 		starGlow := []color.RGBA{
