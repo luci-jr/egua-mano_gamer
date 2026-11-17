@@ -654,6 +654,46 @@ func (g *Garoto) Draw(screen *ebiten.Image, groundY float64, ticks int, invincib
 	// 2. ESTADO: NO AR (Jumping / Falling)
 	// ==========================================
 	if g.IsJumping {
+		// Giro Acrobático estilo Super Metroid (Spin Jump) ao pular para a frente sem atirar
+		if g.IsRunning && !g.IsAttacking && !g.AimUp {
+			spinFrame := (ticks / 3) % 4
+			cx := 7.0
+			cy := 13.0
+
+			// Rastro de velocidade / Afterimage translúcido
+			if (ticks/2)%2 == 0 {
+				drawBox(cx-6, cy-6, 12, 12, color.RGBA{R: 250, G: 210, B: 60, A: 70})
+			}
+
+			switch spinFrame {
+			case 0: // 0°: Encolhido com joelhos no peito
+				drawBox(cx-5, cy-6, 10, 4, cHair)
+				drawBox(cx-5, cy-3, 10, 2, cBandana)
+				drawBox(cx-4, cy-1, 9, 6, cShirt)
+				drawBox(cx-5, cy+3, 10, 4, cPants)
+				drawBox(cx-3, cy+6, 7, 2, cSandalDark)
+			case 1: // 90°: Inclinado em rotação
+				drawBox(cx-6, cy-4, 4, 9, cHair)
+				drawBox(cx-3, cy-4, 2, 9, cBandana)
+				drawBox(cx-1, cy-5, 6, 8, cShirt)
+				drawBox(cx+2, cy-4, 5, 7, cPants)
+				drawBox(cx+5, cy-2, 3, 5, cSandalDark)
+			case 2: // 180°: De cabeça para baixo no ápice
+				drawBox(cx-3, cy-6, 7, 2, cSandalDark)
+				drawBox(cx-5, cy-4, 10, 4, cPants)
+				drawBox(cx-4, cy-1, 9, 6, cShirt)
+				drawBox(cx-5, cy+3, 10, 2, cBandana)
+				drawBox(cx-5, cy+4, 10, 4, cHair)
+			case 3: // 270°: Subindo para completar 360°
+				drawBox(cx+2, cy-4, 4, 9, cHair)
+				drawBox(cx, cy-4, 2, 9, cBandana)
+				drawBox(cx-4, cy-5, 6, 8, cShirt)
+				drawBox(cx-6, cy-4, 5, 7, cPants)
+				drawBox(cx-8, cy-2, 3, 5, cSandalDark)
+			}
+			return
+		}
+
 		hairOffset := -1.0
 		if g.VelocityY > 0 {
 			hairOffset = 1.0

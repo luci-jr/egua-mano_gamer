@@ -1222,21 +1222,21 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 		"MENU INICIAL",
 	}
 
-	// Layout e proporção calculados dinamicamente
+	// Dimensões dinâmicas que contêm perfeitamente todo o texto e rodapé sem vazar
 	itemH := 14
 	itemsCount := len(options)
 	headerH := 20
 	footerH := 18
 	paddingY := 8
 
-	boxW := 216.0
+	boxW := 268.0
 	boxH := float64(headerH + (itemsCount * itemH) + footerH + paddingY)
 	boxX := (screenWidth - boxW) / 2.0
 	boxY := (screenHeight - boxH) / 2.0
 
 	// Sombra projetada
 	ebitenutil.DrawRect(screen, boxX+3, boxY+3, boxW, boxH, color.RGBA{R: 0, G: 0, B: 0, A: 160})
-	// Fundo sólido escuro
+	// Fundo escuro azul-noite
 	ebitenutil.DrawRect(screen, boxX, boxY, boxW, boxH, color.RGBA{R: 14, G: 20, B: 34, A: 250})
 	// Moldura dourada nítida
 	ebitenutil.DrawRect(screen, boxX, boxY, boxW, 1, color.RGBA{R: 250, G: 205, B: 55, A: 255})
@@ -1254,16 +1254,15 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 	// Linha divisória superior
 	ebitenutil.DrawRect(screen, boxX+10, boxY+float64(headerH)-2, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 140})
 
-	// Itens do Menu com espaçamento uniforme
+	// Itens do Menu com barra de seleção em toda a extensão
 	startY := by + headerH + 2
 	for i, opt := range options {
 		itemY := startY + i*itemH
 		if i == selectedIndex {
-			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), boxW-12, float64(itemH-1), color.RGBA{R: 245, G: 185, B: 45, A: 75})
-			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), 2, float64(itemH-1), color.RGBA{R: 250, G: 210, B: 50, A: 255})
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+10, itemY)
+			ebitenutil.DrawRect(screen, boxX+6, float64(itemY-1), boxW-12, float64(itemH-1), color.RGBA{R: 250, G: 205, B: 55, A: 210})
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("> %s <", opt), bx+14, itemY)
 		} else {
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+10, itemY)
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("  %s", opt), bx+14, itemY)
 		}
 	}
 
@@ -1272,7 +1271,7 @@ func DrawPauseMenu(screen *ebiten.Image, screenWidth, screenHeight float64, sele
 	ebitenutil.DrawRect(screen, boxX+10, footerDivY, boxW-20, 1, color.RGBA{R: 250, G: 205, B: 55, A: 90})
 
 	// Rodapé informativo perfeitamente contido e centralizado
-	footerText := "[W/S] Mover  [ENTER] Escolher  [ESC] Sair"
+	footerText := "[W/S] Mover   [ENTER] Escolher   [ESC] Sair"
 	footerX := bx + int((boxW-float64(len(footerText)*6))/2.0)
 	ebitenutil.DebugPrintAt(screen, footerText, footerX, int(footerDivY)+4)
 }

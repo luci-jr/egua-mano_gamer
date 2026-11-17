@@ -15,12 +15,13 @@
     const loadingElem = document.getElementById('loading');
     const go = new Go();
 
-    let response = await fetch('game.dat');
+    const cacheBuster = '?v=' + Date.now();
+    let response = await fetch('game.dat' + cacheBuster);
     let isGzip = true;
 
     // Se game.dat não existir localmente, tenta carregar o game.wasm direto
     if (!response.ok) {
-      response = await fetch('game.wasm');
+      response = await fetch('game.wasm' + cacheBuster);
       isGzip = false;
       if (!response.ok) {
         throw new Error('HTTP 404: nem game.dat nem game.wasm foram encontrados');
