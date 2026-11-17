@@ -93,6 +93,8 @@ type Engine struct {
 	pauseMenuIndex    int
 	isGameOver        bool
 	isStageComplete   bool
+	isBossBattle      bool
+	boss              *entities.Boss
 	wasFocused        bool
 
 	// Fases em dados (internal/level) e a regra de obstáculos em vigor
@@ -154,6 +156,8 @@ func NewEngine() *Engine {
 		pauseMenuIndex:    0,
 		isGameOver:        false,
 		isStageComplete:   false,
+		isBossBattle:      false,
+		boss:              nil,
 		wasFocused:        true,
 		fases:             carregarFases(),
 		recorde:           save.Recorde(),
@@ -210,6 +214,8 @@ func (e *Engine) restartStage() {
 	e.isPaused = false
 	e.isGameOver = false
 	e.isStageComplete = false
+	e.isBossBattle = false
+	e.boss = nil
 	e.audio.RestartBGM()
 }
 
@@ -224,6 +230,8 @@ func (e *Engine) returnToTitle() {
 	e.isPaused = false
 	e.isGameOver = false
 	e.isStageComplete = false
+	e.isBossBattle = false
+	e.boss = nil
 	e.isTitleScreen = false
 	e.isCharSelect = false
 	e.isSaoBrasIntro = false
@@ -1083,15 +1091,15 @@ func (e *Engine) Update() error {
 		if curX >= cameraForwardLimit {
 			excess := curX - cameraForwardLimit
 			e.player.SetPositionX(cameraForwardLimit)
-			worldScrollSpeed = (moveSpeed + excess) * SpeedMultipliers[e.speedIndex]
+			if !e.isBossBattle {
+				worldScrollSpeed = (moveSpeed + excess) * SpeedMultipliers[e.speedIndex]
+			}
 		}
 	} else if moveBackward {
 		e.player.MoveBackward(moveSpeed)
 		curX, _ = e.player.GetPosition()
-		if curX <= cameraBackLimit && e.stageDistance > 0 {
-			excess := cameraBackLimit - curX
+		if curX <= cameraBackLimit {
 			e.player.SetPositionX(cameraBackLimit)
-			worldScrollSpeed = -(moveSpeed*0.75 + excess) * SpeedMultipliers[e.speedIndex]
 		}
 	} else {
 		e.player.StopRunning()
@@ -1194,29 +1202,98 @@ func (e *Engine) Update() error {
 	}
 
 	stageTargetDist := StageTargetDistance
-	// Atualiza distância e cenário apenas de acordo com a movimentação real do jogador
-	if worldScrollSpeed > 0 {
+	// Atualiza distância e cenário apenas avançando para frente
+	if worldScrollSpeed > 0 && !e.isBossBattle {
 		e.stageDistance += worldScrollSpeed * 0.30
-	} else if worldScrollSpeed < 0 {
-		e.stageDistance += worldScrollSpeed * 0.30
-		if e.stageDistance < 0 {
-			e.stageDistance = 0
-		}
 	}
 	e.scenery.Update(worldScrollSpeed)
 	e.relics.Update(worldScrollSpeed)
 
-	// Conclusão de fase baseada EXCLUSIVAMENTE em distância percorrida da corrida
-	if e.stageDistance >= stageTargetDist && !e.isStageComplete {
-		e.isStageComplete = true
-		e.stageDistance = 0
-		e.currentPlatform = nil
-		if e.stage >= 3 {
-			e.registrarRecorde() // zerou o jogo: o placar final concorre ao recorde
+	// Inicia combate com o Chefe ao atingir a distância meta
+	if e.stageDistance >= stageTargetDist && !e.isBossBattle && !e.isStageComplete {
+		e.isBossBattle = true
+		e.boss = entities.NewBoss(e.stage, ScreenWidth, GroundY)
+		e.speechBubbleText = "O CHEFE CHEGOU!"
+		e.speechBubbleTimer = 90
+		e.audio.PlayEguaMano()
+	}
+
+	// Lógica de Combate e Colisão do Chefe
+	if e.isBossBattle && e.boss != nil {
+		worldScrollSpeed = 0 // Trava o scroll na arena do chefe
+
+		// Projéteis causam dano no Chefe
+		for _, proj := range e.projectiles.Projectiles {
+			if !proj.Active {
+				continue
+			}
+			px, py, pw, ph := proj.GetBounds()
+			bx, by, bw, bh := e.boss.GetBounds()
+			if px < bx+bw && px+pw > bx && py < by+bh && py+ph > by {
+				dmg := 1
+				if proj.IsSpecial {
+					dmg = 2
+				}
+				if e.boss.TakeDamage(dmg) {
+					e.score += 1000
+					e.projectiles.AddScorePopup(bx+bw/2, by, 1000)
+				}
+				proj.HitsLeft--
+				if proj.HitsLeft <= 0 {
+					proj.Active = false
+				}
+				e.audio.PlayDefeat()
+				e.projectiles.SpawnHitBurst(px, py, color.RGBA{R: 255, G: 215, B: 0, A: 255}, 14)
+			}
 		}
-		e.audio.PauseBGM()
-		e.audio.PlayStageUp()
-		return nil
+
+		// Pisão acrobático no topo do chefe ou dano no herói
+		bx, by, bw, bh := e.boss.GetBounds()
+		if playerX < bx+bw && playerX+playerW > bx && playerY < by+bh && playerY+playerH > by {
+			if e.player.GetVelocityY() > 0 && playerY+playerH <= by+16.0 {
+				e.player.Bounce(-5.0)
+				e.audio.PlayDefeat()
+				if e.boss.TakeDamage(2) {
+					e.score += 1000
+					e.projectiles.AddScorePopup(bx+bw/2, by, 1000)
+				}
+				e.projectiles.SpawnHitBurst(playerX+playerW/2, by, color.RGBA{R: 255, G: 80, B: 50, A: 255}, 16)
+			} else if e.invincibleTicks <= 0 && e.starPowerTimer <= 0 && !e.boss.Defeated {
+				e.hearts--
+				e.shakeTimer = 14
+				if e.hearts <= 0 {
+					e.lives--
+					e.hearts = 0
+					e.audio.PlayHit()
+					e.waterFallActive = true
+					e.waterFallTimer = 190
+					e.waterFallHeroX = playerX
+					e.waterFallHeroY = playerY
+					e.waterFallHeroVX = -0.8
+					e.waterFallHeroVY = -2.5
+					e.speechBubbleText = "Egua do pitiu! Essa agua ta podre!"
+					e.speechBubbleTimer = 220
+				} else {
+					e.hitDelayTimer = 22
+					e.invincibleTicks = 75
+					e.audio.PlayHit()
+				}
+			}
+		}
+
+		if e.boss.Update(playerX, playerY) {
+			e.isBossBattle = false
+			e.boss = nil
+			e.isStageComplete = true
+			e.stageDistance = 0
+			e.currentPlatform = nil
+			if e.stage >= 3 {
+				e.registrarRecorde()
+			}
+			e.audio.PauseBGM()
+			e.audio.PlayStageUp()
+			return nil
+		}
 	}
 
 	// Coleta de Relíquias e Tesouros Amazônicos (incluindo Cuia de Tacacá que recupera 1 coração!)
@@ -1435,6 +1512,9 @@ func (e *Engine) Draw(screen *ebiten.Image) {
 	}
 
 	e.obstacles.Draw(screen, e.ticks, e.stage)
+	if e.isBossBattle && e.boss != nil {
+		e.boss.Draw(screen, e.ticks)
+	}
 	e.projectiles.Draw(screen, e.ticks)
 
 	if e.stageFadeTimer > 0 {

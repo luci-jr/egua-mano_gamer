@@ -24,7 +24,7 @@
     bottom: auto;
     top: 8px;
     padding: 4px 10px;
-    max-width: 94vw;
+    max-width: calc(100vw - 110px);
     gap: 6px;
   }
   .trivia-badge {
@@ -33,7 +33,53 @@
   }
   #trivia-text {
     font-size: 11px;
-    max-width: 250px;
+    max-width: 200px;
+  }
+}
+
+/* Calibragem precisa para modo Retrato (Portrait) no celular */
+@media (orientation: portrait), (max-width: 600px) {
+  #trivia-bar {
+    top: 8px;
+    left: 8px;
+    transform: none;
+    max-width: calc(100vw - 105px);
+    padding: 3px 8px;
+  }
+  #trivia-text {
+    font-size: 10px;
+    max-width: 170px;
+  }
+  .touch-top-bar {
+    top: 8px;
+    right: 8px;
+  }
+  .touch-btn-top {
+    padding: 5px 10px;
+    font-size: 10px;
+  }
+
+  /* Redimensionamento e ancoragem dos controles no rodapé sem amontoamento */
+  .nes-dpad-container {
+    bottom: 12px;
+    left: 8px;
+    transform: scale(0.8);
+    transform-origin: bottom left;
+  }
+  .nes-action-panel {
+    bottom: 12px;
+    right: 8px;
+    transform: scale(0.8);
+    transform-origin: bottom right;
+    gap: 8px;
+    padding: 6px 10px;
+  }
+  .nes-center-panel {
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.72);
+    gap: 12px;
+    padding: 4px 8px;
   }
 }
 
